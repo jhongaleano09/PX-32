@@ -100,8 +100,8 @@ La ubicación ayuda a reconocer una pieza, pero no prueba su función. La prueba
 
 ## Lecturas y videos para explorar
 
-- [Máquinas y robots para niños: ¿qué son y en qué se diferencian?](https://www.youtube.com/watch?v=Qoyb3eOZmtk) — Español; video; 4 min.
-**Por qué este recurso:** confirma lo visto al comparar máquinas que obedecen una orden fija con robots que perciben y deciden, con ejemplos reales y un ritmo pensado para tu edad.
+- [¿Qué es un ROBOT?](https://www.youtube.com/watch?v=xvzg-oTZ7wM) — Español; video; 4 min.
+**Por qué este recurso:** confirma lo visto al explicar con ejemplos reales qué hace que una máquina sea un robot: percibir, decidir y actuar, con un estilo directo y sin tono infantil.
 
 - [How do robots experience the world?](https://www.youtube.com/watch?v=FeRxP2Z27C4) — Inglés sencillo, hablado despacio; video; 8 min.
 **Por qué este recurso:** profundiza la idea de percibir-procesar-actuar mostrando cómo los sensores son como los sentidos de un robot, tal como vas a clasificar las piezas de PX-32 hoy.

@@ -114,8 +114,8 @@ Abre el circuito en tres lugares distintos, uno por vez: antes de la carga, desp
 - [Kit de Construcción de Circuitos: CD (PhET)](https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_es.html) — Español; simulador interactivo; sesión libre.
 **Por qué este recurso:** profundiza lo practicado dejándote armar circuitos virtuales con pilas, cables y bombillas: puedes abrir el circuito donde quieras y ver en pantalla por qué la luz se apaga.
 
-- [Circuito eléctrico y materiales conductores](https://www.youtube.com/watch?v=a4mY3YMNLz8) — Español; video; 4 min.
-**Por qué este recurso:** estimula tu próximo paso con el experimento de la bombilla, la pila y los cables, y te enseña a distinguir materiales que conducen la electricidad de los que la bloquean.
+- [Cómo hacer un circuito con bombilla, pila e interruptor](https://www.youtube.com/watch?v=WouTWhMDEpY) — Español; video; 2 min.
+**Por qué este recurso:** estimula tu próximo paso mostrando en la práctica cómo se conectan la pila, el interruptor y la bombilla para formar la ruta cerrada que dibujaste hoy.
 
 Cuando los explores, busca la respuesta a esta pregunta: ¿qué pasaría dentro de PX-32 si alguien dejara un cable suelto en la ruta de alimentación?
 
