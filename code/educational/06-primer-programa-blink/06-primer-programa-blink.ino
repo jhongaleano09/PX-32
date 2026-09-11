@@ -1,5 +1,15 @@
-// Curso PX-32 — programa mínimo de la lección 06
-// Cargar solo después de leer la sección de seguridad.
-const byte LED = LED_BUILTIN;
-void setup() { pinMode(LED, OUTPUT); }
-void loop() { digitalWrite(LED,HIGH); delay(500); digitalWrite(LED,LOW); delay(500); }
+// Curso PX-32 — Lección 06: primer Blink seguro.
+const int PIN_LED = LED_BUILTIN;
+
+void setup() {
+  // D13 producirá la señal para el LED integrado.
+  pinMode(PIN_LED, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(PIN_LED, HIGH);  // Enciende el LED L.
+  delay(500);                   // Mantiene la luz medio segundo.
+
+  digitalWrite(PIN_LED, LOW);   // Apaga el LED L.
+  delay(500);                   // Mantiene la oscuridad medio segundo.
+}

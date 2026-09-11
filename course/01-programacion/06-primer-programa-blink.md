@@ -1,141 +1,128 @@
 # Lección 06 — Primer programa: Blink
 
-## 1. Tu misión de hoy
+## Una instrucción que se vuelve luz
 
-Hoy vas a **modificar y cargar un parpadeo en el LED integrado**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Hasta ahora el código vivía en la pantalla. Hoy una palabra escrita, `HIGH`, terminará convertida en luz sobre la Mega2560. Después `LOW` la apagará y `loop()` hará que la historia vuelva a empezar.
 
-## 2. Tiempo estimado
+La placa tiene un LED integrado marcado con la letra `L`. En la Mega2560 oficial está conectado al pin digital 13, y Arduino ofrece el nombre `LED_BUILTIN` para referirse a él sin escribir el número. El LED ya forma parte de un circuito diseñado en la placa: no debes conectar un LED suelto.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Hay un detalle propio de PX-32 que impide tratar este ejemplo como cualquier Blink de Internet: D13 también llega al conector del servo S1. Si el servo permaneciera activo, el parpadeo podría enviarle pulsos que no fueron escritos para controlarlo. Primero se aísla ese actuador y solo después se carga el sketch.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Preparación que no puedes saltarte
 
-## 3. Lo que necesitas saber antes de empezar
+Debes haber identificado placa y puerto en la [Lección 05](05-preparar-arduino-ide.md). Reúne:
 
-[Lección 05: Preparar Arduino IDE](05-preparar-arduino-ide.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+- PX-32 ensamblado, apagado y sin USB.
+- Computador con Arduino IDE 2.
+- Cable USB de datos.
+- El archivo [06-primer-programa-blink.ino](../../code/educational/06-primer-programa-blink/06-primer-programa-blink.ino).
+- La Mega2560, reconocible por su conector USB tipo B; el LED `L` puede quedar parcialmente oculto por el shield.
+- Un teléfono para que el adulto fotografíe la orientación del conector del servo antes de retirarlo, si hace falta.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+🔴 Detente y llama a tu padre. Con USB e interruptores apagados, él retira las baterías 18650 y desconecta el conector de tres hilos del servo en S1 sujetando la carcasa plástica, nunca los cables. Debe registrar su orientación para restaurarlo. Si S1 no puede identificarse con seguridad o el conector no sale sin fuerza, no energicen el robot: puedes leer y verificar el código sin subirlo.
 
-## 4. Lectura principal
+## Cómo está organizado un sketch
 
-### La idea intuitiva
+Arduino necesita dos funciones:
 
-El tema de hoy es **setup, loop, salida digital y delay**. En lenguaje cotidiano, buscamos una forma fiable de modificar y cargar un parpadeo en el LED integrado. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+- `setup()` se ejecuta una vez después de encender o reiniciar la placa. Allí prepararemos el pin como salida.
+- `loop()` se ejecuta una y otra vez mientras la placa tenga energía. Allí construiremos el patrón de luz.
 
-Programar es escribir una descripción precisa de un comportamiento para que una máquina pueda ejecutarlo. La computadora no completa intenciones ocultas: sigue sintaxis y reglas. Por eso leeremos cada programa en tres capas: qué signos exige el lenguaje, qué ocurre al ejecutarlo y para qué sirve dentro de PX-32. Los errores serán evidencia para localizar una diferencia entre lo escrito y lo esperado.
+`pinMode(PIN_LED, OUTPUT);` configura D13 para producir una señal. `digitalWrite(PIN_LED, HIGH);` lleva la salida al estado lógico alto y, por el circuito particular del LED integrado, la luz se enciende. `LOW` la lleva al estado lógico bajo y la luz se apaga. HIGH no significa universalmente “encender”: ese efecto depende de cómo esté conectado el componente.
 
-### De la intuición al concepto técnico
+`delay(500);` detiene temporalmente la ejecución durante 500 milisegundos. Un milisegundo es una milésima de segundo, así que 500 ms equivalen a medio segundo.
 
-Los términos centrales son **setup, loop, salida digital y delay**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+## Experimento: predice, carga y cambia un intervalo
 
-En PX-32, esta idea se usa para comparar intervalos de 1000, 500 y 100 ms. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+1. 🟢 Abre el archivo `.ino` de la clase en Arduino IDE. Si el IDE pregunta si debe colocarlo dentro de una carpeta con el mismo nombre, acepta. Un sketch principal y su carpeta comparten nombre.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Setup:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001, HW-020.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **setup, loop, salida digital y delay**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres modificar y cargar un parpadeo en el LED integrado y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001, HW-020 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con setup, loop, salida digital y delay. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a comparar intervalos de 1000, 500 y 100 ms. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: un LED que repite el patrón previsto y se detiene al desconectar USB. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [06-primer-programa-blink.ino](../../code/educational/06-primer-programa-blink/06-primer-programa-blink.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **setup**. Lee el programa de arriba abajo y predice su salida.
+2. 🟢 Comprueba que el programa se vea así. No lo comprimas en una sola línea: cada instrucción debe poder señalarse.
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 06
-// Cargar solo después de leer la sección de seguridad.
-const byte LED = LED_BUILTIN;
-void setup() { pinMode(LED, OUTPUT); }
-void loop() { digitalWrite(LED,HIGH); delay(500); digitalWrite(LED,LOW); delay(500); }
+// Curso PX-32 — Lección 06: primer Blink seguro.
+const int PIN_LED = LED_BUILTIN;
+
+void setup() {
+  // D13 producirá la señal para el LED integrado.
+  pinMode(PIN_LED, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(PIN_LED, HIGH);  // Enciende el LED L.
+  delay(500);                   // Mantiene la luz medio segundo.
+
+  digitalWrite(PIN_LED, LOW);   // Apaga el LED L.
+  delay(500);                   // Mantiene la oscuridad medio segundo.
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+3. 🟢 Recorre el código con un dedo. El punto y coma termina una instrucción. Los paréntesis llevan datos a una función. Las llaves encierran las instrucciones que pertenecen a `setup()` o `loop()`.
 
-## 11. Qué deberías observar
+4. 🟢 Predice el patrón completo antes de conectar: ¿cuánto dura encendido?, ¿cuánto dura apagado?, ¿cuánto tarda una vuelta completa de `loop()`? La respuesta esperada es medio segundo, medio segundo y un segundo en total.
 
-El resultado normal es **un LED que repite el patrón previsto y se detiene al desconectar USB**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+5. 🟡 Con tu padre presente, revisa que las baterías y el servo sigan desconectados. Conecta únicamente el USB a la Mega. El LED de alimentación puede encenderse; todavía no es evidencia de que este sketch esté cargado.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+6. 🟢 Selecciona `Arduino Mega or Mega 2560` y el puerto que identificaste por aparición y desaparición. Pulsa **Verificar**. Continúa cuando la consola termine sin errores.
 
-## 12. Si no funciona
+7. 🟡 Pulsa **Subir** una sola vez. Durante la transferencia pueden parpadear luces de comunicación `TX` y `RX`; no son el LED `L` de tu experimento. Espera el mensaje de carga completada.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+8. 🟢 Localiza `L` sin tocar las placas. Debe alternar aproximadamente medio segundo encendido y medio segundo apagado. Cuenta cuatro cambios y explica cuál línea produce cada estado. Si el shield oculta completamente el LED desde todos los lados, no retires ni inclines placas energizadas: desconecta el USB y pide al adulto decidir si la observación física puede hacerse con seguridad; la compilación correcta por sí sola no demuestra el parpadeo.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía anotada de la Mega2560 dentro de PX-32.
+> - **Objetivo:** distinguir el LED integrado `L` de los indicadores `ON`, `TX` y `RX`, y mostrar por qué D13 exige aislar S1.
+> - **Descripción:** vista superior orientada por el conector USB tipo B, con acercamientos del LED `L` y del conector de servo S1 en el Model Y; una línea punteada debe indicar que ambos comparten la señal D13 sin sugerir que comparten alimentación.
+> - **Elementos que deben señalarse:** USB tipo B, LED `L`, indicadores `ON/TX/RX`, D13, S1 y conector del servo desconectado.
+> - **Fuente técnica:** pinout oficial Arduino Mega 2560, https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf, páginas 1 y 3; manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 13 y 17.
+> - **Texto alternativo sugerido:** “Mega2560 orientada por el USB con los LEDs L, ON, TX y RX diferenciados, y la ruta D13 hacia el servo S1 indicada”.
 
-## 13. Desafío
+### Cambia solo una cosa
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+9. 🟢 Desconecta el USB antes de editar. Cambia los dos valores `500` por `100`. Predice si el ciclo completo será más largo o más corto y luego conecta, verifica y sube otra vez. Deberías observar cinco ciclos completos por segundo aproximadamente.
 
-## 14. Lecturas y videos para explorar
+10. 🟢 Repite con `1000` en ambos lugares. Ahora cada estado dura un segundo y una vuelta completa dura dos. Si cambiaste un solo `delay`, tendrás un patrón desigual; no es un daño, pero ya no es la comparación planeada.
+
+11. 🟢 Considera la prueba exitosa si puedes hacer corresponder cada transición del LED con un `digitalWrite` y explicar por qué `loop()` reinicia la secuencia.
+
+## Deja D13 en un estado seguro
+
+El último Blink queda guardado en flash y volvería a ejecutarse al energizar la Mega. Antes de restaurar el servo:
+
+12. 🟡 Abre `Archivo > Ejemplos > 01.Basics > BareMinimum`, confirma la misma placa y puerto, y súbelo. Ese sketch deja `setup()` y `loop()` sin instrucciones de control para D13.
+
+13. 🟡 Retira el USB. 🔴 Tu padre comprueba que no hay ninguna fuente conectada y restaura el conector del servo en S1 usando la foto de orientación. Si encuentra resistencia, posición dudosa o cables dañados, no lo conecta.
+
+El robot debe quedar ensamblado, apagado y sin baterías. El archivo de la clase permanece guardado en el computador aunque ya no sea el programa residente en la Mega.
+
+## Si la luz no cuenta la misma historia que el código
+
+| Síntoma | Qué revisar sin adivinar |
+|---|---|
+| Compila, pero no sube | Confirma el puerto por desconexión/reconexión, usa un cable de datos y cierra otras aplicaciones que tengan el puerto abierto |
+| La carga termina, pero no ves parpadeo | Busca específicamente el LED `L`; `ON` indica alimentación y suele permanecer fijo |
+| Parpadean `TX` y `RX` solo durante la carga | Es normal: muestran comunicación USB-serie, no el patrón de `loop()` |
+| El patrón es desigual | Revisa si los dos valores de `delay` son iguales y si cada `digitalWrite` tiene su espera debajo |
+| Aparece un error cerca de `}` o `;` | Usa autoformato y empareja cada llave; comprueba el punto y coma de la línea anterior |
+| El servo se mueve, zumba o golpea | Desconecta el USB de inmediato; el aislamiento de S1 no quedó confirmado y solo el adulto debe revisarlo |
+| Hay calor, olor o daño visible | No repitas; el adulto deja el equipo sin energía y revisa el montaje |
+
+## Lecturas y videos para explorar
 
 - [Estructura y lenguaje de Arduino](https://docs.arduino.cc/language-reference/) — Inglés; referencia oficial; 10 min. Aprenderás estructura y lenguaje de arduino. Esencial.
 - [Ejemplos integrados de Arduino](https://docs.arduino.cc/built-in-examples/) — Inglés; tutorial oficial; 10 min. Aprenderás ejemplos integrados de arduino. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Cuando abras Blink entre los ejemplos integrados, compara su estructura con la versión de PX-32 y busca la preparación especial que exige el servo compartido.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **setup** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Arduino Mega 2560 Rev3](https://docs.arduino.cc/hardware/mega-2560/), placa y LED integrado.
+- [Pinout oficial de la Mega 2560](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf), `LED_BUILTIN` y D13.
+- [Ejemplo integrado Blink](https://docs.arduino.cc/built-in-examples/basics/Blink/), estructura y comportamiento del ejemplo oficial.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), `pinMode`, `digitalWrite` y `delay`.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 13 y 17, ruta D13/S1.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Sin mirar el código, explícale qué ocurre primero en `setup()` y qué cuatro acciones se repiten en `loop()`. Muéstrale cuál LED observaste, por qué `ON` no servía como evidencia y qué hicieron para que D13 no enviara el patrón de Blink al servo.
 
-Hoy aprendiste a **modificar y cargar un parpadeo en el LED integrado** y lo conectaste con **setup, loop, salida digital y delay**. Pudiste observar un LED que repite el patrón previsto y se detiene al desconectar USB. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 07: Variables para representar tiempo](07-variables-para-representar-tiempo.md).
+En la [Lección 07](07-variables-para-representar-tiempo.md) reemplazarás los números repetidos por nombres que expresan qué representan.

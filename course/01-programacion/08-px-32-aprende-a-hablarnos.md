@@ -1,141 +1,137 @@
 # Lección 08 — PX-32 aprende a hablarnos
 
-## 1. Tu misión de hoy
+## Ver algo que ocurre dentro del programa
 
-Hoy vas a **mostrar texto y números internos en el monitor serie**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+El LED puede mostrar dos estados, pero no puede decirte si una cuenta vale 7 o 83. Para observar datos internos usaremos el **monitor serie**, una zona de Arduino IDE que muestra mensajes intercambiados entre el computador y la Mega.
 
-## 2. Tiempo estimado
+`Serial` es el objeto de Arduino que usaremos para esa comunicación. En la Mega2560, `Serial` corresponde al puerto serie principal y se conecta con el computador mediante la interfaz USB de la placa. No es Wi-Fi, Bluetooth ni el `Serial1` reservado más adelante para esos módulos.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Los datos viajan como una secuencia de bits. Emisor y receptor deben acordar el ritmo, llamado **baud rate**. El sketch iniciará `Serial` a 9600 baudios y el monitor debe mostrar 9600 también. Si no coinciden, el receptor puede separar mal los bits y mostrar caracteres sin sentido.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+En Scratch podías marcar una variable para verla en el escenario. `Serial.println()` cumple un propósito parecido: no cambia el comportamiento que estamos estudiando; hace visible un dato para entenderlo y depurarlo.
 
-## 3. Lo que necesitas saber antes de empezar
+## Prepara la conversación por USB
 
-[Lección 06: Primer programa: Blink](06-primer-programa-blink.md), [Lección 07: Variables para representar tiempo](07-variables-para-representar-tiempo.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+Necesitas saber qué es una variable y qué hace una asignación, como en la [Lección 07](07-variables-para-representar-tiempo.md). Reúne:
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+- PX-32 ensamblado, apagado y sin baterías.
+- Computador con Arduino IDE 2.
+- Cable USB de datos.
+- El archivo [08-px-32-aprende-a-hablarnos.ino](../../code/educational/08-px-32-aprende-a-hablarnos/08-px-32-aprende-a-hablarnos.ino).
+- Una hoja para escribir las primeras cinco líneas que predices.
+- Un adulto presente al conectar el USB.
 
-## 4. Lectura principal
+Esta vez el sketch no configura D13 ni ningún pin de motor. El servo puede permanecer conectado si fue restaurado correctamente al final de la clase anterior. 🔴 El adulto debe confirmar que las baterías 18650 están retiradas, los interruptores apagados y el robot no presenta daño, calor u olor. La única alimentación será USB.
 
-### La idea intuitiva
+## El programa que deja pistas
 
-El tema de hoy es **Serial, UART, baud rate, print y observabilidad**. En lenguaje cotidiano, buscamos una forma fiable de mostrar texto y números internos en el monitor serie. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Programar es escribir una descripción precisa de un comportamiento para que una máquina pueda ejecutarlo. La computadora no completa intenciones ocultas: sigue sintaxis y reglas. Por eso leeremos cada programa en tres capas: qué signos exige el lenguaje, qué ocurre al ejecutarlo y para qué sirve dentro de PX-32. Los errores serán evidencia para localizar una diferencia entre lo escrito y lo esperado.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **Serial, UART, baud rate, print y observabilidad**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para enviar un saludo y un contador por USB a 9600 baudios. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Serial:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001, HW-020.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **Serial, UART, baud rate, print y observabilidad**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres mostrar texto y números internos en el monitor serie y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001, HW-020 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con Serial, UART, baud rate, print y observabilidad. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a enviar un saludo y un contador por USB a 9600 baudios. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: saludo único, cuenta creciente y caracteres correctos cuando coinciden las velocidades. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [08-px-32-aprende-a-hablarnos.ino](../../code/educational/08-px-32-aprende-a-hablarnos/08-px-32-aprende-a-hablarnos.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **Serial**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y compáralo línea por línea con este bloque:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 08
-// Cargar solo después de leer la sección de seguridad.
-unsigned long cuenta=0;
-void setup(){ Serial.begin(9600); Serial.println("Hola, soy PX-32"); }
-void loop(){ Serial.print("Cuenta: " ); Serial.println(cuenta++); delay(1000); }
+// Curso PX-32 — Lección 08: mensajes por Serial USB.
+unsigned long cuenta = 0;
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("Hola, soy PX-32");
+}
+
+void loop() {
+  Serial.print("Cuenta: ");
+  Serial.println(cuenta);
+  cuenta = cuenta + 1;
+  delay(1000);
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 Lee primero `setup()`:
 
-## 11. Qué deberías observar
+- `Serial.begin(9600);` prepara la comunicación al ritmo acordado.
+- `Serial.println("Hola, soy PX-32");` envía el texto entre comillas y después cambia de línea.
 
-El resultado normal es **saludo único, cuenta creciente y caracteres correctos cuando coinciden las velocidades**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+Como `setup()` se ejecuta una vez después de cada inicio o reinicio, el saludo debe aparecer una vez por arranque.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+3. 🟢 Lee ahora `loop()`:
 
-## 12. Si no funciona
+- `Serial.print("Cuenta: ");` escribe una etiqueta sin cambiar de línea.
+- `Serial.println(cuenta);` escribe el valor actual y termina la línea.
+- `cuenta = cuenta + 1;` calcula el valor anterior más uno y lo vuelve a asignar a la variable.
+- `delay(1000);` deja aproximadamente un segundo entre mensajes.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+`unsigned long` es un tipo de entero que no representa números negativos y admite valores mayores que `int` en la Mega. No necesitas memorizar su límite; aquí evita que una cuenta de tiempo corta se quede sin espacio enseguida.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+4. 🟢 Antes de cargar, escribe las primeras líneas esperadas:
 
-## 13. Desafío
+```text
+Hola, soy PX-32
+Cuenta: 0
+Cuenta: 1
+Cuenta: 2
+Cuenta: 3
+```
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+Fíjate en el orden: el valor se imprime antes de sumarle uno. Por eso la primera cuenta visible es 0.
 
-## 14. Lecturas y videos para explorar
+## Abre la ventana correcta y acuerda la velocidad
+
+5. 🟡 Con el adulto presente, conecta únicamente el USB. Selecciona `Arduino Mega or Mega 2560` y el puerto que aparece con PX-32.
+
+6. 🟢 Pulsa **Verificar** y, si no hay errores, **Subir**. Espera a que termine la carga.
+
+7. 🟢 Abre el monitor serie con el botón de la esquina superior derecha o mediante `Herramientas > Monitor serie`. Busca el selector de velocidad dentro del monitor y elige **9600 baud**.
+
+8. 🟢 Observa al menos cinco cuentas. Compáralas con tu predicción. El saludo puede aparecer justo al abrir el monitor porque muchas configuraciones reinician la placa al abrir la conexión. Si pulsas el botón RESET de la Mega, la cuenta vuelve a 0 y el saludo reaparece: la variable estaba en SRAM, no guardada de forma permanente.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** captura anotada de Arduino IDE 2 con monitor serie abierto.
+> - **Objetivo:** permitir que el niño localice la salida, la velocidad y la relación entre una línea de código y cada fragmento del mensaje.
+> - **Descripción:** IDE 2 mostrando el sketch a la izquierda y el monitor serie con saludo y cuentas 0 a 3; usar dos colores para unir `Serial.print("Cuenta: ")` con la etiqueta y `Serial.println(cuenta)` con el número.
+> - **Elementos que deben señalarse:** botón Monitor serie, puerto activo, selector `9600 baud`, saludo de `setup()`, líneas de `loop()` y botón RESET en una fotografía pequeña de la Mega.
+> - **Fuente técnica:** Arduino Help Center, https://support.arduino.cc/hc/en-us/articles/360020366520-How-to-do-a-loopback-test, paso de apertura del monitor; pinout oficial, https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf.
+> - **Texto alternativo sugerido:** “Monitor serie a 9600 baudios con un saludo inicial y una cuenta creciente, enlazados con las instrucciones que los imprimen”.
+
+### Provoca una diferencia explicable
+
+9. 🟢 Cambia **solo el selector del monitor** a otra velocidad, sin modificar ni volver a subir el sketch. Según el sistema, quizá veas caracteres ilegibles o no obtengas una representación útil. Esa salida no significa que la Mega haya olvidado el mensaje: monitor y sketch dejaron de coincidir.
+
+10. 🟢 Devuelve el monitor a 9600. Si la salida legible regresa, acabas de aislar la causa. Después cambia en el código `delay(1000)` por `delay(500)`, verifica y sube. La cuenta debe avanzar aproximadamente dos veces por segundo; el baud rate continúa en 9600 porque no cambiaste la comunicación.
+
+11. 🟢 La misión está completa cuando puedes señalar qué se ejecutó una vez, qué se repitió, por qué la primera cuenta fue 0 y por qué la velocidad del monitor no controla el intervalo de la cuenta.
+
+## Cierra sin confundir detener el monitor con detener la placa
+
+12. 🟢 Cierra el monitor serie. El microcontrolador continúa ejecutando `loop()` mientras tenga energía, aunque ya no veas los mensajes.
+
+13. 🟡 Retira el USB sujetando el conector. Ahora sí se detienen el programa y la comunicación. PX-32 queda apagado y sin baterías. Al volver a conectarlo, el sketch almacenado arrancará desde `setup()` y la variable volverá a 0.
+
+## Cuando PX-32 parece hablar otro idioma
+
+| Lo que aparece | Prueba que separa causas |
+|---|---|
+| El monitor está vacío | Confirma que elegiste el puerto usado para subir y que el monitor está abierto después de la carga |
+| Símbolos extraños | Iguala el selector del monitor con `Serial.begin(9600)` y reinicia una vez |
+| Solo aparece el saludo | Revisa llaves: las líneas de cuenta deben estar dentro de `loop()`; verifica además que no falte `delay`, aunque su ausencia produciría demasiados mensajes, no silencio |
+| La cuenta empieza de nuevo | La placa se reinició, se reconectó el puerto o se pulsó RESET; busca el saludo como evidencia del nuevo arranque |
+| La cuenta avanza demasiado rápido | Revisa la unidad y el valor de `delay`; 1000 ms es un segundo |
+| `cuenta` no cambia | Comprueba que existe `cuenta = cuenta + 1;` después de imprimir |
+| El puerto informa que está ocupado | Cierra otros monitores o aplicaciones que lo estén usando antes de reintentar |
+
+## Lecturas y videos para explorar
 
 - [Estructura y lenguaje de Arduino](https://docs.arduino.cc/language-reference/) — Inglés; referencia oficial; 10 min. Aprenderás estructura y lenguaje de arduino. Esencial.
 - [Ejemplos integrados de Arduino](https://docs.arduino.cc/built-in-examples/) — Inglés; tutorial oficial; 10 min. Aprenderás ejemplos integrados de arduino. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Busca ejemplos que impriman una medición. Pregúntate qué dato interno hacen observable y qué velocidad deben compartir con el monitor.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **Serial** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), `Serial`, `print`, `println` y `delay`.
+- [Pinout oficial de Arduino Mega 2560](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf), UART principal y señales USB-serie.
+- [Arduino Mega 2560 Rev3](https://docs.arduino.cc/hardware/mega-2560/), cuatro puertos serie de hardware y memoria de la placa.
+- [Apertura del monitor serie en Arduino IDE](https://support.arduino.cc/hc/en-us/articles/360020366520-How-to-do-a-loopback-test), control de interfaz y envío/recepción.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Muéstrale una cuenta legible y explica por qué `Serial.begin(9600)` y el selector del monitor deben coincidir. Luego cierra el monitor y responde: ¿el programa se detuvo?, ¿qué observación lo demostraría?, ¿por qué la cuenta regresa a cero después de reiniciar?
 
-Hoy aprendiste a **mostrar texto y números internos en el monitor serie** y lo conectaste con **Serial, UART, baud rate, print y observabilidad**. Pudiste observar saludo único, cuenta creciente y caracteres correctos cuando coinciden las velocidades. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 09: Decisiones con if y else](09-decisiones-con-if-y-else.md).
+En la [Lección 09](09-decisiones-con-if-y-else.md) usarás esa cuenta para que el programa elija exactamente uno de dos mensajes.

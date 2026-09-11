@@ -1,141 +1,157 @@
 # Lección 11 — Funciones: enseñar una acción reutilizable
 
-## 1. Tu misión de hoy
+## Una acción merece un nombre
 
-Hoy vas a **crear y explicar parpadear(veces, intervalo)**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
-
-## 2. Tiempo estimado
-
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
-
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
-
-## 3. Lo que necesitas saber antes de empezar
-
-[Lección 10: Repeticiones contadas con for](10-repeticiones-contadas-con-for.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
-
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
-
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **función, parámetro, argumento y retorno**. En lenguaje cotidiano, buscamos una forma fiable de crear y explicar parpadear(veces, intervalo). La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Programar es escribir una descripción precisa de un comportamiento para que una máquina pueda ejecutarlo. La computadora no completa intenciones ocultas: sigue sintaxis y reglas. Por eso leeremos cada programa en tres capas: qué signos exige el lenguaje, qué ocurre al ejecutarlo y para qué sirve dentro de PX-32. Los errores serán evidencia para localizar una diferencia entre lo escrito y lo esperado.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **función, parámetro, argumento y retorno**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para reemplazar bloques repetidos por llamadas a una función. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Función:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **función, parámetro, argumento y retorno**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres crear y explicar parpadear(veces, intervalo) y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con función, parámetro, argumento y retorno. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a reemplazar bloques repetidos por llamadas a una función. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: mismo comportamiento con una estructura más legible y reutilizable. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [11-funciones-ensenar-una-accion-reutilizable.ino](../../code/educational/11-funciones-ensenar-una-accion-reutilizable/11-funciones-ensenar-una-accion-reutilizable.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **función**. Lee el programa de arriba abajo y predice su salida.
+El `for` de la clase anterior sabe producir un grupo de destellos. Si un programa grande necesitara ese grupo en varios lugares, copiar todo el bucle haría el código largo y difícil de corregir. Una **función** reúne instrucciones bajo un nombre:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 11
-// Cargar solo después de leer la sección de seguridad.
-void parpadear(int veces,int intervalo){ for(int i=0;i<veces;i++){ digitalWrite(LED_BUILTIN,HIGH); delay(intervalo); digitalWrite(LED_BUILTIN,LOW); delay(intervalo); } }
-void setup(){ pinMode(LED_BUILTIN,OUTPUT); }
-void loop(){ parpadear(3,200); delay(1500); }
+parpadear(3, 200);
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+Esa llamada dice qué hacer y aporta dos datos. En la definición de la función se llaman **parámetros**: `veces` e `intervaloMs` son nombres que recibirán valores. En la llamada, `3` y `200` son **argumentos**: los valores concretos enviados esta vez.
 
-## 11. Qué deberías observar
+No todas las funciones entregan una respuesta. La palabra `void` antes de `parpadear` indica que realiza una acción, pero no retorna un valor al lugar desde donde fue llamada. Para aprender la otra posibilidad construiremos `duracionGrupoMs()`: calculará cuánto dura un grupo y usará `return` para devolver el resultado.
 
-El resultado normal es **mismo comportamiento con una estructura más legible y reutilizable**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+En Scratch, crear “Mis bloques” permite nombrar una secuencia y darle entradas. Aquí la idea es parecida, pero C++ exige declarar el tipo de cada parámetro y el tipo de dato que la función devuelve.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+## Lo que necesitas tener listo
 
-## 12. Si no funciona
+Debes comprender el recorrido del contador en un `for` de la [Lección 10](10-repeticiones-contadas-con-for.md) y saber abrir el monitor serie. Prepara:
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+- PX-32 ensamblado, apagado y sin USB.
+- Computador con Arduino IDE 2 y cable USB de datos.
+- El archivo [11-funciones-ensenar-una-accion-reutilizable.ino](../../code/educational/11-funciones-ensenar-una-accion-reutilizable/11-funciones-ensenar-una-accion-reutilizable.ino).
+- Dos tarjetas con los rótulos `PARÁMETROS` y `ARGUMENTOS`.
+- Un adulto para aislar las baterías y el servo S1.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+🔴 Con toda fuente desconectada, tu padre retira las baterías 18650 y desconecta el conector del servo S1 sujetando la carcasa plástica. La señal D13 del LED integrado también llega a S1. Registren la orientación para restaurarlo al cerrar. Si no pueden asegurar este estado, compila y simula el código sin subirlo.
 
-## 13. Desafío
+## Dos funciones con trabajos distintos
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+1. 🟢 Abre el `.ino` y compáralo cuidadosamente con el bloque completo:
 
-## 14. Lecturas y videos para explorar
+```cpp
+// Curso PX-32 — Lección 11: funciones con parámetros y retorno.
+void parpadear(int veces, unsigned long intervaloMs) {
+  for (int contador = 0; contador < veces; contador = contador + 1) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(intervaloMs);
+
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(intervaloMs);
+  }
+}
+
+unsigned long duracionGrupoMs(int veces, unsigned long intervaloMs) {
+  return veces * intervaloMs * 2;
+}
+
+void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  const int VECES = 3;
+  const unsigned long INTERVALO_MS = 200;
+
+  Serial.print("Duracion calculada del grupo: ");
+  Serial.print(duracionGrupoMs(VECES, INTERVALO_MS));
+  Serial.println(" ms");
+
+  parpadear(VECES, INTERVALO_MS);
+  delay(1500);
+}
+```
+
+2. 🟢 Coloca la tarjeta `PARÁMETROS` junto a la definición:
+
+```cpp
+void parpadear(int veces, unsigned long intervaloMs)
+```
+
+Dentro de esa función, `veces` ocupa el lugar que antes tenía la constante `DESTELLOS`, e `intervaloMs` ocupa el lugar del tiempo fijo. Los nombres solo existen dentro de la función que los declara.
+
+3. 🟢 Coloca `ARGUMENTOS` junto a la llamada:
+
+```cpp
+parpadear(VECES, INTERVALO_MS);
+```
+
+En cada vuelta, los valores 3 y 200 de esas constantes llegan a los parámetros. La función produce tres destellos con 200 ms encendido y 200 ms apagado.
+
+4. 🟢 Examina la segunda definición. Como comienza con `unsigned long`, promete devolver un entero de ese tipo. `return veces * intervaloMs * 2;` calcula encendido más apagado para cada destello y entrega el resultado. Con 3 y 200 retorna 1200 ms.
+
+5. 🟢 Sigue el dato devuelto hasta esta llamada dentro de `Serial.print(...)`:
+
+```cpp
+duracionGrupoMs(VECES, INTERVALO_MS)
+```
+
+El monitor debe mostrar `Duracion calculada del grupo: 1200 ms`. `return` no imprime por sí mismo: entrega el número y `Serial.print` lo hace visible.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama de llamada y retorno.
+> - **Objetivo:** diferenciar parámetros, argumentos, una función `void` y una función que devuelve un valor.
+> - **Descripción:** dos recorridos paralelos: `parpadear(3, 200)` lleva argumentos a parámetros y termina en tres pulsos de LED sin flecha de regreso; `duracionGrupoMs(3, 200)` lleva los mismos argumentos, calcula 1200 y devuelve una flecha hacia `Serial.print`.
+> - **Elementos que deben señalarse:** nombre de función, tipos, parámetros, argumentos, `void`, `unsigned long`, `return`, llamada y efectos luz/texto.
+> - **Fuente técnica:** referencia oficial del lenguaje Arduino, https://docs.arduino.cc/language-reference/, sección Functions; proceso de sketch, https://docs.arduino.cc/arduino-cli/sketch-build-process.
+> - **Texto alternativo sugerido:** “Una función void usa tres y doscientos para parpadear; otra función devuelve mil doscientos al monitor serie”.
+
+## Prueba que el nombre se puede reutilizar
+
+6. 🟢 Antes de conectar, predice tres observaciones: el número impreso, la cantidad de destellos y el tiempo aproximado de cada estado. Separa la duración del grupo —1200 ms— de la pausa entre grupos —1500 ms—.
+
+7. 🟡 Con el adulto presente, confirma batería retirada y servo S1 desconectado. Conecta únicamente el USB, elige Mega y puerto, verifica y sube.
+
+8. 🟢 Abre el monitor serie a 9600 baudios y observa el LED `L`. Cada línea debe anunciar 1200 ms, seguida por tres destellos y una pausa larga. Si el texto y la luz no coinciden, compara los argumentos de las dos llamadas antes de culpar al hardware.
+
+9. 🟢 Retira el USB. Cambia solamente `VECES` de 3 a 5. Calcula antes: 5 × 200 × 2 = 2000 ms. Verifica, sube y comprueba cinco destellos y el número 2000.
+
+10. 🟢 Retira el USB y restaura `VECES = 3`. Cambia solamente `INTERVALO_MS` de 200 a 400. Debes seguir viendo tres destellos, ahora más lentos, y una duración calculada de 2400 ms. Así compruebas que cada parámetro controla una característica diferente.
+
+11. 🟢 Prueba mentalmente qué pasaría si escribieras `parpadear(INTERVALO_MS, VECES)`. Los tipos permiten convertir esos números, así que podría compilar, pero intentaría hacer 400 destellos de 3 ms en la última variante. El orden de los argumentos es parte del contrato de la función.
+
+12. 🟢 La misión está completa cuando puedes explicar por qué las dos funciones aceptan los mismos datos pero una produce luz y la otra entrega un número.
+
+## El puente hacia el movimiento
+
+En las próximas lecciones aparecerán funciones como `detener()` o `avanzar(velocidad)`. Nombrarlas no vuelve seguro al robot por sí solo, pero permite revisar una vez las instrucciones de cada acción y llamar la misma versión desde distintas decisiones. Parámetros claros evitarán copiar bloques enteros para cada motor.
+
+Antes de llegar allí, deja el hardware neutral:
+
+13. 🟡 Sube `Archivo > Ejemplos > 01.Basics > BareMinimum`. Así D13 deja de producir el patrón antes de reconectar el servo.
+
+14. 🟡 Cierra el monitor y retira el USB. 🔴 Tu padre restaura el conector del servo S1 según la orientación registrada. PX-32 queda ensamblado, apagado y sin baterías.
+
+## Si la función no cumple su contrato
+
+| Síntoma | Pregunta precisa |
+|---|---|
+| El monitor calcula 1200, pero hay otra cantidad de destellos | ¿Las llamadas a `duracionGrupoMs` y `parpadear` reciben los mismos argumentos? |
+| El compilador dice que faltan argumentos | ¿La llamada entrega dos valores separados por coma, en el orden `veces, intervaloMs`? |
+| Error `was not declared in this scope` | ¿Intentaste usar un parámetro fuera de la función donde fue declarado? |
+| Error sobre `return` o falta de valor | ¿`duracionGrupoMs` devuelve un `unsigned long` en todas sus rutas? ¿Escribiste la instrucción `return` completa? |
+| El grupo parece una luz continua | Un intervalo de pocos milisegundos puede ser demasiado rápido para distinguirlo; vuelve a 200 ms |
+| El programa compila pero tarda muchísimo | Revisa si intercambiaste los argumentos; el primero es cantidad y el segundo, milisegundos |
+| El servo se mueve o zumba | Retira el USB y deja que el adulto revise S1; no continúes con otra carga |
+
+## Lecturas y videos para explorar
 
 - [Estructura y lenguaje de Arduino](https://docs.arduino.cc/language-reference/) — Inglés; referencia oficial; 10 min. Aprenderás estructura y lenguaje de arduino. Esencial.
 - [Ejemplos integrados de Arduino](https://docs.arduino.cc/built-in-examples/) — Inglés; tutorial oficial; 10 min. Aprenderás ejemplos integrados de arduino. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Cuando encuentres una función nueva, identifica su nombre, qué argumentos recibe, qué efecto produce y si entrega un valor utilizable.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **función** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), funciones, tipos, variables y `return`.
+- [Proceso de construcción de un sketch](https://docs.arduino.cc/arduino-cli/sketch-build-process), generación de prototipos y compilación de archivos `.ino`.
+- [Pinout oficial de Arduino Mega 2560](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf), D13 y `LED_BUILTIN`.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 13 y 17, ruta compartida D13/S1.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Usa las dos tarjetas para explicarle la diferencia entre parámetros y argumentos. Luego señala `void` y `return`: ¿qué función actúa sin devolver un dato?, ¿qué función entrega 1200?, ¿qué instrucción hace visible ese resultado? Termina contando cómo una función bien nombrada puede preparar el control de motores sin copiar instrucciones.
 
-Hoy aprendiste a **crear y explicar parpadear(veces, intervalo)** y lo conectaste con **función, parámetro, argumento y retorno**. Pudiste observar mismo comportamiento con una estructura más legible y reutilizable. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 12: Del electrón al giro: motor DC](../02-movimiento/12-del-electron-al-giro-motor-dc.md).
+La [Lección 12](../02-movimiento/12-del-electron-al-giro-motor-dc.md) deja el código por un momento para observar cómo un motor convierte energía eléctrica en giro.

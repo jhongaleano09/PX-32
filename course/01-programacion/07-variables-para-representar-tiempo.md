@@ -1,142 +1,131 @@
 # Lección 07 — Variables para representar tiempo
 
-## 1. Tu misión de hoy
+## ¿Qué explica mejor el programa: `500` o `intervaloMs`?
 
-Hoy vas a **controlar el ritmo del LED cambiando un único valor**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+En el Blink anterior, el número `500` aparecía dos veces. Tú sabías que significaba medio segundo porque acababas de escribirlo, pero otra persona tendría que investigar. Además, para cambiar el ritmo debía encontrar ambos números y modificarlos sin olvidar ninguno.
 
-## 2. Tiempo estimado
-
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
-
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
-
-## 3. Lo que necesitas saber antes de empezar
-
-[Lección 06: Primer programa: Blink](06-primer-programa-blink.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
-
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
-
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **variable, const, int, asignación y milisegundo**. En lenguaje cotidiano, buscamos una forma fiable de controlar el ritmo del LED cambiando un único valor. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Programar es escribir una descripción precisa de un comportamiento para que una máquina pueda ejecutarlo. La computadora no completa intenciones ocultas: sigue sintaxis y reglas. Por eso leeremos cada programa en tres capas: qué signos exige el lenguaje, qué ocurre al ejecutarlo y para qué sirve dentro de PX-32. Los errores serán evidencia para localizar una diferencia entre lo escrito y lo esperado.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **variable, const, int, asignación y milisegundo**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para usar una constante de intervalo y comparar tres valores. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Variable:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **variable, const, int, asignación y milisegundo**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres controlar el ritmo del LED cambiando un único valor y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con variable, const, int, asignación y milisegundo. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a usar una constante de intervalo y comparar tres valores. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: el mismo algoritmo con ritmos distintos y una explicación de la asignación. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [07-variables-para-representar-tiempo.ino](../../code/educational/07-variables-para-representar-tiempo/07-variables-para-representar-tiempo.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **variable**. Lee el programa de arriba abajo y predice su salida.
+Un nombre puede conservar la intención. En vez de repetir `500`, el programa puede declarar:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 07
-// Cargar solo después de leer la sección de seguridad.
-const byte LED = LED_BUILTIN;
-const unsigned long INTERVALO_MS = 500;
-void setup(){ pinMode(LED,OUTPUT); }
-void loop(){ digitalWrite(LED,HIGH); delay(INTERVALO_MS); digitalWrite(LED,LOW); delay(INTERVALO_MS); }
+int intervaloMs = 500;
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+`int` indica que guardaremos un número entero. `intervaloMs` es el nombre elegido. El signo `=` **asigna** el valor de la derecha al espacio nombrado a la izquierda. Aquí no pregunta si dos cosas son iguales; hace que `intervaloMs` comience valiendo 500.
 
-## 11. Qué deberías observar
+Una **variable** es un dato con nombre cuyo valor podría cambiar. Una **constante** también tiene nombre, pero el programa promete no reasignarla. Usaremos una constante para el pin físico —no queremos que el LED salte de D13 a otro pin durante la ejecución— y una variable para el intervalo que vamos a probar.
 
-El resultado normal es **el mismo algoritmo con ritmos distintos y una explicación de la asignación**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+En Scratch ya viste variables como marcadores o vidas. La diferencia es que C++ exige declarar qué clase de dato guardarás y escribir cada signo con precisión.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+## Preparativos para una comparación justa
 
-## 12. Si no funciona
+Necesitas comprender `setup()`, `loop()`, `digitalWrite()` y `delay()` de la [Lección 06](06-primer-programa-blink.md). Prepara:
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+- PX-32 ensamblado, apagado y sin USB.
+- Computador con Arduino IDE 2 y cable USB de datos.
+- El archivo [07-variables-para-representar-tiempo.ino](../../code/educational/07-variables-para-representar-tiempo/07-variables-para-representar-tiempo.ino).
+- Una hoja pequeña con tres columnas tituladas `200`, `500` y `1000`, y un lápiz.
+- Un adulto para aislar la alimentación y el servo S1.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+🔴 Antes de conectar USB, tu padre retira las baterías 18650 y desconecta el conector del servo S1 con todo apagado, sujetando su carcasa plástica. D13 se comparte entre `LED_BUILTIN` y la señal del servo. Registren la orientación para restaurarlo después. Si el aislamiento no puede comprobarse, trabaja con el código y el botón Verificar, sin subirlo.
 
-## 13. Desafío
+## Lee el sketch como un mapa de nombres
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+1. 🟢 Abre el `.ino` y comprueba este contenido:
 
-## 14. Lecturas y videos para explorar
+```cpp
+// Curso PX-32 — Lección 07: una variable representa el tiempo.
+const int PIN_LED = LED_BUILTIN;
+int intervaloMs = 500;
+
+void setup() {
+  pinMode(PIN_LED, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(PIN_LED, HIGH);
+  delay(intervaloMs);
+
+  digitalWrite(PIN_LED, LOW);
+  delay(intervaloMs);
+}
+```
+
+2. 🟢 Señala las dos declaraciones, antes de `setup()`:
+
+- `const int PIN_LED = LED_BUILTIN;` crea una constante entera. `const` impide que el código le asigne otro valor después.
+- `int intervaloMs = 500;` crea una variable entera e inicializa su valor. El sufijo `Ms` recuerda la unidad: milisegundos.
+
+Ambos nombres pueden usarse desde `setup()` y `loop()` porque están declarados fuera de esas funciones. Se llaman datos de alcance global. Hoy importa su utilidad: cada parte del sketch ve el mismo nombre.
+
+3. 🟢 Busca cuántas veces aparece `intervaloMs`. La declaración da el valor una vez; las dos llamadas a `delay()` lo consultan. El código no guarda dos copias independientes de 500.
+
+4. 🟢 Predice el efecto de cambiar solamente la línea de declaración a `int intervaloMs = 200;`. Las dos pausas deberían acortarse juntas. Predice también qué ocurriría si escribieras `intervaloMS` con `S` mayúscula en un solo `delay`: C++ distingue mayúsculas y minúsculas y no encontraría ese nombre.
+
+## Tres pruebas, una sola variable experimental
+
+5. 🟡 Con el adulto presente, comprueba de nuevo que batería y servo S1 estén desconectados. Conecta únicamente el USB. Selecciona `Arduino Mega or Mega 2560` y el puerto identificado en la Lección 05.
+
+6. 🟢 Mantén `intervaloMs = 500`, verifica y sube el sketch. Observa cuatro ciclos. En la columna `500`, dibuja una barra que represente cuánto dura una vuelta completa: 500 ms encendido más 500 ms apagado, es decir, 1000 ms.
+
+7. 🟢 Retira el USB. Cambia **solo** el valor inicial de `intervaloMs` a `200`; no cambies los dos `delay()`. Verifica, vuelve a conectar y sube. La vuelta completa ahora tarda 400 ms. Marca si el ritmo se ve más rápido o más lento que antes.
+
+8. 🟢 Retira el USB y repite con `1000`. Cada estado dura un segundo y el ciclo, dos. Anota la comparación en la tercera columna.
+
+| Valor de `intervaloMs` | Encendido | Apagado | Ciclo completo |
+|---:|---:|---:|---:|
+| 200 | 200 ms | 200 ms | 400 ms |
+| 500 | 500 ms | 500 ms | 1000 ms |
+| 1000 | 1000 ms | 1000 ms | 2000 ms |
+
+Esta tabla no es una orden para memorizar. Sirve para comprobar que el nombre conserva la unidad y que el mismo algoritmo puede trabajar con distintos datos.
+
+9. 🟢 Vuelve a `500` y prueba un error deliberado **solo con el USB retirado**: borra el punto y coma de `int intervaloMs = 500;` y pulsa Verificar. Busca en la consola la primera línea que apunte cerca de la declaración. Restaura el punto y coma y verifica de nuevo. No pulses Subir mientras el código tenga errores.
+
+10. 🟢 Explica el resultado con esta estructura: “cambié el valor asignado a…, mantuve iguales…, y por eso ambos `delay()`…”. Si dices solo “lo hice más rápido”, falta nombrar el mecanismo.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** ilustración conceptual con fragmento de código y línea de tiempo.
+> - **Objetivo:** mostrar que una declaración alimenta dos usos del mismo valor y que la unidad determina el ritmo observable.
+> - **Descripción:** `int intervaloMs = 500;` arriba, dos flechas hacia los dos `delay(intervaloMs)`, y debajo una línea de tiempo de 500 ms encendido + 500 ms apagado. Añadir versiones pequeñas de 200 y 1000 ms para comparar, sin representar espacios de memoria como cajas físicas literales.
+> - **Elementos que deben señalarse:** tipo `int`, nombre, operador de asignación, valor inicial, unidad `ms`, dos usos y duración del ciclo.
+> - **Fuente técnica:** referencia oficial del lenguaje Arduino, https://docs.arduino.cc/language-reference/, secciones Variables, `const` y `delay()`.
+> - **Texto alternativo sugerido:** “La variable intervaloMs declarada una vez entrega el mismo valor a dos pausas que controlan encendido y apagado”.
+
+## Cierra la práctica sin dejar el servo bajo Blink
+
+11. 🟡 Sube `Archivo > Ejemplos > 01.Basics > BareMinimum` para que D13 no quede configurado como salida al terminar.
+
+12. 🟡 Retira el USB. 🔴 Solo entonces tu padre restaura el conector del servo S1 con la orientación registrada. PX-32 queda apagado, ensamblado y sin baterías.
+
+El criterio de éxito no es haber probado tres números: es poder cambiar una sola asignación, predecir los dos intervalos y explicar por qué ambos cambian.
+
+## Errores que esta clase puede revelar
+
+| Síntoma | Pista específica |
+|---|---|
+| `'intervaloMS' was not declared in this scope` | Compara letra por letra; `intervaloMs` e `intervaloMS` son nombres distintos |
+| `expected ',' or ';'` | Revisa el final de la declaración y también la línea inmediatamente anterior |
+| Cambia solo la luz encendida, no la apagada | Probablemente quedó un número literal en uno de los `delay`; ambos deben usar el nombre |
+| `PIN_LED` cambia durante el código | La constante no debe recibir otra asignación; su trabajo es representar una conexión fija |
+| Un valor negativo o enorme produce algo extraño | Detén la prueba y vuelve a 200, 500 o 1000; esta actividad usa enteros positivos pequeños compatibles con `delay()` |
+| El servo reacciona | Desconecta USB; el adulto revisa el aislamiento de S1 antes de continuar |
+
+## Lecturas y videos para explorar
 
 - [Estructura y lenguaje de Arduino](https://docs.arduino.cc/language-reference/) — Inglés; referencia oficial; 10 min. Aprenderás estructura y lenguaje de arduino. Esencial.
 - [Ejemplos integrados de Arduino](https://docs.arduino.cc/built-in-examples/) — Inglés; tutorial oficial; 10 min. Aprenderás ejemplos integrados de arduino. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Al explorar, busca ejemplos donde un nombre exprese una unidad o una conexión. Un buen nombre reduce las preguntas que el lector debe resolver.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **variable** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), variables, constantes, `int` y `delay()`.
+- [Proceso de construcción de sketches](https://docs.arduino.cc/arduino-cli/sketch-build-process), alcance y prototipos añadidos durante la preparación de `.ino`.
+- [Pinout oficial de la Mega 2560](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf), D13 y `LED_BUILTIN`.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 13 y 17, señal S1 conectada a D13.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Enséñale las tres columnas y explica la diferencia entre el nombre, el valor y la unidad. Después responde: ¿por qué `=` asigna en esta línea?, ¿por qué `PIN_LED` es constante?, ¿qué error evitamos al escribir `intervaloMs` en los dos `delay()`?
 
-Hoy aprendiste a **controlar el ritmo del LED cambiando un único valor** y lo conectaste con **variable, const, int, asignación y milisegundo**. Pudiste observar el mismo algoritmo con ritmos distintos y una explicación de la asignación. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 08: PX-32 aprende a hablarnos](08-px-32-aprende-a-hablarnos.md).
+En la [Lección 08](08-px-32-aprende-a-hablarnos.md), una variable sí cambiará mientras el programa se ejecuta y podrás verla crecer en el monitor serie.

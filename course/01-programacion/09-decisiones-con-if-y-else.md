@@ -1,141 +1,145 @@
-# Lección 09 — Decisiones con if y else
+# Lección 09 — Decisiones con `if` y `else`
 
-## 1. Tu misión de hoy
+## El instante en que cambia el mensaje
 
-Hoy vas a **hacer que el programa elija entre dos mensajes**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Imagina una cuenta que muestra `ANTES` para 0, 1, 2, 3 y 4. Al llegar a 5 debe mostrar `LÍMITE ALCANZADO`. El programa no “se da cuenta” como una persona: compara dos números y sigue una regla escrita.
 
-## 2. Tiempo estimado
-
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
-
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
-
-## 3. Lo que necesitas saber antes de empezar
-
-[Lección 07: Variables para representar tiempo](07-variables-para-representar-tiempo.md), [Lección 08: PX-32 aprende a hablarnos](08-px-32-aprende-a-hablarnos.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
-
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
-
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **bool, comparación, condición y rama**. En lenguaje cotidiano, buscamos una forma fiable de hacer que el programa elija entre dos mensajes. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Programar es escribir una descripción precisa de un comportamiento para que una máquina pueda ejecutarlo. La computadora no completa intenciones ocultas: sigue sintaxis y reglas. Por eso leeremos cada programa en tres capas: qué signos exige el lenguaje, qué ocurre al ejecutarlo y para qué sirve dentro de PX-32. Los errores serán evidencia para localizar una diferencia entre lo escrito y lo esperado.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **bool, comparación, condición y rama**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para comparar un contador con un límite e imprimir antes/después. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Bool:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **bool, comparación, condición y rama**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres hacer que el programa elija entre dos mensajes y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con bool, comparación, condición y rama. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a comparar un contador con un límite e imprimir antes/después. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: solo una rama ejecutada en cada vuelta y cambio al alcanzar el límite. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [09-decisiones-con-if-y-else.ino](../../code/educational/09-decisiones-con-if-y-else/09-decisiones-con-if-y-else.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **bool**. Lee el programa de arriba abajo y predice su salida.
+Una **comparación** produce un dato de tipo `bool`, que solo puede valer `true` o `false`. La expresión:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 09
-// Cargar solo después de leer la sección de seguridad.
-int cuenta=0;
-void setup(){ Serial.begin(9600); }
-void loop(){ bool alcanzo = cuenta >= 5; if(alcanzo){ Serial.println("LIMITE"); } else { Serial.println("ANTES"); } cuenta++; delay(500); }
+cuenta >= LIMITE
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+pregunta si `cuenta` es mayor o igual que `LIMITE`. No cambia ninguno de los dos datos. El resultado puede guardarse así:
 
-## 11. Qué deberías observar
+```cpp
+bool alcanzoLimite = cuenta >= LIMITE;
+```
 
-El resultado normal es **solo una rama ejecutada en cada vuelta y cambio al alcanzar el límite**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+Después, `if` examina ese resultado. Si es `true`, ejecuta el bloque entre sus primeras llaves. `else` contiene la alternativa para `false`. En una misma vuelta de `loop()` solo se ejecuta una de las dos **ramas**.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+En Scratch, un bloque “si… entonces / si no” encajaba visualmente. En C++ las llaves cumplen esa tarea: muestran qué instrucciones pertenecen a cada camino.
 
-## 12. Si no funciona
+## Antes de poner a prueba la condición
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+Debes saber abrir el monitor serie y reconocer una cuenta creciente de la [Lección 08](08-px-32-aprende-a-hablarnos.md). Necesitas:
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+- PX-32 ensamblado, apagado, sin USB y sin baterías.
+- Computador con Arduino IDE 2 y cable USB de datos.
+- El archivo [09-decisiones-con-if-y-else.ino](../../code/educational/09-decisiones-con-if-y-else/09-decisiones-con-if-y-else.ino).
+- Una fila de seis tarjetas o trozos de papel numerados de 0 a 5.
+- Un lápiz para marcar `true` o `false` bajo cada número.
+- Un adulto presente al conectar USB.
 
-## 13. Desafío
+El sketch solo enviará texto; no configurará motores, servo ni LED. 🔴 El adulto confirma que las baterías están retiradas y que no hay daño, calor, olor ni cables sueltos. La única energía será USB.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+## Simula la decisión antes de ejecutar código
 
-## 14. Lecturas y videos para explorar
+1. 🟢 Coloca las tarjetas 0 a 5 en orden. El límite será 5. Para cada tarjeta responde `¿número >= 5?` y escribe `false` bajo 0–4 y `true` bajo 5.
+
+2. 🟢 Asigna un mensaje a cada resultado: `true → LIMITE ALCANZADO`; `false → ANTES DEL LIMITE`. Comprueba que ninguna tarjeta recibe los dos mensajes y ninguna queda sin mensaje.
+
+3. 🟢 Predice las primeras seis líneas del monitor. Incluye el número para poder revisar exactamente dónde cambia la rama:
+
+```text
+Cuenta 0: ANTES DEL LIMITE
+Cuenta 1: ANTES DEL LIMITE
+Cuenta 2: ANTES DEL LIMITE
+Cuenta 3: ANTES DEL LIMITE
+Cuenta 4: ANTES DEL LIMITE
+Cuenta 5: LIMITE ALCANZADO
+```
+
+## Sigue una vuelta completa del programa
+
+4. 🟢 Abre el `.ino` y comprueba que coincide con este bloque:
+
+```cpp
+// Curso PX-32 — Lección 09: una comparación elige una rama.
+const int LIMITE = 5;
+unsigned int cuenta = 0;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  bool alcanzoLimite = cuenta >= LIMITE;
+
+  Serial.print("Cuenta ");
+  Serial.print(cuenta);
+  Serial.print(": ");
+
+  if (alcanzoLimite) {
+    Serial.println("LIMITE ALCANZADO");
+  } else {
+    Serial.println("ANTES DEL LIMITE");
+  }
+
+  cuenta = cuenta + 1;
+  delay(500);
+}
+```
+
+5. 🟢 Imagina que `cuenta` vale 4. La comparación entrega `false`, se omite la primera rama y se ejecuta `else`. Solo después, `cuenta = cuenta + 1;` prepara el 5 para la vuelta siguiente.
+
+6. 🟢 Imagina ahora que vale 5. `>=` incluye la igualdad, por lo que `alcanzoLimite` vale `true`. Si el operador fuera solo `>`, el cambio ocurriría en 6. Un carácter puede cambiar el comportamiento sin producir un error de compilación.
+
+No confundas operadores: `=` asigna; `>=` compara “mayor o igual”. Más adelante encontrarás `==` para comparar igualdad. Escribir `=` donde querías comparar puede compilar en algunos contextos y producir una decisión equivocada.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama de decisión específico del sketch.
+> - **Objetivo:** mostrar que una comparación produce `true` o `false` y que solo una rama imprime en cada vuelta.
+> - **Descripción:** rombo `¿cuenta >= 5?` con salida `true` hacia `LIMITE ALCANZADO` y salida `false` hacia `ANTES DEL LIMITE`; las dos rutas se reúnen antes de `cuenta = cuenta + 1` y `delay(500)`.
+> - **Elementos que deben señalarse:** valor actual de cuenta, constante 5, operador `>=`, resultados booleanos, bloques `if`/`else` y actualización posterior.
+> - **Fuente técnica:** referencia oficial del lenguaje Arduino, https://docs.arduino.cc/language-reference/, estructura `if...else` y tipo `bool`.
+> - **Texto alternativo sugerido:** “La pregunta cuenta mayor o igual que cinco conduce a uno de dos mensajes y luego aumenta la cuenta”.
+
+## Observa el punto de cambio
+
+7. 🟡 Conecta únicamente el USB con el adulto presente. Selecciona la Mega y su puerto, verifica y sube el sketch.
+
+8. 🟢 Abre el monitor serie a 9600 baudios. Busca la última línea `ANTES DEL LIMITE` y la primera `LIMITE ALCANZADO`. Deben corresponder a 4 y 5. Desde 5 en adelante la condición sigue siendo verdadera, así que el segundo mensaje continúa.
+
+9. 🟢 Pulsa RESET una vez. La variable se inicializa otra vez en 0 y podrás observar de nuevo la frontera completa. El reinicio no cambia `LIMITE`, porque su valor está escrito en el sketch guardado.
+
+10. 🟢 Cierra el monitor, retira el USB y cambia **solo** `const int LIMITE = 5;` por `const int LIMITE = 3;`. Predice la nueva frontera, verifica, conecta y sube. Ahora la última línea anterior debe ser 2 y la primera de límite, 3.
+
+11. 🟢 Explica por qué no basta ver ambos mensajes en algún momento: la evidencia es que aparecen asociados a los números correctos y nunca los dos en la misma línea.
+
+12. 🟡 Cierra el monitor y retira el USB. PX-32 queda apagado y sin baterías. El sketch puede permanecer en flash porque no configura salidas físicas del robot.
+
+## Si la rama cambia donde no esperabas
+
+| Síntoma | Inspección concreta |
+|---|---|
+| Cambia en 6 y no en 5 | Revisa si escribiste `>` en vez de `>=` |
+| Siempre imprime `LIMITE ALCANZADO` desde 0 | Comprueba el sentido de la comparación y que `cuenta` inicie en 0 |
+| Los dos mensajes aparecen en una vuelta | Revisa las llaves; `else` debe pertenecer al mismo `if` y cada rama contiene un solo `println` |
+| Nunca llega al límite | Busca `cuenta = cuenta + 1;` después de las ramas |
+| El número no coincide con el mensaje | Imprime `cuenta` antes de actualizarla y conserva la actualización al final |
+| Error cerca de `else` | Verifica que la llave del bloque `if` cierre justo antes de `else` y que no haya un punto y coma después de `if (...)` |
+| Salida ilegible | Iguala el monitor con `Serial.begin(9600)`; no cambies la condición para arreglar comunicación |
+
+## Una pregunta para llevar al robot
+
+Un sensor también puede producir una condición, pero eso vendrá después. `if` no sabe qué es un obstáculo: solo recibe un resultado verdadero o falso construido a partir de datos. Antes de permitir que una rama mueva motores, aprenderás a imprimir primero la lectura y la decisión.
+
+## Lecturas y videos para explorar
 
 - [Estructura y lenguaje de Arduino](https://docs.arduino.cc/language-reference/) — Inglés; referencia oficial; 10 min. Aprenderás estructura y lenguaje de arduino. Esencial.
 - [Ejemplos integrados de Arduino](https://docs.arduino.cc/built-in-examples/) — Inglés; tutorial oficial; 10 min. Aprenderás ejemplos integrados de arduino. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+En los ejemplos de estructuras de control, busca el `if` oficial y comprueba qué dato produce su condición antes de mirar las acciones de las ramas.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **bool** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), `if...else`, operadores de comparación y tipo `bool`.
+- [Ejemplos integrados de estructuras de control](https://docs.arduino.cc/built-in-examples), ejemplo oficial de una sentencia condicional.
+- [Ayuda oficial para errores de compilación](https://support.arduino.cc/hc/en-us/articles/4402764401554-If-your-sketch-doesn-t-compile), lectura de llaves, ámbitos y mensajes de la consola.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Usa las tarjetas para narrar qué ocurre con 4 y con 5. Debes nombrar el dato comparado, el resultado booleano, la rama elegida y el momento en que aumenta la cuenta. Después explica por qué cambiar `>=` por `>` sería un error de comportamiento aunque el sketch pudiera compilar.
 
-Hoy aprendiste a **hacer que el programa elija entre dos mensajes** y lo conectaste con **bool, comparación, condición y rama**. Pudiste observar solo una rama ejecutada en cada vuelta y cambio al alcanzar el límite. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 10: Repeticiones contadas con for](10-repeticiones-contadas-con-for.md).
+En la [Lección 10](10-repeticiones-contadas-con-for.md) reunirás inicio, condición y actualización en una estructura que cuenta repeticiones.
