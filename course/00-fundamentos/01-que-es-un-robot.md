@@ -14,13 +14,7 @@ Un **robot** es un sistema programable que recibe información y puede actuar so
 
 En Scratch ya conociste una idea parecida. Un bloque puede esperar un evento, comprobar una condición y mover un personaje. En PX-32, la entrada llega desde piezas físicas, el programa se ejecuta en una placa y la salida puede mover algo real. Por eso una instrucción equivocada no solo cambia una imagen en pantalla: más adelante podría mover una rueda.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** fotografía anotada del PX-32 ensamblado.
-> - **Objetivo:** mostrar que percibir, procesar y actuar son trabajos realizados por piezas diferentes de un mismo sistema.
-> - **Descripción:** vista superior en tres cuartos, con el frente del robot orientado hacia arriba y tres colores de llamadas: sensores delanteros como entrada, Mega2560 como procesamiento y motores/ruedas como salida. Las flechas deben representar relaciones, no cables inventados.
-> - **Elementos que deben señalarse:** módulo ultrasónico, un sensor IR de obstáculos, tracker inferior, Mega2560 bajo el shield, Model Y, servo, motores y ruedas.
-> - **Fuente técnica:** manual oficial OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 9 a 21 y 26 a 29.
-> - **Texto alternativo sugerido:** “PX-32 ensamblado con sus sensores, placa Mega2560 y actuadores agrupados por función”.
+![PX-32 ensamblado con sus sensores, placa Mega2560 y actuadores agrupados por función](../../assets/lecciones/leccion-01-percibir-procesar-actuar.png)
 
 ## Nuestro semáforo de seguridad
 

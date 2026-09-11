@@ -30,13 +30,7 @@ Un **cortocircuito** no es simplemente “un circuito corto”. Es una ruta de r
 
 Los rótulos `3.3V`, `5V`, `VIN` y `GND` no son intercambiables. `VIN` es una entrada de alimentación; no significa “otro pin de 5 V”. Una fila de tres pines `S/V/GND` separa señal, alimentación y referencia. El nombre impreso y el diagrama del componente exacto mandan.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** ilustración conceptual en dos estados y una ampliación de riesgo.
-> - **Objetivo:** distinguir circuito cerrado, circuito abierto y cortocircuito sin manipular una fuente real.
-> - **Descripción:** a la izquierda, una fuente, interruptor cerrado, resistencia y LED unidos por una ruta completa; al centro, el mismo circuito con el interruptor abierto y una separación visible; a la derecha, una línea roja de resistencia muy baja que evita la carga, marcada como “no construir”. Las cargas dentro del conductor deben aparecer distribuidas por toda la ruta, no saliendo como bolitas almacenadas en la batería.
-> - **Elementos que deben señalarse:** dos puntos de voltaje, sentido de corriente convencional, resistencia, carga, retorno a GND, interruptor abierto/cerrado y ruta de cortocircuito.
-> - **Fuente técnica:** BIPM, Sistema Internacional de Unidades, https://www.bipm.org/en/publications/si-brochure, sección 2.3.4 y tabla 4; esquema oficial Arduino Mega 2560, https://docs.arduino.cc/resources/schematics/A000067-schematics.pdf, hoja de alimentación.
-> - **Texto alternativo sugerido:** “Comparación entre una ruta eléctrica cerrada, otra interrumpida por un interruptor abierto y un cortocircuito peligroso que evita la carga”.
+![Comparación entre una ruta eléctrica cerrada, otra interrumpida por un interruptor abierto y un cortocircuito peligroso que evita la carga](../../assets/lecciones/leccion-03-circuito-cerrado-abierto-y-cortocircuito.png)
 
 ## La misión: hacer visible una ruta que normalmente no vemos
 

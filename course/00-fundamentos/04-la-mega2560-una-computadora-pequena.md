@@ -14,13 +14,7 @@ No confundas estas tres capas:
 
 El shield no es la Mega y el Model Y no es “otro cerebro”. Una señal pequeña de la Mega puede ordenar al Model Y qué hacer, mientras el Model Y usa la ruta de potencia adecuada para los motores.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** fotografía anotada y corte lateral de la Mega2560 con el shield.
-> - **Objetivo:** que el niño pueda localizar la placa base, el microcontrolador y las familias de pines sin retirar el shield.
-> - **Descripción:** una vista superior de una Mega 2560 sin shield para enseñar su anatomía y, al lado, un corte lateral del montaje PX-32 con el UART WiFi Shield apilado. Mantener el conector USB como referencia de orientación.
-> - **Elementos que deben señalarse:** ATmega2560, conector USB tipo B, botón RESET, LED `L`, pines digitales D0-D53, entradas analógicas A0-A15, 5V, 3.3V, GND, VIN y el shield sobre la placa.
-> - **Fuente técnica:** pinout oficial Arduino Mega 2560, https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf, páginas 1 y 3; manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 9, 10 y 13.
-> - **Texto alternativo sugerido:** “Mega2560 orientada desde su conector USB, con el ATmega2560 y las zonas de pines marcadas, junto a un corte del shield apilado”.
+![Mega2560 orientada desde su conector USB, con el ATmega2560 y las zonas de pines marcadas, junto a un corte del shield apilado](../../assets/lecciones/leccion-04-anatomia-de-la-mega2560.png)
 
 ## Qué ocurre dentro del microcontrolador
 

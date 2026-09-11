@@ -15,13 +15,7 @@ La identificación es más sólida cuando coinciden varias pistas. “Es el Mode
 
 También aprenderás a decir “no confirmado”. El manual contiene algunas contradicciones y el kit puede tener variantes. Marcar una duda no significa que fallaste; significa que no convertiste una suposición en un hecho.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** dos fotografías anotadas, una vista superior y una vista inferior/lateral del PX-32 ensamblado.
-> - **Objetivo:** permitir que el niño ubique quince elementos sin desmontar el robot ni confundir placas apiladas.
-> - **Descripción:** ambas fotografías deben conservar la misma orientación, con el frente hacia arriba. Numerar del 1 al 15 siguiendo la tabla de la actividad; usar líneas de llamada que no tapen serigrafías ni conectores. Una pequeña silueta lateral debe mostrar que la Mega2560 está debajo del UART WiFi Shield y que el Model Y está en el nivel inferior.
-> - **Elementos que deben señalarse:** chasis, ruedas, motores, Model Y V2.0, Mega2560, UART WiFi Shield V1.3, ESP12/S, portabaterías, voltímetro, luces, servo, ultrasónico, sensores IR, tracker y cables/conectores.
-> - **Fuente técnica:** manual oficial OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 4 a 21 y 26 a 29.
-> - **Texto alternativo sugerido:** “Vistas superior y lateral de PX-32 con quince componentes numerados y las tres placas principales separadas por nivel”.
+![Vistas superior y lateral de PX-32 con quince componentes numerados y las tres placas principales separadas por nivel](../../assets/lecciones/leccion-02-mapa-de-quince-componentes.png)
 
 ## La misión: construir un mapa de quince identificaciones
 
