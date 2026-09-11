@@ -1,131 +1,143 @@
 # Lección 02 — Inventario razonado de PX-32
 
-## 1. Tu misión de hoy
+## No basta con decir “esa placa azul”
 
-Hoy vas a **identificar los componentes principales sin desmontar el robot**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Si alguien te pidiera revisar PX-32 porque “una cosa de adelante no funciona”, ¿sabrías cuál cosa? Hay sensores infrarrojos, un sensor ultrasónico, un servo y dos luces muy cerca unos de otros. Un buen constructor no se guía solo por el color o por una fotografía parecida: reúne **evidencia**.
 
-## 2. Tiempo estimado
+La evidencia para identificar un componente puede venir de cuatro lugares:
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+- la **forma**, como los dos cilindros metálicos del módulo ultrasónico;
+- la **cantidad**, como las cuatro ruedas Mecanum;
+- la **posición**, como el tracker que mira al suelo;
+- la **serigrafía**, es decir, las palabras y símbolos impresos en una placa.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+La identificación es más sólida cuando coinciden varias pistas. “Es el Model Y porque está abajo, tiene conectores para los motores y la placa dice `Model Y v2.0`” es mejor que “es la placa azul”.
 
-## 3. Lo que necesitas saber antes de empezar
+También aprenderás a decir “no confirmado”. El manual contiene algunas contradicciones y el kit puede tener variantes. Marcar una duda no significa que fallaste; significa que no convertiste una suposición en un hecho.
 
-[Lección 01: ¿Qué es un robot?](01-que-es-un-robot.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** dos fotografías anotadas, una vista superior y una vista inferior/lateral del PX-32 ensamblado.
+> - **Objetivo:** permitir que el niño ubique quince elementos sin desmontar el robot ni confundir placas apiladas.
+> - **Descripción:** ambas fotografías deben conservar la misma orientación, con el frente hacia arriba. Numerar del 1 al 15 siguiendo la tabla de la actividad; usar líneas de llamada que no tapen serigrafías ni conectores. Una pequeña silueta lateral debe mostrar que la Mega2560 está debajo del UART WiFi Shield y que el Model Y está en el nivel inferior.
+> - **Elementos que deben señalarse:** chasis, ruedas, motores, Model Y V2.0, Mega2560, UART WiFi Shield V1.3, ESP12/S, portabaterías, voltímetro, luces, servo, ultrasónico, sensores IR, tracker y cables/conectores.
+> - **Fuente técnica:** manual oficial OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 4 a 21 y 26 a 29.
+> - **Texto alternativo sugerido:** “Vistas superior y lateral de PX-32 con quince componentes numerados y las tres placas principales separadas por nivel”.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+## La misión: construir un mapa de quince identificaciones
 
-## 4. Lectura principal
+Vienes de la [Lección 01](01-que-es-un-robot.md), donde separaste entrada, procesamiento y salida. Ahora vas a localizar quince partes o conjuntos y justificar cada nombre con una pista visible o documental.
 
-### La idea intuitiva
+### Materiales y preparación
 
-El tema de hoy es **evidencia, componente y función**. En lenguaje cotidiano, buscamos una forma fiable de identificar los componentes principales sin desmontar el robot. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+- PX-32 ensamblado.
+- Una mesa seca, despejada y bien iluminada.
+- Lápiz y una hoja con tres columnas: `NOMBRE`, `EVIDENCIA`, `FUNCIÓN`.
+- Una linterna y un espejo pequeño; no uses una herramienta metálica para señalar.
+- El [diccionario de hardware](../../docs/hardware/README.md) y la [versión verificable del manual](../../reference/osoyoo-manual.md) abiertos en el computador.
+- El [mapa de conexiones](../../docs/reference/mapa-conexiones-robot.md) disponible solo para comprobar rutas; hoy no se cambia ninguna.
+- Ningún programa, Arduino IDE ni archivo `.ino`.
 
-En esta etapa miramos el robot como un sistema. La energía hace posibles los cambios; las señales representan información; y el programa organiza acciones. Conviene mantener separadas esas tres ideas. Un cable de potencia no es una instrucción, una lectura de sensor no es todavía una decisión y una placa electrónica no conoce por sí sola el propósito del proyecto.
+🔴 Antes de comenzar, el adulto confirma que no hay USB conectado, que los interruptores están apagados y que PX-32 no presenta calor, olor, daño o piezas sueltas. Las baterías 18650 y el cargador quedan fuera de la manipulación del niño.
 
-### De la intuición al concepto técnico
+🟡 Si hace falta cambiar la orientación del robot para ver un costado, el adulto mueve el chasis completo sujetándolo por sus placas estructurales. No lo toma por el ultrasónico, los cables, las ruedas ni el portabaterías.
 
-Los términos centrales son **evidencia, componente y función**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+### Primero encuentra el frente y los dos niveles
 
-En PX-32, esta idea se usa para comparar el montaje con el diccionario de hardware y localizar quince elementos. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+El frente es el lado donde el manual instala las dos luces, los dos sensores IR y el módulo ultrasónico. El chasis tiene un nivel superior y otro inferior unidos por separadores. Esta orientación será tu punto de referencia; todavía no asignaremos “izquierda” o “derecha” a cables que no podamos seguir con certeza.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+Antes de mirar la tabla, predice qué nivel contiene la placa que decide y cuál contiene la placa que entrega potencia a los motores. Escribe ambas respuestas sin corregirlas aún.
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+### Ruta de inspección
 
-## 5. Palabras nuevas
+Recorre la tabla en orden. No marques una fila hasta poder completar una frase del tipo “Lo reconozco por ___ y sirve para ___”.
 
-- **Evidencia:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+| Nº | Qué debes localizar | Cómo reconocerlo sin desmontar | Función que debes poder explicar |
+|---:|---|---|---|
+| 1 | **Chasis** | Dos placas estructurales unidas por separadores, con ranuras y tornillos | Mantiene cada componente en una posición conocida |
+| 2 | **Cuatro ruedas Mecanum** | Cuatro ruedas con rodillos inclinados; existen dos orientaciones | Transmiten fuerzas al suelo y permiten combinar movimiento longitudinal y lateral |
+| 3 | **Cuatro motores DC con reductora** | Cajas amarillas junto a las ruedas, con una parte metálica y un eje | Transforman energía eléctrica en giro; los engranajes reducen velocidad y aumentan la fuerza de giro, llamada par |
+| 4 | **OSOYOO Model Y V2.0** | Placa del nivel inferior, cerca de los cuatro motores, con conectores `AK` y `BK` y serigrafía `Model Y v2.0` | Recibe señales de control y abre o cierra rutas de potencia hacia los motores |
+| 5 | **OSOYOO Mega2560 R3** | Placa grande bajo el shield; el conector USB tipo B, el conector de alimentación y parte de la palabra `MEGA` ayudan a distinguirla | Contiene el microcontrolador que ejecuta el programa |
+| 6 | **UART WiFi Shield V1.3** | Placa apilada sobre la Mega, con filas de conectores de tres pines y rótulos de UART | Distribuye alimentación y señales; no reemplaza a la Mega |
+| 7 | **ESP8266 / encapsulado ESP12/S** | Rectángulo metálico o módulo con la marca `ESP12/S` y una antena impresa en el borde del shield | Gestiona la conectividad Wi-Fi documentada del kit |
+| 8 | **Portabaterías** | Caja negra para dos celdas cilíndricas, fijada al nivel superior y con interruptor | Sostiene las celdas y lleva su energía al Model Y |
+| 9 | **Voltímetro de tres dígitos** | Pequeño display numérico montado cerca de un borde y conectado al Model Y | Muestra una lectura aproximada del voltaje; no informa un porcentaje exacto de carga |
+| 10 | **Dos luces LED delanteras** | Dos módulos redondos o faros en la placa frontal, con cables rojo y negro en el manual | Transforman energía eléctrica en luz visible |
+| 11 | **Microservo, documentado como MG90** | Caja pequeña bajo el soporte del ultrasónico, con eje y cable de tres conductores; la etiqueta física del modelo puede quedar oculta | Busca una posición angular para orientar el sensor |
+| 12 | **Módulo ultrasónico** | Placa frontal con dos cilindros metálicos grandes, uno transmisor y otro receptor | Envía una ráfaga de sonido y permite medir el tiempo del eco |
+| 13 | **Dos sensores IR de obstáculos** | Dos placas pequeñas en el frente, cada una con emisor/receptor y un potenciómetro, el pequeño control de ajuste | Indican si la reflexión infrarroja supera un umbral; no dan distancia exacta |
+| 14 | **Tracker IR de cinco canales** | Placa alargada bajo el frente, orientada hacia el suelo, con cinco zonas sensoras | Produce un patrón de cinco estados para localizar una línea |
+| 15 | **Cables y conectores instalados** | Manojos de cables de 2, 3, 6 o 7 posiciones, carcasas plásticas y rótulos impresos en la placa junto a sus extremos | Llevan energía o señales; el color por sí solo no demuestra su función |
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+### Cómo registrar evidencia de verdad
 
-## 6. Así aparece en PX-32
+En el nombre `UART WiFi Shield`, **UART** se refiere a un sistema para intercambiar datos en serie, es decir, uno detrás de otro. Aprenderás sus reglas más adelante; aquí solo necesitas reconocer que nombra una función de comunicación y no al microcontrolador principal.
 
-**Hardware:** HW-001 a HW-020.
+1. 🟢 Empieza por las piezas grandes: chasis, ruedas y motores. Cuenta las unidades. Si ves tres motores y supones que hay un cuarto oculto, aún no has completado la fila: cambia tu punto de vista o usa el espejo.
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+2. 🟢 Mira el nivel inferior desde un costado y localiza la serigrafía del Model Y. No metas el espejo entre cables ni apoyes la mano sobre la placa. Comprueba que sus conectores van hacia los motores sin tirar de ellos.
 
-La cadena exacta de hoy se concentra en **evidencia, componente y función**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+3. 🟢 En el nivel superior, separa visualmente tres cosas: la Mega es la placa base, el UART WiFi Shield está apilado encima y `ESP12/S` es un módulo que forma parte del shield. Escribe una función distinta para cada una.
 
-## 7. Seguridad y participación del adulto
+4. 🟢 Observa el portabaterías y el voltímetro sin tocar interruptores. El manual documenta la ruta `portabaterías → VIN del Model Y`, pero no explica con suficiente claridad si las dos celdas están conectadas internamente en serie o en paralelo. Anota `configuración interna: no confirmada`.
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
+5. 🟢 Recorre el frente desde arriba: luces, sensores IR, ultrasónico y servo. Luego usa el espejo para ver el tracker por debajo. Comprueba que “IR” aparece en dos tipos de sensor con trabajos diferentes: los de obstáculos miran al frente; el tracker mira al suelo y tiene cinco canales.
 
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
+6. 🟢 Sigue con la vista un solo cable desde una pieza hasta el siguiente conector. Detente si el cable queda oculto. El manual advierte que los conectores de seis pines se sujetan por la carcasa plástica, nunca por los hilos; hoy no debes retirarlos.
 
-## 8. Predice antes de probar
+7. 🟢 Revisa tus quince filas. Para aceptar una identificación, exige al menos dos pistas cuando sean visibles. Por ejemplo: `posición + etiqueta`, `forma + cantidad` o `conexión + función documentada`.
 
-1. ¿Qué esperas observar cuando logres identificar los componentes principales sin desmontar el robot y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
+8. 🟢 Encierra en un círculo cualquier dato que no pudiste comprobar. No cambies una fila para que coincida con la respuesta esperada. Una etiqueta física distinta puede indicar una variante que debe revisar un adulto.
 
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
+9. 🟢 Compara tus dos predicciones iniciales. La Mega del nivel superior procesa; el Model Y del nivel inferior maneja la potencia de los motores. Explica por qué una placa más cerca de los motores no es necesariamente “el cerebro”.
 
-## 9. Actividad o experimento guiado
+10. 🟢 Termina dejando la hoja a un lado y verificando visualmente que ninguna tarjeta, espejo o lápiz quedó dentro del chasis. PX-32 permanece apagado y sin cambios.
 
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001 a HW-020 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con evidencia, componente y función. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a comparar el montaje con el diccionario de hardware y localizar quince elementos. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: quince identificaciones apoyadas por forma, posición o etiqueta. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
+### La confusión que debes evitar desde hoy
 
-## 10. Código
+`ESP12/S` identifica el encapsulado del módulo basado en **ESP8266** documentado por el proyecto. No es una ESP32. La semejanza entre los nombres no es evidencia de que sean el mismo chip.
 
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
+El **HC-02**, cuando está presente, es el módulo Bluetooth que se inserta en un zócalo de seis pines. Tampoco es el ESP. Si no está instalado en tu robot, no inventes una ubicación para completar el inventario; registra que es una pieza externa o pendiente de confirmar.
 
-## 11. Qué deberías observar
+## Criterio de éxito
 
-El resultado normal es **quince identificaciones apoyadas por forma, posición o etiqueta**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+Has terminado cuando puedes mostrar quince identificaciones sustentadas y responder:
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+- ¿qué evidencia distingue la Mega del shield?
+- ¿qué evidencia distingue el shield del Model Y?
+- ¿qué dos familias de sensores infrarrojos hay y hacia dónde miran?
+- ¿qué dato del portabaterías sigue sin confirmarse?
+- ¿por qué el color de un cable no demuestra qué transporta?
 
-## 12. Si no funciona
+No es necesario memorizar códigos `HW-xxx`. Sí debes poder volver a encontrar una pieza sin que un adulto improvise una descripción nueva.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+## Si una pieza se resiste a ser identificada
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+| Dificultad concreta | Comprobación útil | Decisión segura |
+|---|---|---|
+| La etiqueta queda oculta | Busca forma, posición y conexión en el manual | Déjala como probable, no como confirmada; no desmontes para verla |
+| Mega y shield parecen una sola placa | Identifica el conector USB tipo B en la placa inferior y `ESP12/S` en la superior | Dibuja dos niveles en tu hoja |
+| No sabes si un sensor IR es izquierdo o derecho | Orienta primero el frente y compara la conexión documentada | No asignes lado si el cable no puede seguirse sin moverlo |
+| El voltímetro está apagado | Esa es la condición correcta de esta actividad | Identifícalo por el display y su conexión; no energices para obtener un número |
+| La cantidad o el modelo no coincide con la tabla | Puede ser un montaje incompleto o una variante | Fotografía la etiqueta con ayuda adulta y consulta la ficha; no fuerces piezas |
+| Encuentras daño o un conector desplazado | Ya no es solo un problema de nombres | 🔴 Detente; el adulto decide cómo aislar y revisar el sistema |
 
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [Arduino: introducción y placa Mega](https://docs.arduino.cc/hardware/mega-2560/) — Inglés; lectura oficial; 10 min. Aprenderás arduino: introducción y placa mega. Esencial.
 - [Qué es la electricidad, lectura interna](../../docs/readings/que-es-electricidad.md) — Español; lectura; 8 min. Aprenderás qué es la electricidad, lectura interna. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Después del inventario, estas lecturas ayudan a pasar de “sé cómo se llama” a “comprendo qué ocurre dentro”.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **evidencia** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Manual oficial OSOYOO del kit](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 4 a 21, 26, 34, 39, 44 y 52.
+- [OSOYOO Model Y H-Bridge 4-Channel Motor Driver](https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/), identificación y función de la revisión V2.0.
+- [Arduino Mega 2560 Rev3](https://docs.arduino.cc/hardware/mega-2560/), anatomía y capacidades de la placa de referencia.
+- [Erratas e incertidumbres del manual](../../docs/reference/errata-osoyoo.md).
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Elige la identificación más fácil y la más dudosa. Para la primera, muestra las dos pistas que coinciden. Para la segunda, explica qué información faltó y qué acción evitaste por seguridad. Luego pídele que señale una pieza al azar y responde con nombre, evidencia y función.
 
-Hoy aprendiste a **identificar los componentes principales sin desmontar el robot** y lo conectaste con **evidencia, componente y función**. Pudiste observar quince identificaciones apoyadas por forma, posición o etiqueta. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 03: Electricidad sin misterios](03-electricidad-sin-misterios.md).
+En la [Lección 03: Electricidad sin misterios](03-electricidad-sin-misterios.md) seguirás la ruta de energía que permite trabajar a todas estas piezas.

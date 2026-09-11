@@ -1,131 +1,133 @@
 # Lección 03 — Electricidad sin misterios
 
-## 1. Tu misión de hoy
+## ¿Por qué un interruptor tan pequeño puede detener todo el robot?
 
-Hoy vas a **explicar un circuito abierto y uno cerrado sin energizar PX-32**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+En la lección anterior encontraste un interruptor en el portabaterías. No guarda órdenes ni sabe qué es un robot. Su trabajo es más sencillo y decisivo: permitir o interrumpir una ruta eléctrica.
 
-## 2. Tiempo estimado
+La materia contiene **carga eléctrica**. En un material conductor ya existen cargas capaces de responder. Cuando hay una diferencia de energía eléctrica entre dos puntos y un camino completo, puede aparecer corriente.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Necesitamos separar tres ideas que suelen mezclarse:
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+- **voltaje:** diferencia de potencial eléctrico entre dos puntos; se mide en voltios (`V`);
+- **corriente:** flujo de carga por unidad de tiempo a través de una sección; se mide en amperios (`A`);
+- **resistencia:** oposición que presenta un camino al paso de la corriente; se mide en ohmios (`Ω`).
 
-## 3. Lo que necesitas saber antes de empezar
+Por acuerdo, los diagramas dibujan la **corriente convencional** desde el punto de mayor potencial hacia el de menor potencial. En los metales, los electrones se desplazan en el sentido opuesto. No cambiaremos de convención a mitad del circuito.
 
-[Lección 01: ¿Qué es un robot?](01-que-es-un-robot.md), [Lección 02: Inventario razonado de PX-32](02-inventario-razonado-de-px-32.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+Una comparación con agua puede ayudar al principio: el voltaje se parece a una diferencia de presión, la corriente al flujo y la resistencia a una restricción. Pero la electricidad no es agua dentro de cables huecos. El metal ya contiene cargas y el campo eléctrico se establece a lo largo del circuito; la comparación solo sirve para distinguir empuje, flujo y oposición.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+## Un circuito siempre cuenta una historia completa
 
-## 4. Lectura principal
+Un **circuito** es una ruta cerrada por la cual puede circular corriente. La fuente crea una diferencia de potencial, los conductores forman el camino y una carga —por ejemplo, un LED o un motor— transforma energía.
 
-### La idea intuitiva
+Cuando un interruptor está **abierto**, existe una separación y no puede mantenerse una corriente por esa ruta. Cuando está **cerrado**, completa el camino. “Cerrado” puede sonar como “bloqueado”, pero en electricidad significa que el contacto deja pasar corriente.
 
-El tema de hoy es **carga, voltaje, corriente, resistencia, circuito y GND**. En lenguaje cotidiano, buscamos una forma fiable de explicar un circuito abierto y uno cerrado sin energizar PX-32. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+Un **cortocircuito** no es simplemente “un circuito corto”. Es una ruta de resistencia muy baja que evita la carga prevista. Puede permitir una corriente capaz de calentar conductores, celdas o placas. Por eso hoy no construiremos un circuito eléctrico real: lo representaremos con papel.
 
-En esta etapa miramos el robot como un sistema. La energía hace posibles los cambios; las señales representan información; y el programa organiza acciones. Conviene mantener separadas esas tres ideas. Un cable de potencia no es una instrucción, una lectura de sensor no es todavía una decisión y una placa electrónica no conoce por sí sola el propósito del proyecto.
+### ¿Y qué es GND?
 
-### De la intuición al concepto técnico
+`GND` se lee *ground* y en PX-32 funciona como referencia común para comparar voltajes y como parte del camino de retorno. No es “electricidad negativa”, ni un agujero donde desaparece la corriente. Cuando dos módulos intercambian una señal eléctrica, normalmente necesitan compartir una referencia para interpretar de la misma manera las dos regiones lógicas llamadas `LOW` —nivel bajo— y `HIGH` —nivel alto—.
 
-Los términos centrales son **carga, voltaje, corriente, resistencia, circuito y GND**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+Los rótulos `3.3V`, `5V`, `VIN` y `GND` no son intercambiables. `VIN` es una entrada de alimentación; no significa “otro pin de 5 V”. Una fila de tres pines `S/V/GND` separa señal, alimentación y referencia. El nombre impreso y el diagrama del componente exacto mandan.
 
-En PX-32, esta idea se usa para representar con tarjetas una ruta de energía completa y luego interrumpirla. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** ilustración conceptual en dos estados y una ampliación de riesgo.
+> - **Objetivo:** distinguir circuito cerrado, circuito abierto y cortocircuito sin manipular una fuente real.
+> - **Descripción:** a la izquierda, una fuente, interruptor cerrado, resistencia y LED unidos por una ruta completa; al centro, el mismo circuito con el interruptor abierto y una separación visible; a la derecha, una línea roja de resistencia muy baja que evita la carga, marcada como “no construir”. Las cargas dentro del conductor deben aparecer distribuidas por toda la ruta, no saliendo como bolitas almacenadas en la batería.
+> - **Elementos que deben señalarse:** dos puntos de voltaje, sentido de corriente convencional, resistencia, carga, retorno a GND, interruptor abierto/cerrado y ruta de cortocircuito.
+> - **Fuente técnica:** BIPM, Sistema Internacional de Unidades, https://www.bipm.org/en/publications/si-brochure, sección 2.3.4 y tabla 4; esquema oficial Arduino Mega 2560, https://docs.arduino.cc/resources/schematics/A000067-schematics.pdf, hoja de alimentación.
+> - **Texto alternativo sugerido:** “Comparación entre una ruta eléctrica cerrada, otra interrumpida por un interruptor abierto y un cortocircuito peligroso que evita la carga”.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+## La misión: hacer visible una ruta que normalmente no vemos
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+Usarás fichas de papel para demostrar por qué una ruta cerrada permite corriente y una abierta la interrumpe. Después localizarás, solo con la vista y el mapa, la ruta de alimentación documentada de PX-32.
 
-## 5. Palabras nuevas
+### Lo que necesitas
 
-- **Carga:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+- PX-32 ensamblado y sin energía.
+- El [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) abierto en el computador.
+- Una hoja grande o cuatro tiras de papel para formar un rectángulo.
+- Cinco tarjetas con los rótulos `FUENTE`, `INTERRUPTOR`, `RESISTENCIA`, `CARGA` y `GND`.
+- Seis monedas, botones o fichas de juego que representarán carga presente en el conductor.
+- Un lápiz.
+- No necesitas pilas, cables sueltos, LED, multímetro, Arduino IDE ni código.
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+🔴 El adulto confirma que el USB está desconectado y los interruptores están apagados. El niño no retira baterías, no abre el portabaterías y no toca `VIN`, `VOUT` ni conectores de potencia. Si no puede verificarse el estado, realiza únicamente el modelo de papel.
 
-## 6. Así aparece en PX-32
+### Construye el circuito de papel
 
-**Hardware:** HW-001, HW-014 a HW-016.
+1. 🟢 Coloca las cuatro tiras formando un camino rectangular cerrado. Pon `FUENTE` en un lado y marca sus extremos con `+` y `−`. Distribuye `INTERRUPTOR`, `RESISTENCIA` y `CARGA` a lo largo de la ruta; coloca `GND` cerca del regreso a la fuente. La palabra GND indica una referencia elegida dentro del circuito; la ficha no consume cargas.
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+2. 🟢 Reparte las seis monedas a lo largo de todo el camino, no amontonadas en `FUENTE`. Esta colocación recuerda que un conductor contiene cargas antes de cerrar el interruptor.
 
-La cadena exacta de hoy se concentra en **carga, voltaje, corriente, resistencia, circuito y GND**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+3. 🟢 Dibuja dos puntos, `A` y `B`, a cada lado de la fuente. Escribe: `voltaje = diferencia entre A y B`. Pregunta de predicción: si ambos puntos tuvieran el mismo potencial, ¿existiría el “empuje” eléctrico que queremos representar?
 
-## 7. Seguridad y participación del adulto
+4. 🟢 Cierra el interruptor de papel uniendo las dos puntas de su tira. Mueve cada moneda una posición alrededor del circuito. Una vuelta completa representa corriente sostenida por una ruta cerrada y energía transformada en la carga.
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
+5. 🟢 Detente para corregir el modelo: en un circuito real las cargas no esperan a que una moneda complete toda la vuelta para que la siguiente se mueva. Mover fichas por turnos solo nos ayuda a comprobar que ninguna ruta termina en un callejón sin salida.
 
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
+6. 🟢 Abre el interruptor separando sus dos puntas unos centímetros. Predice qué ocurrirá y trata de continuar la vuelta sin saltar el hueco. Debes descubrir que la ruta ya no es continua. La evidencia de la actividad es geométrica: hay una interrupción visible; no estamos midiendo corriente real.
 
-## 8. Predice antes de probar
+7. 🟢 Vuelve a cerrar el camino y dibuja una línea en zigzag sobre la tarjeta `RESISTENCIA`. Si aumentara la oposición manteniendo las demás condiciones, la corriente tendería a disminuir. No hace falta calcularla todavía.
 
-1. ¿Qué esperas observar cuando logres explicar un circuito abierto y uno cerrado sin energizar PX-32 y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
+8. 🟢 Dibuja con lápiz una ruta directa desde un lado de la fuente hasta el otro que evite la carga. Rodéala en rojo y escribe `CORTOCIRCUITO: NO CONSTRUIR`. La ruta de papel es segura; reproducirla con una batería y un cable no lo sería.
 
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
+### Lleva el modelo hasta PX-32 sin tocar conexiones
 
-## 9. Actividad o experimento guiado
+9. 🟢 Orienta el robot como en la lección anterior. En la pantalla, sigue la ruta documentada: `2 celdas 18650 → portabaterías → VIN del Model Y`. Desde el Model Y, una rama entrega energía a los motores y otra sale por `VOUT` hacia `VIN` del UART WiFi Shield.
 
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001, HW-014 a HW-016 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con carga, voltaje, corriente, resistencia, circuito y GND. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a representar con tarjetas una ruta de energía completa y luego interrumpirla. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: una ruta cerrada coherente y otra abierta que no puede conducir corriente. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
+10. 🟢 Señala las piezas desde fuera del chasis. No sigas un cable oculto con los dedos. Observa que el cable de potencia tiene que incluir tanto ida como retorno, aunque el dibujo resumido no muestre cada conductor por separado.
 
-## 10. Código
+11. 🟢 Busca en una fila del shield las etiquetas `S`, `V` y `GND`. No conectes nada. Explica: `S` transporta una señal, `V` alimenta el módulo y `GND` proporciona la referencia y el retorno común. Un mismo sistema eléctrico puede llevar **energía** y también representar **información**.
 
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
+12. 🟢 Compara el interruptor real con tu tarjeta. Cuando el interruptor abre la ruta, las ruedas no reciben energía de las celdas por ese camino. Eso no demuestra que todo el robot esté sin energía si otra fuente —como USB— estuviera conectada; por eso la comprobación inicial revisa todas las fuentes.
 
-## 11. Qué deberías observar
+13. 🟢 Escribe junto al dibujo del robot: `No sabemos aún: serie/paralelo, límites exactos del Model Y y especificaciones del cargador`. El manual entregado no basta para afirmar esos datos. No sumes los voltajes nominales de las celdas hasta verificar su conexión interna.
 
-El resultado normal es **una ruta cerrada coherente y otra abierta que no puede conducir corriente**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+14. 🟢 Aleja las fichas y papeles del robot. Comprueba que nada quedó dentro del chasis y que no se movió ningún interruptor ni conector.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+## Qué debes poder demostrar
 
-## 12. Si no funciona
+La actividad está completa si puedes construir:
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+- una ruta cerrada coherente, sin saltos;
+- la misma ruta abierta en un solo punto, explicando por qué ya no sostiene corriente;
+- un dibujo de cortocircuito que identificas como peligroso y que nunca pruebas con hardware real;
+- la ruta de alimentación documentada de PX-32, separando lo confirmado de lo pendiente.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+Luego di con tus palabras la diferencia entre voltaje, corriente y resistencia. Si la explicación usa “cantidad de electricidad guardada” para corriente o trata GND como una fuente, vuelve a las definiciones del comienzo.
 
-## 13. Desafío
+## Si el modelo te engaña
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+| Problema | Pista para corregirlo |
+|---|---|
+| Las monedas empiezan todas dentro de la fuente | Distribúyelas por el conductor: representan cargas que ya están en el material |
+| Puedes continuar después de abrir el interruptor | Estás saltando el hueco; ninguna ficha puede abandonar la ruta de papel |
+| Dices que el voltaje “circula” | Marca dos puntos: el voltaje es una diferencia entre ellos; la corriente es la magnitud asociada al flujo de carga |
+| Dibujas GND como un recipiente que se llena | Conecta GND a la ruta de retorno y úsalo como referencia para comparar voltajes |
+| Quieres comprobar un corto con una celda | 🔴 No lo hagas. Un camino de muy baja resistencia puede producir calor y daño |
+| El mapa parece indicar el voltaje exacto de todo el robot | Solo muestra la ruta; la configuración de las celdas y varios límites eléctricos siguen pendientes de verificación |
 
-## 14. Lecturas y videos para explorar
+## Una variación controlada
+
+Abre el circuito en tres lugares distintos, uno por vez: antes de la carga, después de la carga y en el retorno. En cada caso pregunta si existe una vuelta completa. La posición del hueco cambia; el resultado esencial no: una sola interrupción rompe la ruta.
+
+## Lecturas y videos para explorar
 
 - [Arduino: introducción y placa Mega](https://docs.arduino.cc/hardware/mega-2560/) — Inglés; lectura oficial; 10 min. Aprenderás arduino: introducción y placa mega. Esencial.
 - [Qué es la electricidad, lectura interna](../../docs/readings/que-es-electricidad.md) — Español; lectura; 8 min. Aprenderás qué es la electricidad, lectura interna. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Cuando las leas, busca dos usos diferentes de la electricidad en PX-32: transportar energía y representar información.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **carga** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Sistema Internacional de Unidades del BIPM](https://www.bipm.org/en/publications/si-brochure), unidades de corriente, diferencia de potencial y resistencia.
+- [Manual oficial OSOYOO del kit](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 14 a 16 para la ruta de alimentación documentada.
+- [Esquema oficial Arduino Mega 2560](https://docs.arduino.cc/resources/schematics/A000067-schematics.pdf), circuito de alimentación y referencias GND.
+- [Alimentación de PX-32](../../docs/reference/alimentacion.md) y [electricidad básica](../../docs/reference/electricidad-basica.md).
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Muéstrale el modelo primero cerrado y luego abierto. Explícale qué representa cada tarjeta y qué parte de la comparación con monedas no ocurre literalmente dentro de un cable. Por último, señálale el dato que decidiste no inventar sobre el portabaterías.
 
-Hoy aprendiste a **explicar un circuito abierto y uno cerrado sin energizar PX-32** y lo conectaste con **carga, voltaje, corriente, resistencia, circuito y GND**. Pudiste observar una ruta cerrada coherente y otra abierta que no puede conducir corriente. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 04: La Mega2560: una computadora pequeña](04-la-mega2560-una-computadora-pequena.md).
+En la [Lección 04: La Mega2560, una computadora pequeña](04-la-mega2560-una-computadora-pequena.md) seguirás una señal: electricidad que representa información para el programa.

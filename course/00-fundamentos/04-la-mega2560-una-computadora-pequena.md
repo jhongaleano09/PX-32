@@ -1,131 +1,152 @@
 # Lección 04 — La Mega2560: una computadora pequeña
 
-## 1. Tu misión de hoy
+## La placa no es una sola cosa
 
-Hoy vas a **seguir una señal desde un pin de entrada hasta una salida**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+En un computador puedes reconocer pantalla, teclado y procesador como partes diferentes. En PX-32 ocurre algo parecido, aunque casi todo cabe entre dos placas apiladas.
 
-## 2. Tiempo estimado
+La **Mega2560** es una placa de desarrollo. Incluye el conector USB, circuitos de alimentación, un botón de reinicio, luces indicadoras, filas de pines y varios chips. El chip principal es el **ATmega2560**, un microcontrolador: un computador pequeño integrado que reúne procesador, memoria y periféricos.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+No confundas estas tres capas:
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+- la **Mega2560** ejecuta el programa y maneja señales;
+- el **UART WiFi Shield** está encima y distribuye conexiones, además de incluir el módulo `ESP12/S`;
+- el **Model Y** está en el nivel inferior y maneja la potencia de los motores.
 
-## 3. Lo que necesitas saber antes de empezar
+El shield no es la Mega y el Model Y no es “otro cerebro”. Una señal pequeña de la Mega puede ordenar al Model Y qué hacer, mientras el Model Y usa la ruta de potencia adecuada para los motores.
 
-[Lección 02: Inventario razonado de PX-32](02-inventario-razonado-de-px-32.md), [Lección 03: Electricidad sin misterios](03-electricidad-sin-misterios.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía anotada y corte lateral de la Mega2560 con el shield.
+> - **Objetivo:** que el niño pueda localizar la placa base, el microcontrolador y las familias de pines sin retirar el shield.
+> - **Descripción:** una vista superior de una Mega 2560 sin shield para enseñar su anatomía y, al lado, un corte lateral del montaje PX-32 con el UART WiFi Shield apilado. Mantener el conector USB como referencia de orientación.
+> - **Elementos que deben señalarse:** ATmega2560, conector USB tipo B, botón RESET, LED `L`, pines digitales D0-D53, entradas analógicas A0-A15, 5V, 3.3V, GND, VIN y el shield sobre la placa.
+> - **Fuente técnica:** pinout oficial Arduino Mega 2560, https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf, páginas 1 y 3; manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 9, 10 y 13.
+> - **Texto alternativo sugerido:** “Mega2560 orientada desde su conector USB, con el ATmega2560 y las zonas de pines marcadas, junto a un corte del shield apilado”.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+## Qué ocurre dentro del microcontrolador
 
-## 4. Lectura principal
+El procesador realiza instrucciones. Las memorias conservan información con propósitos distintos:
 
-### La idea intuitiva
+- la **memoria flash** guarda el programa, incluso cuando se corta la energía;
+- la **SRAM** guarda datos temporales mientras el programa está funcionando y se vacía al apagar;
+- la **EEPROM** puede conservar pequeños datos sin energía, aunque no está pensada para escribirla sin límite.
 
-El tema de hoy es **microcontrolador, memoria, GPIO y señal**. En lenguaje cotidiano, buscamos una forma fiable de seguir una señal desde un pin de entrada hasta una salida. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+La Mega 2560 de referencia tiene 256 KB de flash —8 KB los usa el *bootloader*—, 8 KB de SRAM y 4 KB de EEPROM. Son cantidades pequeñas frente a un computador portátil, pero suficientes para controlar muchos sensores y actuadores.
 
-En esta etapa miramos el robot como un sistema. La energía hace posibles los cambios; las señales representan información; y el programa organiza acciones. Conviene mantener separadas esas tres ideas. Un cable de potencia no es una instrucción, una lectura de sensor no es todavía una decisión y una placa electrónica no conoce por sí sola el propósito del proyecto.
+Los **periféricos** conectan el procesador con el mundo. Los GPIO son pines digitales de propósito general que el programa puede preparar como entrada o salida. Otros periféricos miden voltajes analógicos, cuentan tiempo o intercambian datos. **UART** es uno de los periféricos de comunicación: envía bits en serie, uno detrás de otro. La placa oficial ofrece 54 pines digitales, 16 entradas analógicas y cuatro UART de hardware; en PX-32 muchos pines ya tienen un trabajo asignado.
 
-### De la intuición al concepto técnico
+Un pin no “sabe” si debe escuchar o hablar. El programa lo configura y el circuito conectado limita lo que puede hacer. Tampoco todos los pines tienen las mismas capacidades. Por eso usaremos el [mapa de conexiones de PX-32](../../docs/reference/mapa-conexiones-robot.md), no un número elegido al azar.
 
-Los términos centrales son **microcontrolador, memoria, GPIO y señal**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+## De Scratch a un archivo `.ino`
 
-En PX-32, esta idea se usa para localizar alimentación, USB, pines digitales, analógicos y recorrer entrada-proceso-salida. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+En Scratch, las formas de los bloques impiden algunas combinaciones imposibles y muestran visualmente la secuencia. Arduino usa código escrito. Los mismos tipos de ideas aparecerán después —secuencias, repeticiones, condiciones, variables y funciones—, pero tendrás que escribir nombres, signos y paréntesis con precisión.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+Los programas de Arduino se llaman **sketches**. El archivo principal suele terminar en `.ino`. Esa extensión indica a las herramientas de Arduino cómo preparar el sketch; el código se convierte en C++, un lenguaje de programación escrito, y después el compilador lo traduce a instrucciones de máquina para la placa. Un archivo `.py` pertenece normalmente a Python y sigue otro proceso. Cambiarle el apellido a un archivo no cambia el lenguaje que contiene.
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+En este curso, la Mega no usa un sistema operativo convencional como macOS o Ubuntu. Al cargar un sketch, las instrucciones quedan en flash y el microcontrolador puede volver a ejecutarlas después de un reinicio. Existe un pequeño programa de arranque llamado *bootloader*, que ayuda a recibir el sketch compilado y a iniciar su ejecución. Es posible diseñar otros microcontroladores con sistemas operativos de tiempo real, pero ese no es el modelo que usaremos aquí.
 
-## 5. Palabras nuevas
+Más adelante verás dos nombres especiales en los sketches de Arduino: `setup()` para preparar el comienzo y `loop()` para repetir acciones. Hoy solo necesitas entender el viaje completo: **archivo legible por humanos → compilación → instrucciones en flash → señales en pines → efecto físico**.
 
-- **Microcontrolador:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+## La misión: seguir una señal documentada a través de PX-32
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+Harás un mapa de una posible reacción del robot, sin encenderlo y sin afirmar que el sketch guardado actualmente realiza esa acción.
 
-## 6. Así aparece en PX-32
+### Materiales
 
-**Hardware:** HW-001, HW-002.
+- PX-32 ensamblado y sin energía.
+- El [pinout relevante de la Mega2560](../../docs/reference/pinout-mega2560.md).
+- El [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md).
+- Diez tarjetas de papel y un lápiz.
+- Una tira de lana o varias flechas recortadas para representar la ruta; no la introduzcas entre pines.
+- Una linterna, opcional.
+- Ningún programa, Arduino IDE ni cable USB.
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+🔴 El adulto comprueba que USB y alimentación de baterías están desconectados o apagados y que no hay daño, calor ni cables sueltos. Nadie retira el shield, cambia conexiones ni gira ruedas durante esta actividad.
 
-La cadena exacta de hoy se concentra en **microcontrolador, memoria, GPIO y señal**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+### Reconoce las tres placas antes de trazar
 
-## 7. Seguridad y participación del adulto
+1. 🟢 Orienta PX-32 por su frente. Busca la Mega en el nivel superior usando el conector USB tipo B como pista. Después identifica el shield que está encima por `ESP12/S` y las filas de conectores `S/V/GND`.
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
+2. 🟢 Mira desde un costado y encuentra el Model Y en el nivel inferior. Comprueba su nombre impreso y los conectores que van hacia los motores. Di en voz alta: “Mega procesa; shield distribuye; Model Y entrega potencia a motores”.
 
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
+3. 🟢 Si el ATmega2560 queda oculto por el shield, no desarmes nada. Localízalo en el pinout oficial y coloca una tarjeta `ATmega2560` al lado de la zona donde se encuentra en la placa inferior.
 
-## 8. Predice antes de probar
+### Construye la ruta de información y acción
 
-1. ¿Qué esperas observar cuando logres seguir una señal desde un pin de entrada hasta una salida y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
+4. 🟢 Escribe estas nueve tarjetas: `OBSTÁCULO`, `SENSOR IR DERECHO`, `OUT`, `D2 ENTRADA`, `PROGRAMA EN FLASH`, `DECISIÓN`, `D9 + D22 + D24 SALIDAS`, `MODEL Y`, `MOTOR FRONTAL DERECHO (BK1)`.
 
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
+5. 🟢 Ordénalas sobre la mesa en esa secuencia. Esta cadena usa conexiones documentadas: el sensor IR derecho entrega `OUT` a D2; para el motor frontal derecho BK1, D9 habilita o modula potencia y D22/D24 determinan dirección mediante el Model Y.
 
-## 9. Actividad o experimento guiado
+6. 🟢 Antes de acercar las flechas al robot, predice dónde termina la señal de control y dónde comienza la entrega de potencia. La frontera está en el driver Model Y: la Mega envía órdenes; el driver conmuta la energía del motor.
 
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001, HW-002 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con microcontrolador, memoria, GPIO y señal. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a localizar alimentación, USB, pines digitales, analógicos y recorrer entrada-proceso-salida. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: un mapa funcional de la Mega sin confundirla con el driver de motores. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
+7. 🟢 Busca `D2` en el shield o en el mapa. Es una entrada en esta historia porque recibe el estado del sensor IR derecho. `D` significa digital en el nombre de la placa; la lectura representará uno de dos estados eléctricos, no una distancia en centímetros.
 
-## 10. Código
+8. 🟢 Sigue en el papel desde D2 hasta `PROGRAMA EN FLASH`. No existe un cable físico desde el pin hasta una cajita llamada “programa”: dentro del microcontrolador, los periféricos y las instrucciones permiten leer el estado. Esta parte de la flecha representa una relación interna.
 
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
+9. 🟢 Coloca `DECISIÓN` después del programa. La palabra no significa que la Mega tenga intención. Significa que las instrucciones comparan datos y eligen qué señales producir.
 
-## 11. Qué deberías observar
+10. 🟢 Localiza en el mapa D9, D22 y D24. En esta ruta son salidas de control hacia el Model Y para BK1. No toques los pines ni sigas cables ocultos. Comprueba solo los rótulos y las conexiones del diagrama oficial del kit.
 
-El resultado normal es **un mapa funcional de la Mega sin confundirla con el driver de motores**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+11. 🟢 Termina en el motor frontal derecho. Observa que tres señales de control no suministran directamente la corriente del motor: llegan al Model Y, que controla la ruta de potencia. Si falta el programa correcto, si el pin está mal configurado o si no hay energía, la cadena no produce el efecto previsto.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+12. 🟢 Cambia una sola tarjeta: sustituye `OBSTÁCULO` por `SIN OBSTÁCULO`. ¿Qué parte física puede producir ahora un estado diferente? ¿Qué parte de la respuesta depende del programa y no del sensor? No existe una respuesta universal de movimiento: depende de las instrucciones cargadas.
 
-## 12. Si no funciona
+13. 🟢 Escribe en el reverso de `PROGRAMA EN FLASH` un nombre de archivo: `mi_primer_sketch.ino`. Explica por qué `.ino` identifica el archivo fuente, mientras la placa ejecuta instrucciones de máquina compiladas. No necesitas crear el archivo todavía.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+14. 🟢 Retira lana y tarjetas. Verifica que ninguna quedó sobre la electrónica o dentro de las ruedas. PX-32 termina exactamente como empezó: apagado, ensamblado y sin cambios.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama de flujo físico y lógico específico de PX-32.
+> - **Objetivo:** distinguir la señal que entra a la Mega, la decisión del programa y la potencia conmutada por el Model Y.
+> - **Descripción:** cadena horizontal `sensor IR derecho → OUT/D2 → ATmega2560 + flash → D9/D22/D24 → Model Y → BK1/motor frontal derecho`. Usar línea fina para señales y línea gruesa para la ruta de potencia desde el Model Y al motor. No dibujar una conexión directa del sensor al motor.
+> - **Elementos que deben señalarse:** D2 como entrada, flash como ubicación del sketch compilado, D9 como habilitación/PWM, D22-D24 como dirección, Model Y como driver y BK1 como conector del motor.
+> - **Fuente técnica:** manual oficial OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 6, 13 y 39 a 40; pinout oficial Arduino, https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf, páginas 1 y 3.
+> - **Texto alternativo sugerido:** “Ruta desde el sensor IR derecho por D2 y el programa de la Mega hasta las señales que controlan el motor BK1 mediante el Model Y”.
 
-## 13. Desafío
+## Comprobación: ¿tu mapa explica y no solo nombra?
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+La misión está completa si puedes señalar:
 
-## 14. Lecturas y videos para explorar
+- la placa Mega2560 y el chip ATmega2560, aunque el chip esté oculto en el montaje;
+- una entrada digital real, D2;
+- la memoria flash como lugar donde queda el programa;
+- tres salidas de control documentadas para BK1;
+- el Model Y como frontera entre control y potencia;
+- el motor como efecto físico final.
+
+También debes poder responder: ¿por qué un `.ino` no es un `.py`?, ¿qué conserva la flash al apagar?, ¿qué pierde la SRAM?, ¿por qué la Mega no necesita un escritorio o ventanas para ejecutar el sketch?
+
+## Cuando el mapa no encaja
+
+| Duda o hallazgo | Cómo resolverlo |
+|---|---|
+| Solo ves la placa superior | Busca el conector USB de la Mega y usa el corte lateral pendiente; no retires el shield |
+| Confundes `ESP12/S` con el microcontrolador principal | El ESP está en el shield para Wi-Fi; el ATmega2560 de la Mega ejecuta el programa principal de este curso |
+| No encuentras D22/D24 en la misma fila que D2/D9 | La Mega agrupa pines en varias cabeceras; usa el pinout oficial y conserva la orientación del USB |
+| Crees que D2 entrega centímetros | D2 recibe un estado digital del sensor IR; el módulo no mide una distancia exacta |
+| Dibujaste Mega → motor directamente | Inserta el Model Y: un GPIO no debe alimentar un motor |
+| Una serigrafía o conexión física contradice el mapa | 🔴 No corrijas el cableado; registra la discrepancia y pide al adulto compararla con la [errata](../../docs/reference/errata-osoyoo.md) |
+
+## Un ensayo mental antes del IDE
+
+Imagina que el archivo contiene una palabra mal escrita. El compilador podría detenerse antes de crear las instrucciones para la placa. Imagina ahora que compila, pero usa D3 donde el cable real llega a D2: el error ya no es de ortografía; el programa observaría otro pin. En la próxima lección aprenderás a distinguir **compilar**, **cargar** y **ejecutar**.
+
+## Lecturas y videos para explorar
 
 - [Arduino: introducción y placa Mega](https://docs.arduino.cc/hardware/mega-2560/) — Inglés; lectura oficial; 10 min. Aprenderás arduino: introducción y placa mega. Esencial.
 - [Qué es la electricidad, lectura interna](../../docs/readings/que-es-electricidad.md) — Español; lectura; 8 min. Aprenderás qué es la electricidad, lectura interna. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Al explorar, intenta separar cada afirmación sobre la placa oficial de lo que todavía debe comprobarse en la revisión OSOYOO.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **microcontrolador** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Arduino Mega 2560 Rev3](https://docs.arduino.cc/hardware/mega-2560/), descripción y capacidades oficiales.
+- [Pinout oficial de Arduino Mega 2560](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf), distribución de pines y LED integrado.
+- [Datasheet oficial de Arduino Mega 2560](https://docs.arduino.cc/resources/datasheets/A000067-datasheet.pdf), ATmega2560, memorias y periféricos.
+- [Proceso oficial de compilación de un sketch](https://docs.arduino.cc/arduino-cli/sketch-build-process), tratamiento de `.ino`, compilación y carga.
+- [Manual oficial OSOYOO del kit](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 6, 9, 10, 13 y 39 a 40.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Sin mirar la tabla, recorre las nueve tarjetas de la cadena y di dónde hay información, dónde hay instrucciones y dónde hay potencia. Después explícale qué guardaría cada memoria si apagaras la placa y por qué el nombre `.ino` importa antes de cargar el programa.
 
-Hoy aprendiste a **seguir una señal desde un pin de entrada hasta una salida** y lo conectaste con **microcontrolador, memoria, GPIO y señal**. Pudiste observar un mapa funcional de la Mega sin confundirla con el driver de motores. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 05: Preparar Arduino IDE](../01-programacion/05-preparar-arduino-ide.md).
+Ya estás preparado para la [Lección 05: Preparar Arduino IDE](../01-programacion/05-preparar-arduino-ide.md): allí el archivo, el compilador, la placa y el puerto dejarán de ser palabras sueltas y formarán un proceso verificable.
