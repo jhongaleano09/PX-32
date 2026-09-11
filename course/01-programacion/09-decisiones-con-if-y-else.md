@@ -87,13 +87,7 @@ void loop() {
 
 No confundas operadores: `=` asigna; `>=` compara “mayor o igual”. Más adelante encontrarás `==` para comparar igualdad. Escribir `=` donde querías comparar puede compilar en algunos contextos y producir una decisión equivocada.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** diagrama de decisión específico del sketch.
-> - **Objetivo:** mostrar que una comparación produce `true` o `false` y que solo una rama imprime en cada vuelta.
-> - **Descripción:** rombo `¿cuenta >= 5?` con salida `true` hacia `LIMITE ALCANZADO` y salida `false` hacia `ANTES DEL LIMITE`; las dos rutas se reúnen antes de `cuenta = cuenta + 1` y `delay(500)`.
-> - **Elementos que deben señalarse:** valor actual de cuenta, constante 5, operador `>=`, resultados booleanos, bloques `if`/`else` y actualización posterior.
-> - **Fuente técnica:** referencia oficial del lenguaje Arduino, https://docs.arduino.cc/language-reference/, estructura `if...else` y tipo `bool`.
-> - **Texto alternativo sugerido:** “La pregunta cuenta mayor o igual que cinco conduce a uno de dos mensajes y luego aumenta la cuenta”.
+![La pregunta cuenta mayor o igual que cinco conduce a uno de dos mensajes y luego aumenta la cuenta](../../assets/lecciones/leccion-09-diagrama-de-decision.png)
 
 ## Observa el punto de cambio
 

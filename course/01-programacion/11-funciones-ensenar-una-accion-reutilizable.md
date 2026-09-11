@@ -90,13 +90,7 @@ duracionGrupoMs(VECES, INTERVALO_MS)
 
 El monitor debe mostrar `Duracion calculada del grupo: 1200 ms`. `return` no imprime por sí mismo: entrega el número y `Serial.print` lo hace visible.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** diagrama de llamada y retorno.
-> - **Objetivo:** diferenciar parámetros, argumentos, una función `void` y una función que devuelve un valor.
-> - **Descripción:** dos recorridos paralelos: `parpadear(3, 200)` lleva argumentos a parámetros y termina en tres pulsos de LED sin flecha de regreso; `duracionGrupoMs(3, 200)` lleva los mismos argumentos, calcula 1200 y devuelve una flecha hacia `Serial.print`.
-> - **Elementos que deben señalarse:** nombre de función, tipos, parámetros, argumentos, `void`, `unsigned long`, `return`, llamada y efectos luz/texto.
-> - **Fuente técnica:** referencia oficial del lenguaje Arduino, https://docs.arduino.cc/language-reference/, sección Functions; proceso de sketch, https://docs.arduino.cc/arduino-cli/sketch-build-process.
-> - **Texto alternativo sugerido:** “Una función void usa tres y doscientos para parpadear; otra función devuelve mil doscientos al monitor serie”.
+![Una función void usa tres y doscientos para parpadear; otra función devuelve mil doscientos al monitor serie](../../assets/lecciones/leccion-11-llamada-y-retorno-de-funciones.png)
 
 ## Prueba que el nombre se puede reutilizar
 

@@ -94,13 +94,7 @@ Harás un mapa de una posible reacción del robot, sin encenderlo y sin afirmar 
 
 14. 🟢 Retira lana y tarjetas. Verifica que ninguna quedó sobre la electrónica o dentro de las ruedas. PX-32 termina exactamente como empezó: apagado, ensamblado y sin cambios.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** diagrama de flujo físico y lógico específico de PX-32.
-> - **Objetivo:** distinguir la señal que entra a la Mega, la decisión del programa y la potencia conmutada por el Model Y.
-> - **Descripción:** cadena horizontal `sensor IR derecho → OUT/D2 → ATmega2560 + flash → D9/D22/D24 → Model Y → BK1/motor frontal derecho`. Usar línea fina para señales y línea gruesa para la ruta de potencia desde el Model Y al motor. No dibujar una conexión directa del sensor al motor.
-> - **Elementos que deben señalarse:** D2 como entrada, flash como ubicación del sketch compilado, D9 como habilitación/PWM, D22-D24 como dirección, Model Y como driver y BK1 como conector del motor.
-> - **Fuente técnica:** manual oficial OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 6, 13 y 39 a 40; pinout oficial Arduino, https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf, páginas 1 y 3.
-> - **Texto alternativo sugerido:** “Ruta desde el sensor IR derecho por D2 y el programa de la Mega hasta las señales que controlan el motor BK1 mediante el Model Y”.
+![Ruta desde el sensor IR derecho por D2 y el programa de la Mega hasta las señales que controlan el motor BK1 mediante el Model Y](../../assets/lecciones/leccion-04-ruta-de-senal-sensor-a-motor.png)
 
 ## Comprobación: ¿tu mapa explica y no solo nombra?
 

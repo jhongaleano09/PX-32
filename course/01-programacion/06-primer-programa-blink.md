@@ -68,13 +68,7 @@ void loop() {
 
 8. 🟢 Localiza `L` sin tocar las placas. Debe alternar aproximadamente medio segundo encendido y medio segundo apagado. Cuenta cuatro cambios y explica cuál línea produce cada estado. Si el shield oculta completamente el LED desde todos los lados, no retires ni inclines placas energizadas: desconecta el USB y pide al adulto decidir si la observación física puede hacerse con seguridad; la compilación correcta por sí sola no demuestra el parpadeo.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** fotografía anotada de la Mega2560 dentro de PX-32.
-> - **Objetivo:** distinguir el LED integrado `L` de los indicadores `ON`, `TX` y `RX`, y mostrar por qué D13 exige aislar S1.
-> - **Descripción:** vista superior orientada por el conector USB tipo B, con acercamientos del LED `L` y del conector de servo S1 en el Model Y; una línea punteada debe indicar que ambos comparten la señal D13 sin sugerir que comparten alimentación.
-> - **Elementos que deben señalarse:** USB tipo B, LED `L`, indicadores `ON/TX/RX`, D13, S1 y conector del servo desconectado.
-> - **Fuente técnica:** pinout oficial Arduino Mega 2560, https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf, páginas 1 y 3; manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 13 y 17.
-> - **Texto alternativo sugerido:** “Mega2560 orientada por el USB con los LEDs L, ON, TX y RX diferenciados, y la ruta D13 hacia el servo S1 indicada”.
+![Mega2560 orientada por el USB con los LEDs L, ON, TX y RX diferenciados, y la ruta D13 hacia el servo S1 indicada](../../assets/lecciones/leccion-06-leds-de-la-mega2560.png)
 
 ### Cambia solo una cosa
 

@@ -83,13 +83,7 @@ Esta tabla no es una orden para memorizar. Sirve para comprobar que el nombre co
 
 10. 🟢 Explica el resultado con esta estructura: “cambié el valor asignado a…, mantuve iguales…, y por eso ambos `delay()`…”. Si dices solo “lo hice más rápido”, falta nombrar el mecanismo.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** ilustración conceptual con fragmento de código y línea de tiempo.
-> - **Objetivo:** mostrar que una declaración alimenta dos usos del mismo valor y que la unidad determina el ritmo observable.
-> - **Descripción:** `int intervaloMs = 500;` arriba, dos flechas hacia los dos `delay(intervaloMs)`, y debajo una línea de tiempo de 500 ms encendido + 500 ms apagado. Añadir versiones pequeñas de 200 y 1000 ms para comparar, sin representar espacios de memoria como cajas físicas literales.
-> - **Elementos que deben señalarse:** tipo `int`, nombre, operador de asignación, valor inicial, unidad `ms`, dos usos y duración del ciclo.
-> - **Fuente técnica:** referencia oficial del lenguaje Arduino, https://docs.arduino.cc/language-reference/, secciones Variables, `const` y `delay()`.
-> - **Texto alternativo sugerido:** “La variable intervaloMs declarada una vez entrega el mismo valor a dos pausas que controlan encendido y apagado”.
+![La variable intervaloMs declarada una vez entrega el mismo valor a dos pausas que controlan encendido y apagado](../../assets/lecciones/leccion-07-variable-intervalo-ms.png)
 
 ## Cierra la práctica sin dejar el servo bajo Blink
 

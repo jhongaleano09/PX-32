@@ -82,13 +82,7 @@ Fíjate en el orden: el valor se imprime antes de sumarle uno. Por eso la primer
 
 8. 🟢 Observa al menos cinco cuentas. Compáralas con tu predicción. El saludo puede aparecer justo al abrir el monitor porque muchas configuraciones reinician la placa al abrir la conexión. Si pulsas el botón RESET de la Mega, la cuenta vuelve a 0 y el saludo reaparece: la variable estaba en SRAM, no guardada de forma permanente.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** captura anotada de Arduino IDE 2 con monitor serie abierto.
-> - **Objetivo:** permitir que el niño localice la salida, la velocidad y la relación entre una línea de código y cada fragmento del mensaje.
-> - **Descripción:** IDE 2 mostrando el sketch a la izquierda y el monitor serie con saludo y cuentas 0 a 3; usar dos colores para unir `Serial.print("Cuenta: ")` con la etiqueta y `Serial.println(cuenta)` con el número.
-> - **Elementos que deben señalarse:** botón Monitor serie, puerto activo, selector `9600 baud`, saludo de `setup()`, líneas de `loop()` y botón RESET en una fotografía pequeña de la Mega.
-> - **Fuente técnica:** Arduino Help Center, https://support.arduino.cc/hc/en-us/articles/360020366520-How-to-do-a-loopback-test, paso de apertura del monitor; pinout oficial, https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf.
-> - **Texto alternativo sugerido:** “Monitor serie a 9600 baudios con un saludo inicial y una cuenta creciente, enlazados con las instrucciones que los imprimen”.
+![Monitor serie a 9600 baudios con un saludo inicial y una cuenta creciente, enlazados con las instrucciones que los imprimen](../../assets/lecciones/leccion-08-monitor-serie.png)
 
 ### Provoca una diferencia explicable
 

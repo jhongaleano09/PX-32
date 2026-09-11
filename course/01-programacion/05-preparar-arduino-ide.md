@@ -81,13 +81,7 @@ Si aparece `Missing FQBN`, falta seleccionar la placa. Si aparece un error que m
 
 13. 🟡 Cierra el IDE y retira el USB sujetando el conector, no el cable. 🔴 Sin ninguna fuente conectada, tu padre restaura el conector del servo S1 según la orientación registrada. PX-32 termina ensamblado y sin energía; las baterías siguen bajo responsabilidad del adulto.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** captura anotada de Arduino IDE 2.
-> - **Objetivo:** distinguir los controles Verificar, Subir, selector de placa/puerto y consola antes de la primera carga.
-> - **Descripción:** ventana de IDE 2 con `BareMinimum` abierto y la consola mostrando una compilación correcta para Mega 2560; incluir un recuadro pequeño de la captura histórica de IDE 1.8.13 del manual con la etiqueta “interfaz antigua”.
-> - **Elementos que deben señalarse:** botón Verificar, botón Subir, `Arduino Mega or Mega 2560`, puerto seleccionado, consola y primer error útil.
-> - **Fuente técnica:** Arduino Help Center, https://support.arduino.cc/hc/en-us/articles/4406856349970-Select-board-and-port-in-Arduino-IDE; manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 22 a 24.
-> - **Texto alternativo sugerido:** “Arduino IDE 2 con los botones Verificar y Subir, el selector Mega 2560, un puerto USB y la consola identificados”.
+![Arduino IDE 2 con los botones Verificar y Subir, el selector Mega 2560, un puerto USB y la consola identificados](../../assets/lecciones/leccion-05-controles-de-arduino-ide.png)
 
 ## Cómo sabes que la misión está completa
 

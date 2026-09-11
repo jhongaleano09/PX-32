@@ -66,13 +66,7 @@ void loop() {
 
 5. 🟢 Predice qué verías si `contador` nunca aumentara. La condición seguiría siendo verdadera y el `for` no terminaría. Predice también qué ocurriría si empezara en 1: con la misma comparación habría solo tres valores válidos, 1, 2 y 3.
 
-> **[PENDIENTE VISUAL]**
-> - **Tipo:** secuencia de estados del bucle `for`.
-> - **Objetivo:** relacionar inicio, condición, cuerpo y actualización con exactamente cuatro destellos.
-> - **Descripción:** cuatro columnas para contador 0, 1, 2 y 3, cada una con condición verdadera y un pulso de LED; una quinta columna para contador 4 con condición falsa que conduce a la pausa de 1500 ms y luego al nuevo `loop()`.
-> - **Elementos que deben señalarse:** inicialización, comparación antes de repetir, cuerpo HIGH/LOW, suma de uno, salida del `for` y reinicio externo de `loop()`.
-> - **Fuente técnica:** referencia oficial del lenguaje Arduino, https://docs.arduino.cc/language-reference/, estructura `for`; ejemplo integrado For Loop Iteration, https://docs.arduino.cc/built-in-examples/control-structures/ForLoopIteration/.
-> - **Texto alternativo sugerido:** “El contador toma los valores cero a tres, produce cuatro pulsos y se detiene cuando cuatro ya no es menor que cuatro”.
+![El contador toma los valores cero a tres, produce cuatro pulsos y se detiene cuando cuatro ya no es menor que cuatro](../../assets/lecciones/leccion-10-secuencia-del-bucle-for.png)
 
 ## Cuenta con los ojos y comprueba con una variación
 
