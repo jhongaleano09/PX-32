@@ -11,7 +11,7 @@ def fail(msg): errors.append(msg)
 
 if len(lessons)!=75: fail(f"Se esperaban 75 lecciones; hay {len(lessons)}")
 numbers=[]
-processed_blocks={'00-fundamentos', '01-programacion'}
+processed_blocks={'00-fundamentos', '01-programacion', '02-movimiento', '03-infrarrojo'}
 student_pillars=["## Lecturas y videos para explorar",
                  "## Referencias técnicas de la clase",
                  "## Cuéntale a papá"]
@@ -68,7 +68,7 @@ for p in ROOT.glob('**/*.md'):
         if not target.exists(): fail(f"Enlace roto {dest} en {p.relative_to(ROOT)}")
 
 sketches=sorted((ROOT/'code'/'educational').glob('*/*.ino'))
-if len(sketches)!=44: fail(f"Se esperaban 44 sketches; hay {len(sketches)}")
+if len(sketches)!=43: fail(f"Se esperaban 43 sketches; hay {len(sketches)}")
 for p in sketches:
     if p.parent.name != p.stem: fail(f"Carpeta/ino no coinciden: {p}")
     txt=p.read_text(encoding='utf-8')

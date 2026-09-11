@@ -1,131 +1,90 @@
 # Lección 24 — Emisor y receptor infrarrojos
 
-## 1. Tu misión de hoy
+## Una linterna y un ojo montados en una plaquita
 
-Hoy vas a **identificar qué parte emite y cuál recibe en un sensor de obstáculos**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Un sensor de obstáculos suena a cosa mágica: "detecta objetos". Pero ya tienes todas las piezas para desenmascararlo. En la Lección 21 armaste la cadena fuente → viaje → superficie → rebote → detector. En la Lección 23 viste que existe luz que no ves y cámaras que sí la ven. Hoy abres el sensor de PX-32 y descubres que adentro vive una **linterna** y un **ojo** en miniatura.
 
-## 2. Tiempo estimado
+La linterna es un **LED infrarrojo**: un diodo emisor como el LED que hiciste parpadear en el Blink, pero fabricado para emitir en ~940 nm en vez de color visible. El ojo es un **fotodetector**: un componente cuyo comportamiento eléctrico cambia según la cantidad de luz infrarroja que le llega. Los dos viven en cápsulas gemelas, una al lado de la otra, mirando hacia adelante.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+¿Cómo saber cuál es cuál si parecen iguales? Hay dos pistas. La primera es el color de la cápsula: el receptor suele venir en cápsula oscura, casi negra, porque ese plástico filtra la luz visible y deja pasar principalmente infrarroja; el emisor suele venir transparente. La segunda pista es la que ya dominas: enciéndelo y míralo con la cámara que funcionó en la Lección 23. La cápsula que brille en la pantalla es la linterna. Hoy verificas las dos pistas con tu propio módulo.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Hay una palabra nueva importante: **ruido**. El ojo del sensor no solo recibe la luz de su propia linterna rebota. También le llega infrarrojo del sol, de las lámparas, de tu cuerpo calentito cerca del módulo. Todo eso es ruido: información que llega mezclada con la que nos interesa. La **señal** es la parte que sí significa algo para el experimento: la luz de nuestra linterna que regresa tras chocar con un objeto. Un sensor con mucho ruido se confunde; más adelante verás cómo el diseño y la calibración lo defienden.
 
-## 3. Lo que necesitas saber antes de empezar
+Además de las cápsulas, el módulo tiene más residentes que irás conociendo: un chip negro rotulado **LM393** que convierte la señal en decisión (Lección 26), un cuadrito azul con tornillo que ajusta la sensibilidad (Lección 27), LED indicadores y tres pines de conexión.
 
-[Lección 23: Infrarrojo: luz que no vemos](23-infrarrojo-luz-que-no-vemos.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+## Lo que necesitas
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+- PX-32 ensamblado, con los dos sensores infrarrojos montados al frente.
+- El teléfono con la cámara que vio el control remoto en la Lección 23.
+- Tu cuaderno y lápiz.
+- El [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) a la vista (impreso o en pantalla).
+- Cable USB y un computador al cual conectarlo (solo para dar energía en la segunda parte; no se sube ningún programa hoy).
+- Un adulto presente durante la conexión USB.
 
-## 4. Lectura principal
+Estado inicial: PX-32 apagado, sin baterías y sin USB al empezar. Los sensores ya deben estar conectados según el manual; hoy no conectas nada nuevo, solo verificas.
 
-### La idea intuitiva
+## Primera parte: anatomía con el robot frío
 
-El tema de hoy es **LED IR, fotodetector, señal y ruido**. En lenguaje cotidiano, buscamos una forma fiable de identificar qué parte emite y cuál recibe en un sensor de obstáculos. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+1. 🟢 **Encuentra los módulos.** Ubica los dos sensores HW-008 en el frente del robot, uno a cada lado. Son las plaquitas pequeñas con las dos cápsulas gemelas hacia adelante. Señálalos con el dedo sin tocar los cables.
 
-Un sensor infrarrojo no ve objetos como un ojo. Emite o recibe radiación y transforma una interacción física en una señal eléctrica. Superficie, ángulo, distancia, iluminación y umbral pueden cambiar la lectura. Por eso una detección es una medición bajo condiciones concretas, no una verdad universal sobre el mundo.
+2. 🟢 **Identifica cada parte** en uno de los módulos, ayudándote con la lista: las dos cápsulas gemelas (linterna y ojo), el chip negro de muchas patas rotulado LM393, el cuadrito azul con tornillo (el potenciómetro), los LED indicadores y los tres pines del extremo con su cable de tres hilos.
 
-### De la intuición al concepto técnico
+3. 🟢 **Sigue el cable.** Recorre con el dedo, sin jalar, el cable de tres hilos del sensor izquierdo hasta el shield: debe terminar en los pines 5V, GND y **D3**. El del sensor derecho termina en 5V, GND y **D2**. Compara con el mapa canónico y con la página 40 del manual. Anota en el cuaderno la pareja de cada sensor: "izquierdo → D3, derecho → D2".
 
-Los términos centrales son **LED IR, fotodetector, señal y ruido**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+4. 🟢 **Verifica o detente.** Si algún cable no llega donde dice el mapa, no conectes energía. Marca la diferencia en el cuaderno y pásale el caso al adulto antes de la segunda parte.
 
-En PX-32, esta idea se usa para inspeccionar las dos cápsulas y seguir su ruta hasta OUT. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+5. 🟢 **Dibuja el módulo** de frente, rotulando: emisor, receptor, LM393, potenciómetro, LEDs, VCC, GND y OUT.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía anotada del módulo sensor IR.
+> - **Objetivo:** permitir localizar cada componente del módulo antes de usarlo.
+> - **Descripción:** primer plano del sensor HW-008 con flechas y rótulos sobre cada elemento; junto a él, el mismo módulo visto por la cámara del teléfono con la cápsula emisora brillando.
+> - **Elementos que deben señalarse:** cápsula emisora, cápsula receptora (oscura), chip LM393, potenciómetro azul, LED de alimentación, LED de señal, pines VCC/GND/OUT.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, página 40, conexión de los sensores IR.
+> - **Texto alternativo sugerido:** "Primer plano del sensor infrarrojo con sus componentes rotulados y la vista de cámara que revela la cápsula emisora encendida".
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+## Segunda parte: ¿cuál cápsula es la linterna?
 
-## 5. Palabras nuevas
+6. 🟡 **Energía lógica.** El adulto revisa que no haya baterías y conecta solo el cable USB. Observa el módulo: un LED de alimentación debe encenderse en cada sensor. Ese es tu comprobante de que el USB alimenta los sensores a través del shield. Si no se enciende, detente: el adulto revisa la conexión antes de continuar.
 
-- **Led ir:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+7. 🟢 **Mira con la cámara.** Apunta la cámara que funcionó en la Lección 23 a las cápsulas de un módulo, a unos 5 o 10 cm. Una de las dos debería verse iluminada (blanquecina o violácea, fija o con un parpadeo rápido): es el emisor haciendo su trabajo. La otra permanece oscura: es el receptor. Anota cuál brilló y de qué color era su cápsula. ¿Coincidió con la predicción de la cápsula transparente?
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+8. 🟢 **Prueba de detección.** Pon tu mano a unos 10 cm frente al módulo, abierta y plana. El LED de señal del sensor debe encenderse al detectar; al retirar la mano, se apaga. Con esto confirmas el circuito completo: linterna encendida, mano que refleja, ojo que recibe el rebote.
 
-## 6. Así aparece en PX-32
+9. 🟢 **Repite en el otro módulo** los pasos 7 y 8. Anota si ambas cápsulas emisoras brillan por igual y si ambos detectan la mano. Si uno detecta mucho antes que otro, no lo arregles todavía: es exactamente el problema que resolverás en la Lección 27.
 
-**Hardware:** HW-008.
+10. 🟡 **Cierre.** Avisa al adulto para retirar el USB. El robot vuelve a quedar apagado.
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+La lección está completa cuando puedes, señalando el módulo real: nombrar la linterna y el ojo, decir cuál brilló en la cámara, y explicar qué es señal y qué es ruido con un ejemplo (la mano que refleja es señal; el sol de la ventana es ruido).
 
-La cadena exacta de hoy se concentra en **LED IR, fotodetector, señal y ruido**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+## Desafío: el mapa del ruido
 
-## 7. Seguridad y participación del adulto
+Con el USB conectado y el adulto presente, acércale al sensor una lámpara de la casa encendida desde un lado, sin poner nada frente al módulo. Observa si el LED de señal reacciona aunque no haya "objeto" frente a él. Anota tu conclusión: ¿qué tanto ruido infrarrojo hay en tu sala? Ese dato te servirá al calibrar.
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
+## Si algo no cuadra
 
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Ninguna cápsula brilla en la cámara | ¿Se encendió el LED de alimentación del módulo? | Si no, el USB no está alimentando el sensor: el adulto revisa el cable de tres hilos; si sí, prueba otra cámara |
+| El LED de alimentación no enciende | ¿El cable de tres hilos está bien insertado en el shield? | El adulto verifica el mapa 5V/GND/OUT antes de repetir |
+| El LED de señal está siempre encendido | ¿Hay algo frente al sensor o mucha luz directa? | Anótalo: en la Lección 27 ajustarás el potenciómetro; es el síntoma que el manual manda corregir |
+| El LED de señal nunca enciende | ¿La mano está a unos 10 cm y frente a las cápsulas? | Acércala despacio; si tampoco así, el umbral quedó muy exigente (Lección 27) |
 
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres identificar qué parte emite y cuál recibe en un sensor de obstáculos y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-008 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con LED IR, fotodetector, señal y ruido. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a inspeccionar las dos cápsulas y seguir su ruta hasta OUT. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: componentes diferenciados por función, no solo por aspecto. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
-
-## 11. Qué deberías observar
-
-El resultado normal es **componentes diferenciados por función, no solo por aspecto**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [El espectro electromagnético y el infrarrojo](https://science.nasa.gov/ems/07_infraredwaves/) — Inglés; lectura NASA; 8 min. Aprenderás el espectro electromagnético y el infrarrojo. Esencial.
 - [Sensores de PX-32](../../docs/reference/sensores.md) — Español; referencia interna; 6 min. Aprenderás sensores de px-32. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+La referencia interna resume qué informa y qué no informa cada sensor de PX-32; después de hoy sabes por qué el de obstáculos no mide distancias exactas: solo pregunta si regresó suficiente luz.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **LED IR** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 39 a 43 y conexión de la página 40: sensores izquierdo en D3 y derecho en D2, LEDs indicadores de alimentación y señal.
+- [Ficha HW-008 del repositorio](../../docs/hardware/HW-008-ir-obstaculos.md), componentes y pines de los sensores de obstáculos.
+- [NASA Science: infrarrojo cercano reflejado](https://science.nasa.gov/ems/08_nearinfraredwaves/), cómo se refleja el infrarrojo cercano y por qué interesa filtrar el visible.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Llévalo al robot y preséntale las partes como quien presenta a un equipo: "esta es la linterna, este el ojo, este el árbitro que decidirá, este el tornillo de la sensibilidad". Explícale cómo supiste cuál cápsula es la linterna sin ver su luz, y dale un ejemplo de señal y otro de ruido para el sensor de la casa.
 
-Hoy aprendiste a **identificar qué parte emite y cuál recibe en un sensor de obstáculos** y lo conectaste con **LED IR, fotodetector, señal y ruido**. Pudiste observar componentes diferenciados por función, no solo por aspecto. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 25: Reflexión y absorción](25-reflexion-y-absorcion.md).
+La linterna ya ilumina y el ojo ya recibe. En la [Lección 25](25-reflexion-y-absorcion.md) pondrás a prueba al conjunto con distintos materiales: blanco, negro, metal… y descubrirás que no todos los objetos "aparecen" igual ante el sensor.

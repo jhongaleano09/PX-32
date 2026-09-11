@@ -1,141 +1,120 @@
 # Lección 28 — Leer un sensor IR por un pin digital
 
-## 1. Tu misión de hoy
+## Un pin que escucha
 
-Hoy vas a **mostrar en Serial el estado del sensor izquierdo conectado a D3**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Hasta ahora, el veredicto del sensor vivía en un LED: encendido o apagado, y nada más. Pero la Mega 2560 no tiene ojos para mirar LEDs. Necesita recibir ese veredicto por un cable, en su idioma: voltajes.
 
-## 2. Tiempo estimado
+El camino ya está tendido. El pin OUT del sensor izquierdo termina en el pin **D3** de la Mega a través del shield (lo verificaste en la Lección 24): cuando el LM393 cambia de veredicto, el voltaje del pin D3 cambia entre dos niveles, HIGH y LOW. Lo nuevo de hoy es enseñarle al programa a escuchar.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Para escuchar, un pin se configura distinto que para empujar. En el Blink y en los motores usaste `pinMode(..., OUTPUT)`: el pin empuja, decide su propio voltaje. Hoy usas `pinMode(..., INPUT)`: el pin no decide nada, obedece el voltaje que le llega por el cable y nada más. Y la orden para preguntarle cómo está es `digitalRead(pin)`, que contesta exactamente dos cosas posibles: `HIGH` (nivel alto, en esta placa cercano a 5 V) o `LOW` (nivel bajo, cercano a GND). Dos palabras que conoces desde la Lección 03.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Si vienes de Scratch, esto te va a sonar: el bloque "¿presionando la barra espaciadora?" no dibuja nada ni mueve nada; solo contesta verdadero o falso, y un "si… entonces" hace el resto. `digitalRead()` es ese bloque: pregunta el estado del pin; `if` (Lección 09) decide con la respuesta.
 
-## 3. Lo que necesitas saber antes de empezar
+Queda un misterio técnico, y es el más interesante del día: ¿cuál de los dos valores significa "detecté algo"? En muchos módulos con LM393, la salida es activa-baja: detectar entrega LOW y el aire libre entrega HIGH. Pero "muchos módulos" no es una prueba, y este curso no reparte hechos sin evidencia. Hoy vas a medirlo con tu propio sensor y a escribir la respuesta en tu cuaderno. Esa nota será la clave de las Lecciones 29 y 30.
 
-[Lección 09: Decisiones con if y else](../01-programacion/09-decisiones-con-if-y-else.md), [Lección 27: El potenciómetro ajusta el umbral](27-el-potenciometro-ajusta-el-umbral.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+## Lo que necesitas
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+- PX-32 con ambos sensores conectados y calibrados a la ventana de 10/15 cm (Lección 27).
+- Tu mano o el cartón blanco y la regla.
+- Computador con Arduino IDE 2, cable USB de datos.
+- El sketch [28-leer-un-sensor-ir-por-un-pin-digital.ino](../../code/educational/28-leer-un-sensor-ir-por-un-pin-digital/28-leer-un-sensor-ir-por-un-pin-digital.ino).
+- Tu cuaderno, abierto en una página nueva titulada "Lecturas de D3".
+- Un adulto para el USB.
 
-## 4. Lectura principal
+Estado inicial: PX-32 apagado, sin baterías. Los motores no participan: el sketch de hoy no menciona un solo pin de motor.
 
-### La idea intuitiva
+🟡 El adulto conecta el USB cuando toque y lo retira al cierre. La clase no tiene movimiento.
 
-El tema de hoy es **INPUT, digitalRead, HIGH y LOW**. En lenguaje cotidiano, buscamos una forma fiable de mostrar en Serial el estado del sensor izquierdo conectado a D3. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+## Lee el programa antes de cargarlo
 
-Un sensor infrarrojo no ve objetos como un ojo. Emite o recibe radiación y transforma una interacción física en una señal eléctrica. Superficie, ángulo, distancia, iluminación y umbral pueden cambiar la lectura. Por eso una detección es una medición bajo condiciones concretas, no una verdad universal sobre el mundo.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **INPUT, digitalRead, HIGH y LOW**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para leer D3, acercar y retirar un objeto y registrar la lógica real. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Input:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001, HW-008.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **INPUT, digitalRead, HIGH y LOW**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante prepara la predicción, el programa y la tabla de datos.
-- 🟡 Un adulto revisa el montaje antes de conectar USB o alimentar sensores.
-- 🔴 El adulto corrige cualquier cable, ruta de Serial1 o conexión de potencia. Se cablea únicamente con USB retirado y alimentación apagada.
-
-La actividad comienza sin movimiento. Si una lectura es extraña, no se cambian varios cables a la vez: se apaga, se compara con el mapa canónico y se modifica una sola variable.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres mostrar en Serial el estado del sensor izquierdo conectado a D3 y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001, HW-008 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con INPUT, digitalRead, HIGH y LOW. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a leer D3, acercar y retirar un objeto y registrar la lógica real. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: cambios 0/1 estables y lógica activa-alta o activa-baja determinada por evidencia. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [28-leer-un-sensor-ir-por-un-pin-digital.ino](../../code/educational/28-leer-un-sensor-ir-por-un-pin-digital/28-leer-un-sensor-ir-por-un-pin-digital.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **INPUT**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y recórrelo línea por línea. Debe ser idéntico a este bloque:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 28
-// Cargar solo después de leer la sección de seguridad.
-const byte IR_IZQ=3, IR_DER=2;
-void setup(){ pinMode(IR_IZQ,INPUT); pinMode(IR_DER,INPUT); Serial.begin(9600); }
-void loop(){ int izq=digitalRead(IR_IZQ), der=digitalRead(IR_DER); Serial.print(izq); Serial.print(','); Serial.println(der); delay(100); }
+// Curso PX-32 - Leccion 28: leer el sensor IR izquierdo en D3.
+
+const byte SENSOR_IR_IZQUIERDO = 3;
+
+void setup() {
+  pinMode(SENSOR_IR_IZQUIERDO, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int lectura = digitalRead(SENSOR_IR_IZQUIERDO);
+  Serial.println(lectura);
+  delay(200);
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 **`const byte SENSOR_IR_IZQUIERDO = 3;`** le pone nombre al número del pin, como hiciste con `LIMITE` en la Lección 09. `byte` alcanza para guardar un número pequeño como 3, y `const` recuerda al compilador que no va a cambiar. Cuando leas `SENSOR_IR_IZQUIERDO`, piensa "el cable que viene del sensor izquierdo".
 
-## 11. Qué deberías observar
+3. 🟢 **`pinMode(SENSOR_IR_IZQUIERDO, INPUT);`** configura D3 como entrada: el pin escuchará el voltaje que trae el cable OUT del sensor, en vez de imponer el suyo. Va en `setup()` porque basta decirlo una vez.
 
-El resultado normal es **cambios 0/1 estables y lógica activa-alta o activa-baja determinada por evidencia**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+4. 🟢 **`int lectura = digitalRead(SENSOR_IR_IZQUIERDO);`** es el corazón de la clase: pregunta el estado actual del pin y guarda la respuesta (`HIGH` o `LOW`) en una variable, lista para usar. Ocurre una vez por vuelta de `loop()`.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+5. 🟢 **`Serial.println(lectura);`** imprime esa respuesta en su propia línea. Cuando `println` recibe `HIGH` imprime `1` y con `LOW` imprime `0`: son las mismas cosas con otro disfraz (Lecciones 08 y 09).
 
-## 12. Si no funciona
+6. 🟢 **`delay(200);`** frena la vuelta un quinto de segundo para que el monitor muestre unas cinco líneas por segundo: un ritmo que tus ojos pueden leer. Sin esta pausa el monitor se llena de números a toda velocidad.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+7. 🟢 **Predice antes de cargar.** Escribe en el cuaderno: "Con la sala despejada, el monitor mostrará ___" (¿0 o 1?) y "Con mi mano a 10 cm, mostrará ___". Son dos apuestas; abajo las cobras o las corriges.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+## El experimento: averigua qué significa cada número
 
-## 13. Desafío
+8. 🟡 **Carga y abre el oído.** El adulto conecta el USB. Elige la Mega y su puerto, verifica y sube el sketch. Abre el monitor serie a 9600 baudios. Deberías ver una columna estable con el mismo número, una y otra vez.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+9. 🟢 **Situación 1: aire libre.** Aléjate del robot, deja el frente del sensor sin nada. Anota el número que se repite. Ese es el estado "no detecta" de tu módulo.
 
-## 14. Lecturas y videos para explorar
+10. 🟢 **Situación 2: mano a 10 cm.** Coloca tu mano abierta a 10 cm del sensor izquierdo, medidos con la regla. La columna debería cambiar al otro valor. Retírala: regresa. Acércala: cambia. Repite el ciclo tres veces: los cambios deben ser limpios y repetibles.
+
+11. 🟢 **Escribe tu ley.** En el cuaderno, con fecha: "En mi sensor, detectar = ___ y aire libre = ___". La respuesta más frecuente en estos módulos es detectar = 0 y aire libre = 1 (salida activa-baja), pero lo que manda es tu medición. Esta nota viaja contigo a las próximas dos lecciones; sin ella, los programas del hito leerán al revés.
+
+12. 🟢 **Un solo cambio: la dirección.** Cambia únicamente `= 3` por `= 2` en la línea de la constante. Antes de subir, predice: ¿qué sensor escucharás ahora? Sube y comprueba tapando primero un sensor y luego el otro con la mano: la columna solo debe reaccionar al derecho. Moraleja: el número del código y el cable deciden juntos a quién escucha la Mega. Deja el sketch de vuelta en 3.
+
+13. 🟢 **Un solo cambio: el ritmo.** Cambia solo `delay(200)` por `delay(50)`. Predice cuántas líneas por segundo aparecerán (cuenta durante cinco segundos y divide). ¿El robot se volvió más sensible? No: escucha más seguido, que es distinto. Vuelve a 200 para leer tranquilo.
+
+14. 🟢 **El vocabulario completo, junto.** Recuerda el vocabulario de la clase: el módulo entrega en OUT un nivel **digital** de dos posibles gracias al comparador (Lección 26); la Mega lo lee con `digitalRead`; `HIGH`/`LOW` son los nombres del voltaje alto y bajo; `1`/`0` son sus disfraces impresos.
+
+15. 🟡 **Cierre.** Cierra el monitor, el adulto retira el USB. El robot queda apagado, calibración intacta.
+
+El experimento está completo cuando tu cuaderno tiene la ley del paso 11 comprobada tres veces, y puedes explicar por qué `digitalRead` es el bloque de preguntas de Scratch convertido a C++.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** captura del monitor serie junto a fotografía del montaje.
+> - **Objetivo:** mostrar el contraste entre las dos lecturas y dónde ocurren físicamente.
+> - **Descripción:** imagen dividida: a la izquierda, la mano a 10 cm del sensor izquierdo con la regla visible; a la derecha, el monitor serie mostrando una columna de 1 que cambia a 0 en el momento marcado. Abajo, detalle del shield con los pines D3 y D2 señalados y el cable de tres hilos llegando.
+> - **Elementos que deben señalarse:** mano, regla, sensor izquierdo, columna del monitor antes y después, pines D3 y D2 en el shield.
+> - **Fuente técnica:** referencia del lenguaje Arduino, https://docs.arduino.cc/language-reference/, `digitalRead()` y constantes `HIGH`/`LOW`.
+> - **Texto alternativo sugerido:** "Una mano a diez centímetros del sensor cambia la columna del monitor serie entre uno y cero, con los pines D3 y D2 señalados en el shield".
+
+## Desafío: el cono invisible
+
+Con el sketch escuchando D3, mueve tu mano lentamente en arco frente al sensor: al centro, a la izquierda, a la derecha, arriba. Marca en el aire (o pide que te ayuden a medir) hasta dónde de lado sigue detectando. Dibuja en el cuaderno el "cono de visión" de tu sensor visto desde arriba. Ahora sabes cuánto mundo ve de verdad.
+
+## Si el monitor no cuenta la historia
+
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| No aparece nada en el monitor | ¿Puerto y baudios correctos? | Repite la lista de la Lección 08: placa Mega, su puerto, monitor a 9600 |
+| La columna nunca cambia | ¿El LED de señal del sensor sí cambia con tu mano? | Si el LED cambia pero el número no, revisa que el cable OUT llegue a D3 (Lección 24) y que la constante diga 3; si el LED tampoco cambia, es físico: calibración (Lección 27) |
+| Los valores saltan solos sin mover nada | ¿Estás en la zona inestable del umbral? | Recuerda la Lección 26: ajusta la calibración o cambia de distancia de trabajo |
+| Cambia con movimientos lejos del frente | ¿Qué tan ancho era tu cono del desafío? | Es el campo de visión del módulo: anota el hallazgo, no es un error |
+| Cambia al sonido o al tocar la mesa | ¿Algún cable flojo? | Pide al adulto revisar el conector de tres hilos con el USB retirado |
+
+## Lecturas y videos para explorar
 
 - [El espectro electromagnético y el infrarrojo](https://science.nasa.gov/ems/07_infraredwaves/) — Inglés; lectura NASA; 8 min. Aprenderás el espectro electromagnético y el infrarrojo. Esencial.
 - [Sensores de PX-32](../../docs/reference/sensores.md) — Español; referencia interna; 6 min. Aprenderás sensores de px-32. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+La regla de integración de la referencia interna empieza contigo: un sensor gana permiso para mover motores solo después de mostrar datos comprensibles en Serial. Acabas de cumplir el primer requisito.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **INPUT** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), `digitalRead()`, `pinMode()` con `INPUT`, y constantes `HIGH`/`LOW`.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 39 a 43, sensor izquierdo en D3 y derecho en D2.
+- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md), sensores IR de obstáculos.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Muéstrale la columna de números cambiando con tu mano y explícale la diferencia entre un pin OUTPUT que empuja y un pin INPUT que escucha, con el ejemplo del LED del Blink. Cuéntale cuál número significa "detecté" en tu módulo y por qué lo escribiste en el cuaderno en vez de darlo por sabido. Pídele que invente una situación donde leer al revés (confundir 0 con 1) causaría un problema gracioso… o no tan gracioso.
 
-Hoy aprendiste a **mostrar en Serial el estado del sensor izquierdo conectado a D3** y lo conectaste con **INPUT, digitalRead, HIGH y LOW**. Pudiste observar cambios 0/1 estables y lógica activa-alta o activa-baja determinada por evidencia. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 29: Dos sensores, cuatro situaciones](29-dos-sensores-cuatro-situaciones.md).
+Un sensor entrega un sí o un no. Pero PX-32 tiene dos sensores, y dos preguntas sí/no se combinan en cuatro respuestas posibles. En la [Lección 29](29-dos-sensores-cuatro-situaciones.md) aprendes a leerlas todas.

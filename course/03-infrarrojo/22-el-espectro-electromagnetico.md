@@ -1,131 +1,83 @@
 # Lección 22 — El espectro electromagnético
 
-## 1. Tu misión de hoy
+## Un teclado de luz que casi no se ve
 
-Hoy vas a **ordenar radio, infrarrojo, visible, ultravioleta y rayos X**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Un piano tiene teclas graves y agudas, pero todas son teclas del mismo instrumento. Con la luz pasa algo parecido: existe una familia de "luces" que se distinguen por su **longitud de onda**, la distancia entre una cresta y la siguiente de la onda. Todas son lo mismo físicamente —ondas electromagnéticas—, todas viajan en el vacío a la velocidad de la luz (unos 300.000 km cada segundo) y todas pueden transportar energía, como sentiste en la Lección 21.
 
-## 2. Tiempo estimado
+La gran diferencia es el tamaño de la onda. Piensa en las olas del mar: unas tienen crestas muy separadas y otras muy juntas. Ojo: las olas de verdad necesitan agua; la luz no necesita ningún medio para viajar. La comparación sirve solo para imaginar la distancia entre crestas, no el material.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Esa familia completa, ordenada de la onda más larga a la más corta, es el **espectro electromagnético**: radio, microondas, infrarrojo, luz visible, ultravioleta, rayos X y rayos gamma. Lo que tus ojos ven —del rojo al violeta— es una franja diminuta en el medio. Los demás "colores" del teclado existen igual, aunque no tengas receptor para ellos.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Hay una regla que vale la pena entender: como todas viajan a la misma velocidad, las ondas cortas tienen que repetirse más veces por segundo para no quedarse atrás. A esa cantidad de repeticiones por segundo se le llama **frecuencia**, y se mide en hertz. Onda más corta, frecuencia más alta.
 
-## 3. Lo que necesitas saber antes de empezar
+| Región | Longitud de onda aproximada | Un ejemplo cercano |
+|---|---|---|
+| Radio | de metros a kilómetros | Bluetooth y Wi-Fi de PX-32 |
+| Microondas | centímetros | el horno de la cocina |
+| Infrarrojo | de ~700 nm a 1 mm | los sensores IR de PX-32, el control del televisor |
+| Visible | de 380 a 700 nm | tus ojos, el arcoíris |
+| Ultravioleta | menos de 380 nm | la que quema la piel en la playa |
+| Rayos X | muchísimo más cortas | una radiografía médica |
+| Rayos gamma | las más cortas de todas | fenómenos del espacio profundo |
 
-[Lección 21: La luz transporta energía](21-la-luz-transporta-energia.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+Un **nanómetro** (nm) es la millonésima parte de un milímetro. Un cabello humano mide alrededor de 50.000 a 100.000 nm de ancho: la luz visible entera cabe muchas veces en ese grosor.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+Dos advertencias para no confundirte. Primera: que una región tenga ondas más cortas no significa que una lámpara de esa región sea "más potente"; una linterna roja grande puede entregarte más energía total que una lucecita ultravioleta diminuta. La región dice cómo viene empaquetada la energía, no cuánta llega. Segunda: "invisible" no es lo mismo que "inexistente", como comprobarás con el control remoto en la Lección 23.
 
-## 4. Lectura principal
+## Lo que necesitas
 
-### La idea intuitiva
+- Una tira de papel de unos 60 cm (papel kraft, cartulina o varias hojas pegadas).
+- Siete tarjetas o etiquetas pequeñas con los nombres de las regiones: radio, microondas, infrarrojo, visible, ultravioleta, rayos X, rayos gamma.
+- Lápiz, regla y colores.
+- Tu cuaderno.
+- Un adulto con un computador o teléfono para abrir la página de NASA y comparar tu resultado con su diagrama.
 
-El tema de hoy es **onda electromagnética, longitud de onda y frecuencia**. En lenguaje cotidiano, buscamos una forma fiable de ordenar radio, infrarrojo, visible, ultravioleta y rayos X. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+PX-32 permanece apagado toda la clase: hoy construyes un mapa, no un circuito.
 
-Un sensor infrarrojo no ve objetos como un ojo. Emite o recibe radiación y transforma una interacción física en una señal eléctrica. Superficie, ángulo, distancia, iluminación y umbral pueden cambiar la lectura. Por eso una detección es una medición bajo condiciones concretas, no una verdad universal sobre el mundo.
+## Construye tu regla del espectro
 
-### De la intuición al concepto técnico
+1. 🟢 **Baraja y predice.** Mezcla las siete tarjetas y ordénalas tú solo, de la que creas que tiene la onda más larga a la más corta. Anota tu orden antes de comprobar nada.
 
-Los términos centrales son **onda electromagnética, longitud de onda y frecuencia**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+2. 🟢 **Verifica con la fuente.** Abre con el adulto la página del espectro de NASA y compara tu orden con el suyo. Corrige si hace falta y marca cuáles acertaste. El orden correcto, de larga a corta: radio, microondas, infrarrojo, visible, ultravioleta, rayos X, gamma.
 
-En PX-32, esta idea se usa para construir una escala relativa de bandas sin confundir energía con brillo. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+3. 🟢 **Dibuja la tira.** Sobre la tira de papel traza una barra horizontal larga y divídela en las siete regiones en orden. Deja la región **visible** más ancha que las demás y colórale los colores del arcoíris: del rojo (onda más larga del visible, ~700 nm) al violeta (la más corta, ~380 nm). Escribe los números límite del visible: 380 y 700.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+4. 🟢 **Marca dónde escucha PX-32.** Con otro color, coloca dos flechas: una sobre el infrarrojo que diga "aquí trabajan los sensores IR de las próximas clases, justo pasado el rojo" y otra sobre la radio que diga "aquí hablarán Bluetooth y Wi-Fi en bloques futuros". Tu robot vivirá en dos regiones invisibles del teclado.
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+5. 🟢 **La prueba del par.** Pide al adulto que tape dos regiones al azar de tu tira y que te pregunte cuáles faltan y qué vecinas tienen. Si puedes reconstruir el orden sin verlas, ya no es memoria suelta: es una familia ordenada.
 
-## 5. Palabras nuevas
+6. 🟢 **Cuenta la historia completa** en voz alta: una sola familia de ondas, misma velocidad, distinta longitud de onda; mis ojos solo responden a la franja de 380 a 700 nm; el resto existe y se puede emitir y detectar con electrónica.
 
-- **Onda electromagnética:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+Tu regla está lista cuando el orden coincide con NASA, el visible muestra su arcoíris con sus dos límites, y puedes explicar qué tienen en común las siete regiones. Guárdala: la usarás como mapa de referencia del curso.
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+## Desafío: el telescopio de las dos regiones
 
-## 6. Así aparece en PX-32
+En tu cuaderno responde: si pudieras ver solo dos regiones del espectro además del visible, ¿cuáles elegirías para PX-32 y para qué te servirían? No hay una única respuesta correcta; lo que cuenta es tu justificación usando la palabra longitud de onda.
 
-**Hardware:** HW-008.
+## Si algo no cuadra
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Mi orden no coincide con NASA | ¿Confundiste radio con rayos gamma en los extremos? | Recuerda el ancla: radio = ondas de metros, gamma = las más pequeñas que existen |
+| Me cuesta ubicar el infrarrojo | ¿Está justo después del rojo? | El infrarrojo comienza donde termina el rojo visible (~700 nm) |
+| Creo que el Wi-Fi no es luz | ¿Es una onda electromagnética que viaja sin medio? | Lo es: una onda de la región de radio; invisible como el infrarrojo |
+| No entiendo frecuencia | ¿Quedó claro que todas viajan igual de rápido? | Onda corta obliga a repetirse más veces por segundo: eso es la frecuencia |
 
-La cadena exacta de hoy se concentra en **onda electromagnética, longitud de onda y frecuencia**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres ordenar radio, infrarrojo, visible, ultravioleta y rayos X y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-008 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con onda electromagnética, longitud de onda y frecuencia. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a construir una escala relativa de bandas sin confundir energía con brillo. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: orden correcto y reconocimiento de que son la misma familia física. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
-
-## 11. Qué deberías observar
-
-El resultado normal es **orden correcto y reconocimiento de que son la misma familia física**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [El espectro electromagnético y el infrarrojo](https://science.nasa.gov/ems/07_infraredwaves/) — Inglés; lectura NASA; 8 min. Aprenderás el espectro electromagnético y el infrarrojo. Esencial.
 - [Sensores de PX-32](../../docs/reference/sensores.md) — Español; referencia interna; 6 min. Aprenderás sensores de px-32. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+En la página de NASA busca el diagrama del espectro completo y compáralo con tu tira de papel: es la misma información que construiste con tus manos.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **onda electromagnética** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [NASA Science: luz visible](https://science.nasa.gov/ems/09_visiblelight/), rango aproximado de 380 a 700 nm percibido por el ojo humano.
+- [NASA Science: introducción al espectro electromagnético](https://science.nasa.gov/ems/01_intro/), orden de las regiones y velocidad común de la familia.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 39 a 43, los sensores IR del kit como aplicación de la región infrarroja.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Desbaraja las tarjetas frente a él y ordénalas explicando tu criterio. Señala en tu tira dónde trabaja PX-32 y dónde vive lo que ven sus ojos. Para terminar, explícale por qué "la luz visible es apenas una franja" usando la comparación del teclado o de las olas, y aclárale cuál es la diferencia entre la analogía y la realidad.
 
-Hoy aprendiste a **ordenar radio, infrarrojo, visible, ultravioleta y rayos X** y lo conectaste con **onda electromagnética, longitud de onda y frecuencia**. Pudiste observar orden correcto y reconocimiento de que son la misma familia física. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 23: Infrarrojo: luz que no vemos](23-infrarrojo-luz-que-no-vemos.md).
+Acabas de ubicar el infrarrojo en el mapa: empieza justo pasado el rojo. En la [Lección 23](23-infrarrojo-luz-que-no-vemos.md) lo vas a ver con tus propios ojos… bueno, con la ayuda de una cámara.

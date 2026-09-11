@@ -1,131 +1,94 @@
 # Lección 25 — Reflexión y absorción
 
-## 1. Tu misión de hoy
+## Por qué la camiseta negra quema en el verano
 
-Hoy vas a **comparar cómo distintas superficies devuelven infrarrojo**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Dos camisetas al sol, misma hora, misma piel: la blanca se siente tibia y la negra quema. La luz que les llega es la misma; lo que cambia es qué hacen con ella. La blanca **refleja** gran parte de la luz: la devuelve al mundo y se queda poca energía. La negra **absorbe**: se queda con la energía y se calienta.
 
-## 2. Tiempo estimado
+Lo mismo les pasa a los objetos frente al sensor de PX-32, y aquí está el truco que hay que entender bien: el sensor no pregunta "¿qué tan lejos está el objeto?". Pregunta "¿regresó suficiente luz a mi receptor?". Y la respuesta depende del material, de la distancia y hasta del ángulo. Un cartón blanco a 20 cm puede devolver más luz que un paño negro a 8 cm. Un sensor infrarrojo de reflexión no mide distancias: mide cuánta luz regresó.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Hay un detalle más, y es delicioso: no todos los objetos brillantes reflejan igual. El papel blanco es mate: rebate la luz en todas direcciones, como una pared pintada. El papel aluminio es como un espejo: rebate la luz en una sola dirección, ordenada. Si inclinas el aluminio, el reflejo se marcha para otro lado y el sensor "pierde" un objeto que estaba justo enfrente, aunque sea lo más brillante de la mesa. A la reflexión mate se le llama difusa; a la de espejo, especular.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Todo esto lo vas a medir con tu propio sensor, y la moneda del experimento será el LED de señal que conociste en la Lección 24: encendido significa "regresó suficiente luz"; apagado, "no regresó la suficiente". Guárdate esta idea para el futuro cercano: el seguimiento de línea del próximo bloque funciona exactamente así, con una cinta negra que absorbe y un piso blanco que refleja.
 
-## 3. Lo que necesitas saber antes de empezar
+## Lo que necesitas
 
-[Lección 24: Emisor y receptor infrarrojos](24-emisor-y-receptor-infrarrojos.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+- PX-32 con sus dos sensores conectados según el mapa.
+- Un rectángulo de cartón o papel blanco (media carta está bien).
+- Un rectángulo de cartón o fieltro negro.
+- Un trozo de papel aluminio (puedes pegarlo plano sobre un cartón para que quede firme).
+- Una prenda o tela oscura.
+- Una regla o cinta métrica.
+- Tu cuaderno con una tabla como la de abajo.
+- Cable USB, computador y un adulto para energizar.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+Estado inicial: PX-32 apagado y sin baterías sobre la mesa, quieto. Los sensores deben estar calibrados de fábrica o al menos encender su LED de alimentación con USB.
 
-## 4. Lectura principal
+🟡 El adulto conecta el USB y permanece cerca. No habrá movimiento: la única energía de la clase es la del cable.
 
-### La idea intuitiva
+## La tabla de materiales
 
-El tema de hoy es **reflexión, absorción, distancia y material**. En lenguaje cotidiano, buscamos una forma fiable de comparar cómo distintas superficies devuelven infrarrojo. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+| Material | ¿Detecta a 10 cm? (3 pruebas) | Distancia máxima aproximada |
+|---|---|---|
+| Cartón blanco | | |
+| Cartón negro | | |
+| Papel aluminio | | |
+| Tela oscura | | |
+| Tu mano | | |
 
-Un sensor infrarrojo no ve objetos como un ojo. Emite o recibe radiación y transforma una interacción física en una señal eléctrica. Superficie, ángulo, distancia, iluminación y umbral pueden cambiar la lectura. Por eso una detección es una medición bajo condiciones concretas, no una verdad universal sobre el mundo.
+1. 🟢 **Predice el orden.** Antes de probar nada, ordena en el cuaderno los cinco materiales del que crees que se detectará más lejos al que se detectará más cerca. Tu predicción queda congelada antes del primer dato.
 
-### De la intuición al concepto técnico
+2. 🟡 **Energiza.** El adulto conecta el USB. Verifica que el LED de alimentación de ambos sensores esté encendido.
 
-Los términos centrales son **reflexión, absorción, distancia y material**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+3. 🟢 **Prueba a 10 cm, tres veces cada material.** Elige un sensor y úsalo durante toda la tabla; para no confundirte de lado, recuerda que el izquierdo es el cuyo cable de tres hilos llega a D3. Sostén cada material plano, frente a las cápsulas, a 10 cm medidos con la regla. Mantén el mismo ángulo (paralelo al sensor) y la misma mano que sostiene. Anota "sí" o "no" tres veces por material; si sale distinto entre intentos, anótalo también: ese dato vale.
 
-En PX-32, esta idea se usa para acercar cartón blanco, negro y metal sin mover el ajuste. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+4. 🟢 **Mide la distancia máxima.** Con el cartón blanco empieza a 10 cm y aléjalo despacio, milímetro a milímetro, hasta que el LED de señal se apaga. Anota esa distancia. Repite la medición con el aluminio y con tu mano. Con los materiales oscuros, mide también: tal vez la respuesta sea "no detecta ni a 5 cm", y eso también es un dato.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+5. 🟢 **El truco del espejo.** Vuelve a poner el aluminio a 10 cm, detectándose. Ahora inclínalo unos 30 grados, como un espejo que desvía el sol. El LED puede apagarse aunque el aluminio siga brillante y cercano: el reflejo especular se fue a otra parte y no regresó al ojo del sensor. Compara con el cartón blanco inclinado igual: al ser difuso, sigue devolviendo algo de luz en muchas direcciones. Anota la diferencia.
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+6. 🟢 **Cambia una sola condición: la luz de la sala.** Elige el cartón blanco a una distancia donde se detecte, y repite la medición con la lámpara principal de la habitación encendida y apagada. Si el resultado cambia, acabas de conocer al ruido de la Lección 24 en acción: el infrarrojo ambiente altera la lectura. Anota las condiciones junto al dato.
 
-## 5. Palabras nuevas
+7. 🟢 **Cierra la tabla.** Compara tu orden final con tu predicción del paso 1 y explica las diferencias con las palabras reflexión, absorción, difusa y especular.
 
-- **Reflexión:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+8. 🟡 **Cierre.** El adulto retira el USB.
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+La actividad está completa cuando tu tabla tiene al menos los cinco materiales probados a 10 cm con tres repeticiones, dos distancias máximas medidas, y una frase tuya que explique por qué el mismo sensor "ve" distinto según el material.
 
-## 6. Así aparece en PX-32
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama de tres paneles sobre reflexión.
+> - **Objetivo:** distinguir visualmente reflexión difusa, especular y absorción frente al sensor.
+> - **Descripción:** tres viñetas con el módulo sensor a la izquierda emitiendo un haz hacia un material: en la primera, un cartón blanco rebate flechas en muchas direcciones y una regresa al receptor; en la segunda, el aluminio rebate una sola flecha ordenada que se va lejos del receptor; en la tercera, el paño negro se "come" el haz con una marca de calor y casi nada regresa.
+> - **Elementos que deben señalarse:** haz infrarrojo de ida, flechas de regreso, receptor, rótulos difusa/especular/absorción.
+> - **Fuente técnica:** NASA Science, https://science.nasa.gov/ems/08_nearinfraredwaves/, reflexión del infrarrojo cercano según superficie.
+> - **Texto alternativo sugerido:** "Tres diagramas muestran cómo un cartón blanco refleja en todas direcciones, el aluminio refleja como espejo y el paño negro absorbe el haz infrarrojo".
 
-**Hardware:** HW-008.
+## Desafío: el detective de materiales
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+Sin que tú mires, pide al adulto que escoja un objeto de la casa y te diga solo dos datos: a qué distancia máxima lo detecta el sensor y de qué color es. Con esa información, adivina si su superficie es mate o brillante, y explica tu razonamiento. Luego compruébalo con el objeto.
 
-La cadena exacta de hoy se concentra en **reflexión, absorción, distancia y material**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+## Si algo no cuadra
 
-## 7. Seguridad y participación del adulto
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Todo se detecta igual, hasta el negro a 30 cm | ¿El umbral quedó muy sensible? | Anótalo: lo ajustarás en la Lección 27; por ahora registra los datos relativos entre materiales |
+| Nada se detecta, ni la mano a 5 cm | ¿El LED de alimentación está encendido? | Verifica energía; si está encendido, el umbral quedó muy exigente (Lección 27) |
+| Las tres pruebas del mismo material dan distinto | ¿Distancia, ángulo o luz cambiaron entre intentos? | Controla una variable a la vez y registra las condiciones |
+| El aluminio inclinado sigue detectándose | ¿El ángulo fue pequeño o el sensor recibe reflejos de la mesa? | Inclina un poco más o cambia el sensor de lugar sobre la mesa |
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres comparar cómo distintas superficies devuelven infrarrojo y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-008 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con reflexión, absorción, distancia y material. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a acercar cartón blanco, negro y metal sin mover el ajuste. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: cambios de detección que dependen tanto del material como de la distancia. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
-
-## 11. Qué deberías observar
-
-El resultado normal es **cambios de detección que dependen tanto del material como de la distancia**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [El espectro electromagnético y el infrarrojo](https://science.nasa.gov/ems/07_infraredwaves/) — Inglés; lectura NASA; 8 min. Aprenderás el espectro electromagnético y el infrarrojo. Esencial.
 - [Sensores de PX-32](../../docs/reference/sensores.md) — Español; referencia interna; 6 min. Aprenderás sensores de px-32. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Después de tu tabla, la página de NASA te mostrará fotos de vegetación en infrarrojo cercano: la misma física de reflexión que mediste, usada para estudiar plantas desde aviones y satélites.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **reflexión** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [NASA Science: infrarrojo cercano reflejado](https://science.nasa.gov/ems/08_nearinfraredwaves/), cómo el material y el color cambian la reflexión del infrarrojo cercano.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 39 a 43, comportamiento de los sensores IR con objetos a distintas distancias.
+- [Ficha HW-008 del repositorio](../../docs/hardware/HW-008-ir-obstaculos.md), experimento mínimo con superficies de distinto material.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Muéstrale la tabla terminada y explícale por qué el negro no "aparece" para el sensor aunque esté cerca. Cuéntale lo del aluminio inclinado y pregúntale dónde ha visto ese efecto con luz visible (pistas: un espejo de carro, el destello de un reloj, un charco al sol). Cierra explicando por qué el próximo robot seguidor de líneas necesitará una línea negra sobre piso blanco.
 
-Hoy aprendiste a **comparar cómo distintas superficies devuelven infrarrojo** y lo conectaste con **reflexión, absorción, distancia y material**. Pudiste observar cambios de detección que dependen tanto del material como de la distancia. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 26: LM393: convertir una señal en decisión](26-lm393-convertir-una-senal-en-decision.md).
+Ya sabes que la cantidad de luz que regresa es gradual: mucha con el blanco, poquísima con el negro. Pero el sensor solo contesta sí o no. En la [Lección 26](26-lm393-convertir-una-senal-en-decision.md) conocerás al árbitro que corta esa escala gradual en dos.

@@ -1,141 +1,141 @@
 # Lección 29 — Dos sensores, cuatro situaciones
 
-## 1. Tu misión de hoy
+## Dos preguntas sí/no son cuatro mundos
 
-Hoy vas a **interpretar conjuntamente los sensores de D3 y D2**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Un sensor entrega un solo dato: detecta o no detecta. La respuesta a una pregunta sí/no se llama un **bit** de información. Con un bit hay dos mundos posibles. Pero PX-32 tiene dos sensores apuntando al frente, uno a cada lado: izquierda y derecha. Dos preguntas sí/no se combinan en 2 × 2 = **cuatro situaciones**:
 
-## 2. Tiempo estimado
+| ¿Izquierdo detecta? | ¿Derecho detecta? | Situación frente al robot |
+|---|---|---|
+| no | no | nada detectado a la vista |
+| sí | no | algo está hacia la izquierda |
+| no | sí | algo está hacia la derecha |
+| sí | sí | algo está al frente (grande o cercano) |
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Esta tabla es una **tabla de verdad**: lista todas las combinaciones posibles de las entradas, sin repetir ni olvidar ninguna. Es la herramienta que usarás después con cinco sensores del tracker, donde las combinaciones serán 2 × 2 × 2 × 2 × 2 = 32.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Para que el programa distinga las cuatro situaciones necesita combinar condiciones, y ahí entra un operador nuevo: `&&`, que se lee "y". `izquierdaDetecta && derechaDetecta` es `true` solamente cuando las dos condiciones son `true` a la vez; si una falla, el conjunto es `false`. Es el hermano del bloque "y" de Scratch, ese que unías debajo de un "si… entonces" para exigir dos condiciones juntas. Su primo es `||` ("o"), que es `true` cuando al menos una condición se cumple.
 
-## 3. Lo que necesitas saber antes de empezar
+Antes de dejar que el código piense por ti, llena la tabla a mano: es tu mapa del territorio. Y una advertencia de orientación, que en este experimento es fácil perderse: "izquierda" y "derecha" se cuentan **desde el punto de vista del robot**, no del tuyo. Si miras a PX-32 de frente, tu izquierda es la derecha de él. Cuando quieras probar "la izquierda del robot", párate detrás de él o usa el cono que dibujaste en la Lección 28.
 
-[Lección 28: Leer un sensor IR por un pin digital](28-leer-un-sensor-ir-por-un-pin-digital.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+## Lo que necesitas
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+- PX-32 con ambos sensores calibrados a la ventana de 10/15 cm (Lección 27).
+- Tu cuaderno con la tabla de verdad vacía copiada.
+- Tus dos manos, o una mano y el cartón blanco para ocupar los dos sensores a la vez.
+- Computador con Arduino IDE 2, cable USB y el sketch [29-dos-sensores-cuatro-situaciones.ino](../../code/educational/29-dos-sensores-cuatro-situaciones/29-dos-sensores-cuatro-situaciones.ino).
+- Un adulto para el USB.
 
-## 4. Lectura principal
+Estado inicial: robot apagado y sin baterías, quieto sobre la mesa. Ningún movimiento en esta clase: hoy el robot aprende a nombrar lo que ve, no a reaccionar.
 
-### La idea intuitiva
+🟡 El adulto conecta el USB y lo retira al final. Si el sketch imprimiera algo distinto a lo que ocurre frente al robot, primero se revisa el montaje, no el experimento.
 
-El tema de hoy es **AND, OR, tabla de verdad y combinación**. En lenguaje cotidiano, buscamos una forma fiable de interpretar conjuntamente los sensores de D3 y D2. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+## Lee el programa que nombra situaciones
 
-Un sensor infrarrojo no ve objetos como un ojo. Emite o recibe radiación y transforma una interacción física en una señal eléctrica. Superficie, ángulo, distancia, iluminación y umbral pueden cambiar la lectura. Por eso una detección es una medición bajo condiciones concretas, no una verdad universal sobre el mundo.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **AND, OR, tabla de verdad y combinación**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para registrar libre, izquierda, derecha y ambos frente a un objeto. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **And:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-008 x2.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **AND, OR, tabla de verdad y combinación**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante prepara la predicción, el programa y la tabla de datos.
-- 🟡 Un adulto revisa el montaje antes de conectar USB o alimentar sensores.
-- 🔴 El adulto corrige cualquier cable, ruta de Serial1 o conexión de potencia. Se cablea únicamente con USB retirado y alimentación apagada.
-
-La actividad comienza sin movimiento. Si una lectura es extraña, no se cambian varios cables a la vez: se apaga, se compara con el mapa canónico y se modifica una sola variable.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres interpretar conjuntamente los sensores de D3 y D2 y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-008 x2 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con AND, OR, tabla de verdad y combinación. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a registrar libre, izquierda, derecha y ambos frente a un objeto. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: cuatro patrones asociados a posiciones, sin mover aún el robot. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [29-dos-sensores-cuatro-situaciones.ino](../../code/educational/29-dos-sensores-cuatro-situaciones/29-dos-sensores-cuatro-situaciones.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **AND**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y recórrelo completo. Debe ser idéntico a este bloque:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 29
-// Cargar solo después de leer la sección de seguridad.
-const byte IR_IZQ=3, IR_DER=2;
-void setup(){ pinMode(IR_IZQ,INPUT); pinMode(IR_DER,INPUT); Serial.begin(9600); }
-void loop(){ int izq=digitalRead(IR_IZQ), der=digitalRead(IR_DER); Serial.print(izq); Serial.print(','); Serial.println(der); delay(100); }
+// Curso PX-32 - Leccion 29: dos sensores IR, cuatro situaciones.
+
+const byte SENSOR_IR_IZQUIERDO = 3;
+const byte SENSOR_IR_DERECHO = 2;
+
+// Segun la evidencia de tu cuaderno en la Leccion 28: si tu modulo
+// entrega HIGH al detectar, cambia LOW por HIGH en esta linea.
+const int LECTURA_AL_DETECTAR = LOW;
+
+void setup() {
+  pinMode(SENSOR_IR_IZQUIERDO, INPUT);
+  pinMode(SENSOR_IR_DERECHO, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  bool izquierdaDetecta =
+      digitalRead(SENSOR_IR_IZQUIERDO) == LECTURA_AL_DETECTAR;
+  bool derechaDetecta =
+      digitalRead(SENSOR_IR_DERECHO) == LECTURA_AL_DETECTAR;
+
+  if (izquierdaDetecta && derechaDetecta) {
+    Serial.println("AMBOS DETECTAN");
+  } else if (izquierdaDetecta) {
+    Serial.println("SOLO IZQUIERDA");
+  } else if (derechaDetecta) {
+    Serial.println("SOLO DERECHA");
+  } else {
+    Serial.println("NINGUNO DETECTA");
+  }
+
+  delay(300);
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 **Dos constantes de pin.** `3` y `2`: los dos cables OUT que verificaste en la Lección 24. Escucharlos juntos en el mismo `loop()` es gratuito: cada `digitalRead` pregunta a un pin distinto y guarda su respuesta en su propia variable `bool`.
 
-## 11. Qué deberías observar
+3. 🟢 **`LECTURA_AL_DETECTAR` es tu ley del paso 11 de la Lección 28**, convertida en constante. La comparación `digitalRead(...) == LECTURA_AL_DETECTAR` traduce el número crudo a algo con significado: "¿este sensor está detectando?". Gracias a eso, el resto del programa piensa en detecciones, no en 0 y 1. Si tu evidencia dijo que detectar era `HIGH`, cambias una línea y todo el programa sigue funcionando: eso es lo que gana un programa que habla el idioma de su dueño.
 
-El resultado normal es **cuatro patrones asociados a posiciones, sin mover aún el robot**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+4. 🟢 **El `&&` del primer `if`** exige las dos detecciones juntas para imprimir "AMBOS DETECTAN". Repásalo como en Scratch: "si ¿izquierda detecta? y ¿derecha detecta?".
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+5. 🟢 **La escalera `else if`** reparte las otras tres situaciones. La estructura es la de la Lección 09: en cada vuelta del `loop()` se ejecuta una sola rama. Comprueba con la tabla de verdad que las cuatro ramas corresponden a las cuatro filas: ni una repetida, ni una olvidada. La última (`else`) es la que atrapa el "no, no".
 
-## 12. Si no funciona
+6. 🟢 **`delay(300)`** imprime tres líneas por segundo: tiempo de sobra para mover tu mano entre línea y línea sin perder el hilo.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+7. 🟢 **Predice las cuatro.** Antes de conectar, escribe el orden en que harás las cuatro situaciones y qué palabra esperas en cada una.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+## Llena la tabla de verdad con tu cuerpo
 
-## 13. Desafío
+8. 🟡 **Energiza.** El adulto conecta el USB; sube el sketch y abre el monitor a 9600 baudios.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+9. 🟢 **Situación "ninguno".** Aléjate del robot. La palabra estable debe ser "NINGUNO DETECTA". Cópiala en la primera fila de tu tabla con un check.
 
-## 14. Lecturas y videos para explorar
+10. 🟢 **Situación "solo izquierda".** Coloca una mano frente al sensor izquierdo, cuidando no invadir el campo del derecho (usa tu cono dibujado de la Lección 28 como guía). Debería aparecer "SOLO IZQUIERDA". Si aparece "SOLO DERECHA", no corrijas nada todavía: lee la advertencia del punto de vista del robot, párate detrás de PX-32 y comprueba con los ojos del robot. Confirma físicamente qué sensor estás tapando (su LED de señal encendido te lo dice) y qué cable lo une al shield.
+
+11. 🟢 **Situación "solo derecha".** Mano al sensor derecho: "SOLO DERECHA".
+
+12. 🟢 **Situación "ambos".** Usa las dos manos, una frente a cada sensor, o un cartón ancho que cubra los dos a la vez y a la misma distancia: "AMBOS DETECTAN". Con una sola mano cerrada a 5 cm del centro también puedes lograrlo si los conos se cruzan; experimenta dónde se cruzan.
+
+13. 🟢 **Cierra la tabla.** Vuelve a pasar por las cuatro situaciones en desorden, anunciando en voz alta la palabra ANTES de mirar el monitor. Acierta las cuatro seguidas y tu tabla de verdad queda firmada.
+
+14. 🟢 **El juego del adulto.** Pide a tu papá que esconda las manos y produzca una situación a su elección mientras tú miras el monitor; tú anuncias qué está pasando frente al robot y él confirma. Intercambien papeles. Si alguien pierde, revisen juntos cuál fila de la tabla se confundió.
+
+15. 🟡 **Cierre.** Cierra el monitor; el adulto retira el USB.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama cenital con tabla de verdad integrada.
+> - **Objetivo:** asociar cada posición de la mano con una fila de la tabla y una rama del programa.
+> - **Descripción:** vista desde arriba de la mitad frontal de PX-32 con los dos sensores y sus conos de detección dibujados; cuatro escenas pequeñas alrededor: manos ausentes, mano izquierda, mano derecha, cartón ancho cubriendo ambos; cada escena conectada con una flecha a su fila de la tabla de verdad y a la palabra impresa por el programa.
+> - **Elementos que deben señalarse:** sensor izquierdo y su cono, sensor derecho y su cono, punto de vista del robot, las cuatro palabras del monitor.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, página 43, comportamiento con objeto a izquierda, derecha y centro.
+> - **Texto alternativo sugerido:** "Vista superior del robot con los conos de sus dos sensores y cuatro posiciones de la mano conectadas a las filas de una tabla de verdad".
+
+## Desafío: el operador que falta
+
+Agrega una sola línea nueva antes de los cuatro casos: `bool hayAlgo = izquierdaDetecta || derechaDetecta;` e imprime primero "HAY ALGO" o "DESPEJADO" según ella. Sube y prueba: ¿en cuántas de las cuatro situaciones dice "HAY ALGO"? Esa es la tabla de verdad del "o". Cuando termines, deja el sketch como estaba.
+
+## Si no funciona
+
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Las palabras salen al revés (izquierda por derecha) | ¿Estás mirando al robot de frente? | Cuenta desde el punto de vista del robot; confirma con el LED de señal del sensor tapado y su cable en el shield |
+| Una palabra nunca aparece | ¿La mano llega a la distancia de calibración de ese sensor? | Repite la ventana 10/15 de la Lección 27 para ese sensor |
+| "AMBOS" aparece con un objeto pequeño y lejano al centro | ¿Los conos se cruzan antes de lo que creías? | Es normal a corta distancia; anota dónde se cruzan los tuyos |
+| El monitor no cambia nunca | ¿Compilaste con tu constante de la Lección 28 al revés? | Si "NINGUNO DETECTA" se vuelve "AMBOS DETECTAN" al tapar, invierte `LECTURA_AL_DETECTAR` |
+| Aparecen palabras intermedias o mezcladas | ¿Algún `else if` quedó fuera de la escalera? | Repasa las llaves: una sola rama por vuelta (Lección 09) |
+
+## Lecturas y videos para explorar
 
 - [El espectro electromagnético y el infrarrojo](https://science.nasa.gov/ems/07_infraredwaves/) — Inglés; lectura NASA; 8 min. Aprenderás el espectro electromagnético y el infrarrojo. Esencial.
 - [Sensores de PX-32](../../docs/reference/sensores.md) — Español; referencia interna; 6 min. Aprenderás sensores de px-32. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Después de jugar con las cuatro situaciones, la tabla de sensores de la referencia te da una idea del siguiente reto: el tracker multiplicará este juego por cinco canales.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **AND** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), operadores booleanos `&&` y `||`, comparación `==` y tipo `bool`.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 42 a 43, comportamiento combinado de los dos sensores IR.
+- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md), sensores IR de obstáculos en D3 y D2.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Jueguen al adivinario de las cuatro palabras y luego explícale por qué dos sensores dan exactamente cuatro situaciones y no tres ni cinco. Muéstrale el `&&` en el código y compáralo con el bloque "y" de Scratch que usabas en tus juegos. Para cerrar, cuéntale cuántas combinaciones tendría el tracker de cinco sensores del próximo bloque y por qué conviene una tabla de verdad antes de programar.
 
-Hoy aprendiste a **interpretar conjuntamente los sensores de D3 y D2** y lo conectaste con **AND, OR, tabla de verdad y combinación**. Pudiste observar cuatro patrones asociados a posiciones, sin mover aún el robot. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 30: Seguir una mano con prudencia](30-seguir-una-mano-con-prudencia.md).
+El robot ya nombra las cuatro situaciones. En la [Lección 30](30-seguir-una-mano-con-prudencia.md) cada situación se convierte en una orden de movimiento… con el freno de mano puesto.

@@ -1,5 +1,33 @@
-// Curso PX-32 — programa mínimo de la lección 29
-// Cargar solo después de leer la sección de seguridad.
-const byte IR_IZQ=3, IR_DER=2;
-void setup(){ pinMode(IR_IZQ,INPUT); pinMode(IR_DER,INPUT); Serial.begin(9600); }
-void loop(){ int izq=digitalRead(IR_IZQ), der=digitalRead(IR_DER); Serial.print(izq); Serial.print(','); Serial.println(der); delay(100); }
+// Curso PX-32 - Leccion 29: dos sensores IR, cuatro situaciones.
+
+const byte SENSOR_IR_IZQUIERDO = 3;
+const byte SENSOR_IR_DERECHO = 2;
+
+// Segun la evidencia de tu cuaderno en la Leccion 28: si tu modulo
+// entrega HIGH al detectar, cambia LOW por HIGH en esta linea.
+const int LECTURA_AL_DETECTAR = LOW;
+
+void setup() {
+  pinMode(SENSOR_IR_IZQUIERDO, INPUT);
+  pinMode(SENSOR_IR_DERECHO, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  bool izquierdaDetecta =
+      digitalRead(SENSOR_IR_IZQUIERDO) == LECTURA_AL_DETECTAR;
+  bool derechaDetecta =
+      digitalRead(SENSOR_IR_DERECHO) == LECTURA_AL_DETECTAR;
+
+  if (izquierdaDetecta && derechaDetecta) {
+    Serial.println("AMBOS DETECTAN");
+  } else if (izquierdaDetecta) {
+    Serial.println("SOLO IZQUIERDA");
+  } else if (derechaDetecta) {
+    Serial.println("SOLO DERECHA");
+  } else {
+    Serial.println("NINGUNO DETECTA");
+  }
+
+  delay(300);
+}

@@ -1,161 +1,270 @@
 # Lección 30 — Seguir una mano con prudencia
 
-## 1. Tu misión de hoy
+## El día que PX-32 te siga
 
-Hoy vas a **combinar dos IR con movimiento lento y STOP seguro**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Hoy es el hito del bloque de infrarrojo: PX-32 va a seguir tu mano. La pones al frente y avanza despacito; la mueves a la izquierda y gira hacia ella; la escondes y se detiene. El manual de OSOYOO describe exactamente ese comportamiento para su lección de seguimiento de objetos, y ya tienes todas las piezas para construirlo tú, con una diferencia importante: nuestro robot frena antes que el suyo.
 
-## 2. Tiempo estimado
+La novedad conceptual de hoy es la **política de control**: el conjunto de reglas que traduce lecturas en acciones. No es un componente ni una instrucción: es el diseño de la decisión. La política de hoy tiene cuatro reglas, una por situación de la Lección 29:
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+- ambos detectan → avanzar lento;
+- solo el izquierdo detecta → girar a la izquierda, hacia la mano;
+- solo el derecho detecta → girar a la derecha;
+- ninguno detecta → **ALTO**.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Fíjate en la última regla. Cuando el sensor no ve nada confiable, la acción más segura no es "seguir con lo último que hacía" ni "buscar": es detenerse. Esa decisión se llama **parada dominante** y es la misma filosofía del `STOP` que protegía los vectores de la Lección 20. Un robot que se detiene al dudar es un robot con el que se puede experimentar tranquilo.
 
-## 3. Lo que necesitas saber antes de empezar
+La última regla también pone nombre a un hueco real: la **zona muerta**. Tu mano puede estar demasiado lejos (más allá de los 15 cm de tu calibración) o justo en el pequeño espacio central donde ningún cono la alcanza. En ambos casos los sensores callan y el robot frena. No es un defecto del programa: es la política correcta ante la falta de señal.
 
-[Lección 20: Vectores para mover PX-32](../02-movimiento/20-vectores-para-mover-px-32.md), [Lección 29: Dos sensores, cuatro situaciones](29-dos-sensores-cuatro-situaciones.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+¿Y de dónde salen los movimientos? De tu propio trabajo: las funciones de la Lección 20 (`mover` con los signos +1/-1/0 sobre los cuatro motores) reaparecen completas, con `detenerTodos()` como red de seguridad. La novedad es una bandera al inicio, `MOTOR_ACTIVO`: mientras esté en `false`, el programa imprime la decisión pero jamás ordena un movimiento. Primero el robot aprende a decir; después, a hacer.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+## Lo que necesitas
 
-## 4. Lectura principal
+- PX-32 ensamblado con sensores calibrados a la ventana de 10/15 cm (Lección 27) y las cuatro situaciones comprobadas (Lección 29).
+- Computador con Arduino IDE 2 y cable USB.
+- El sketch [30-seguir-una-mano-con-prudencia.ino](../../code/educational/30-seguir-una-mano-con-prudencia/30-seguir-una-mano-con-prudencia.ino).
+- Tu mano y la regla para mantener la distancia de trabajo.
+- Para la fase de ruedas levantadas: los dos soportes rígidos de la Lección 20.
+- Para la fase de piso: un área despejada de al menos 2 m, seca y lisa, sin escaleras, mascotas, cables ni objetos frágiles.
+- Baterías 18650 verificadas, bajo control del adulto.
+- Tu cuaderno con la ley de lecturas de la Lección 28.
 
-### La idea intuitiva
+🟢 Puedes leer, cargar y jugar la fase de solo-imprimir con la única energía del USB. 🔴 Las fases con baterías las abre y cierra el adulto: instala celdas, mantiene la mano cerca del interruptor y corte energía ante cualquier anomalía. Nadie frena ruedas con la mano.
 
-El tema de hoy es **política de control, zona muerta y parada**. En lenguaje cotidiano, buscamos una forma fiable de combinar dos IR con movimiento lento y STOP seguro. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+## El programa, por dentro
 
-Un sensor infrarrojo no ve objetos como un ojo. Emite o recibe radiación y transforma una interacción física en una señal eléctrica. Superficie, ángulo, distancia, iluminación y umbral pueden cambiar la lectura. Por eso una detección es una medición bajo condiciones concretas, no una verdad universal sobre el mundo.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **política de control, zona muerta y parada**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para probar primero órdenes impresas, luego pulsos de movimiento con ruedas elevadas. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Política de control:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-004 a HW-006, HW-008.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **política de control, zona muerta y parada**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante predice, lee el código y registra observaciones.
-- 🟡 Un adulto permanece presente durante USB, calibración o cualquier prueba física.
-- 🔴 El adulto manipula baterías 18650, interruptores de potencia, driver y cables. Toda conexión se revisa sin USB y con alimentación apagada.
-
-Para movimiento: primero ruedas levantadas sobre una base estable, velocidad baja, área despejada y el interruptor accesible. Cabello, mangas y dedos lejos de ruedas. Si hay calor, olor, humo, chispa, zumbido fuerte o movimiento inesperado, el adulto corta energía; no se intenta frenar con la mano.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres combinar dos IR con movimiento lento y STOP seguro y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-004 a HW-006, HW-008 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con política de control, zona muerta y parada. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a probar primero órdenes impresas, luego pulsos de movimiento con ruedas elevadas. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: correcciones izquierda/derecha y parada cuando no hay señal fiable. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [30-seguir-una-mano-con-prudencia.ino](../../code/educational/30-seguir-una-mano-con-prudencia/30-seguir-una-mano-con-prudencia.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **política de control**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y recórrelo completo; debe ser idéntico a este bloque:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 30
-// Cargar solo después de leer la sección de seguridad.
-const byte EN[4]={9,10,11,12};
-const byte P1[4]={22,26,5,7};
-const byte P2[4]={24,28,6,8};
-// Orden: frontal derecha, frontal izquierda, trasera derecha, trasera izquierda.
-void rueda(byte i,int sentido,byte pwm){
-  digitalWrite(P1[i],sentido>0?HIGH:LOW);
-  digitalWrite(P2[i],sentido<0?HIGH:LOW);
-  analogWrite(EN[i],sentido==0?0:pwm);
+// Curso PX-32 - Leccion 30: seguir una mano con dos sensores IR.
+// Con MOTOR_ACTIVO en false el programa solo imprime la decision:
+// no ordena ningun movimiento.
+
+const bool MOTOR_ACTIVO = false;
+const byte POTENCIA_PRUEBA = 65;
+
+// Orden: frontal derecho, frontal izquierdo, trasero derecho,
+// trasero izquierdo.
+const byte PWM_BK1 = 9;   // Frontal derecho
+const byte BK1_IN1 = 22;
+const byte BK1_IN2 = 24;
+const byte PWM_BK3 = 10;  // Frontal izquierdo
+const byte BK3_IN3 = 26;
+const byte BK3_IN4 = 28;
+const byte PWM_AK1 = 11;  // Trasero derecho
+const byte AK1_IN1 = 5;
+const byte AK1_IN2 = 6;
+const byte PWM_AK3 = 12;  // Trasero izquierdo
+const byte AK3_IN3 = 7;
+const byte AK3_IN4 = 8;
+
+const byte SENSOR_IR_IZQUIERDO = 3;
+const byte SENSOR_IR_DERECHO = 2;
+
+// Segun la evidencia de tu cuaderno en la Leccion 28: si tu modulo
+// entrega HIGH al detectar, cambia LOW por HIGH en esta linea.
+const int LECTURA_AL_DETECTAR = LOW;
+
+void controlarMotor(
+  byte pinPwm,
+  byte pin1,
+  byte pin2,
+  int sentido,
+  byte potenciaPwm
+) {
+  if (sentido > 0) {
+    digitalWrite(pin1, HIGH);
+    digitalWrite(pin2, LOW);
+    analogWrite(pinPwm, potenciaPwm);
+  } else if (sentido < 0) {
+    digitalWrite(pin1, LOW);
+    digitalWrite(pin2, HIGH);
+    analogWrite(pinPwm, potenciaPwm);
+  } else {
+    analogWrite(pinPwm, 0);
+    digitalWrite(pin1, LOW);
+    digitalWrite(pin2, LOW);
+  }
 }
-void parar(){ for(byte i=0;i<4;i++) rueda(i,0,0); }
-void mover(int fd,int fi,int td,int ti,byte pwm){
-  int s[4]={fd,fi,td,ti}; for(byte i=0;i<4;i++) rueda(i,s[i],pwm);
+
+void mover(
+  int frontalDerecho,
+  int frontalIzquierdo,
+  int traseroDerecho,
+  int traseroIzquierdo
+) {
+  controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, frontalDerecho, POTENCIA_PRUEBA);
+  controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, frontalIzquierdo, POTENCIA_PRUEBA);
+  controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, traseroDerecho, POTENCIA_PRUEBA);
+  controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4, traseroIzquierdo, POTENCIA_PRUEBA);
 }
-void prepararMotores(){ for(byte i=0;i<4;i++){ pinMode(EN[i],OUTPUT); pinMode(P1[i],OUTPUT); pinMode(P2[i],OUTPUT); } parar(); }
-const byte IR_IZQ=3,IR_DER=2; const int DETECTADO=LOW;
-void setup(){ prepararMotores(); pinMode(IR_IZQ,INPUT); pinMode(IR_DER,INPUT); delay(3000); }
-void loop(){ bool izq=digitalRead(IR_IZQ)==DETECTADO, der=digitalRead(IR_DER)==DETECTADO;
-  if(izq&&der) mover(+1,+1,+1,+1,65);
-  else if(izq) mover(-1,+1,-1,+1,60);
-  else if(der) mover(+1,-1,+1,-1,60);
-  else parar();
-  delay(30);
+
+void detenerTodos() {
+  mover(0, 0, 0, 0);
+}
+
+void prepararMotores() {
+  pinMode(PWM_BK1, OUTPUT);
+  pinMode(PWM_BK3, OUTPUT);
+  pinMode(PWM_AK1, OUTPUT);
+  pinMode(PWM_AK3, OUTPUT);
+  pinMode(BK1_IN1, OUTPUT);
+  pinMode(BK1_IN2, OUTPUT);
+  pinMode(BK3_IN3, OUTPUT);
+  pinMode(BK3_IN4, OUTPUT);
+  pinMode(AK1_IN1, OUTPUT);
+  pinMode(AK1_IN2, OUTPUT);
+  pinMode(AK3_IN3, OUTPUT);
+  pinMode(AK3_IN4, OUTPUT);
+  detenerTodos();
+}
+
+void ordenarAvance() {
+  if (MOTOR_ACTIVO) {
+    mover(+1, +1, +1, +1);
+  } else {
+    detenerTodos();
+  }
+}
+
+void ordenarGiroIzquierda() {
+  if (MOTOR_ACTIVO) {
+    mover(+1, -1, +1, -1);
+  } else {
+    detenerTodos();
+  }
+}
+
+void ordenarGiroDerecha() {
+  if (MOTOR_ACTIVO) {
+    mover(-1, +1, -1, +1);
+  } else {
+    detenerTodos();
+  }
+}
+
+void setup() {
+  prepararMotores();
+  pinMode(SENSOR_IR_IZQUIERDO, INPUT);
+  pinMode(SENSOR_IR_DERECHO, INPUT);
+  Serial.begin(9600);
+
+  if (MOTOR_ACTIVO) {
+    Serial.println("MODO: MOVIMIENTO ACTIVO");
+  } else {
+    Serial.println("MODO: SOLO IMPRIMIR");
+  }
+
+  // Tres segundos de calma antes de escuchar los sensores.
+  delay(3000);
+}
+
+void loop() {
+  bool izquierdaDetecta =
+      digitalRead(SENSOR_IR_IZQUIERDO) == LECTURA_AL_DETECTAR;
+  bool derechaDetecta =
+      digitalRead(SENSOR_IR_DERECHO) == LECTURA_AL_DETECTAR;
+
+  if (izquierdaDetecta && derechaDetecta) {
+    Serial.println("AVANZAR");
+    ordenarAvance();
+  } else if (izquierdaDetecta) {
+    Serial.println("GIRAR A LA IZQUIERDA");
+    ordenarGiroIzquierda();
+  } else if (derechaDetecta) {
+    Serial.println("GIRAR A LA DERECHA");
+    ordenarGiroDerecha();
+  } else {
+    Serial.println("ALTO");
+    detenerTodos();
+  }
+
+  delay(150);
 }
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 **Lo conocido.** Los pines de motores, `controlarMotor()`, `mover()` y `detenerTodos()` son los de la Lección 20, con su mismo orden FD/FI/TD/TI. Si allí validaste las identidades y el patrón de la X, hoy no hay nada nuevo de hardware que descubrir.
 
-## 11. Qué deberías observar
+3. 🟢 **La bandera.** `MOTOR_ACTIVO` funciona como `EJECUTAR_PRUEBA` en la Lección 20: es el permiso. Cada función `ordenar...()` revisa el permiso antes de mover. En `false`, da igual lo que digan los sensores: la única orden que llega a los motores es `detenerTodos()`. La primera línea del monitor te dice en qué modo quedó cargado: léela siempre antes de dar por listo el programa.
 
-El resultado normal es **correcciones izquierda/derecha y parada cuando no hay señal fiable**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+4. 🟢 **La potencia.** `POTENCIA_PRUEBA = 65` sobre un máximo de 255: alrededor de un cuarto de la potencia PWM de la Lección 17. Un seguidor lento es un seguidor que te da tiempo de reaccionar.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+5. 🟢 **La escalera de decisiones** es la tabla de verdad de la Lección 29 con músculo: misma estructura, pero ahora cada rama imprime su orden y la ejecuta. La rama `else` no imprime "ninguno": imprime **ALTO** y ejecuta `detenerTodos()`. Sin señal confiable, para. Esa es la parada dominante.
 
-## 12. Si no funciona
+6. 🟢 **El giro correcto.** Repasa los signos con la tabla de la Lección 20: `mover(+1, -1, +1, -1)` gira antihorario visto desde arriba, es decir, hacia la izquierda del robot. Cuando solo el sensor izquierdo ve la mano, el robot gira hacia ese lado, hacia donde está la mano. Nunca al contrario.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+7. 🟢 **Predice la sesión completa** antes de tocar el robot: escribe qué palabra aparecerá y qué harán las ruedas (nada en la fase A) para cada posición de tu mano.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+## Fase A: el robot solo habla (USB)
 
-## 13. Desafío
+8. 🟡 El adulto conecta el USB. Deja `MOTOR_ACTIVO = false`, sube el sketch y abre el monitor a 9600 baudios. La primera línea debe decir "MODO: SOLO IMPRIMIR": es tu comprobante del modo seguro.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+9. 🟢 Repite el juego de las cuatro situaciones de la Lección 29, ahora leyendo las órdenes: AVANZAR, GIRAR A LA IZQUIERDA, GIRAR A LA DERECHA, ALTO. Ninguna rueda debe moverse ni un milímetro (ni hay baterías, ni permiso). Comprueba también la honestidad de la calibración: mano a 10 cm centrada → AVANZAR; mano a 30 cm → ALTO.
 
-## 14. Lecturas y videos para explorar
+10. 🟢 Busca tu zona muerta con la regla: a qué distancia centrada la palabra pasa de AVANZAR a ALTO, y si existe un hueco central donde dos manos separadas no logran AMBOS. Anota los números. El robot que conoces sus silencios es más fácil de pilotear.
+
+## Fase B: ruedas levantadas
+
+11. 🟡 Con el robot apagado y sin baterías, cambia únicamente `MOTOR_ACTIVO = false` por `MOTOR_ACTIVO = true`, conecta solo el USB, verifica y sube. El monitor debe anunciar "MODO: MOVIMIENTO ACTIVO". Compruébalo y cierra el monitor: en esta fase ya no habrá pantalla, la evidencia serán las ruedas.
+
+12. 🔴 El adulto retira el USB, instala las celdas y enciende el robot sobre los dos soportes, con una mano junto al interruptor y lejos de las ruedas. Respeta los tres segundos de calma del `setup()`: nadie debe tener la mano frente a los sensores al encender, para no estrenar el programa con una orden involuntaria.
+
+13. 🟢 **Mano centrada a 10 cm**: las cuatro ruedas giran despacio hacia adelante, como en la Lección 20. Mira el chasis: no se traslada, está en soportes; tu evidencia es el sentido de las cuatro ruedas y su lentitud.
+
+14. 🟢 **Mano a un costado**: el giro correspondiente. Verifica con la tabla de signos que las ruedas del lado que corresponde van hacia atrás (Lección 20: girar hacia la izquierda usa `+1, -1, +1, -1`). Recorre la mano de lado a lado despacio y observa las correcciones: izquierda, ambos, derecha… así corrige un seguidor.
+
+15. 🟢 **La parada dominante en vivo**: retira la mano hacia arriba y a un lado, saliendo de los conos. Todo se detiene en un abrir y cerrar de ojos (el `delay(150)` es el margen máximo). Practica esta maniobra dos veces más: es tu freno de emergencia.
+
+16. 🔴 Ante cualquier anomalía —una rueda inesperada, ausencia de STOP, zumbido, calor, olor— el adulto corta energía y la fase de piso queda cancelada hasta revisar.
+
+## Fase C: en el piso (opcional, con el adulto al mando)
+
+17. 🔴 Solo si la fase B fue limpia: el adulto apaga, baja el robot y lo coloca en el centro del área despejada. Enciende, respeta los tres segundos y aléjense del frente.
+
+18. 🟢 Coloca tu mano a 10 cm frente al robot y camina hacia atrás despacio, manteniendo la distancia. El robot te sigue. Muévela a los lados para que corrija. Para detenerlo, sube la mano saliendo de los conos: nunca la retire hacia adelante ni dejes que el robot la alcance.
+
+19. 🔴 Al terminar, el adulto apaga y retira las celdas. Ustedes vuelven a `MOTOR_ACTIVO = false`, conectan solo USB y suben la versión neutral, comprobando que el monitor anuncie "MODO: SOLO IMPRIMIR". Un PX-32 guardado no debería poder moverse aunque se encienda por accidente.
+
+El hito está completo cuando viviste las tres fases en orden, tu cuaderno registra la zona muerta, y puedes explicar la política completa con sus cuatro reglas sin leer el código.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** secuencia cenital de la política de control.
+> - **Objetivo:** mostrar las cuatro reglas de la política con la mano y el robot en cada caso.
+> - **Descripción:** cuatro miniaturas vistas desde arriba: mano centrada con robot avanzando (flecha recta corta), mano a la izquierda con robot girando a la izquierda (flecha curva), mano a la derecha con giro a la derecha, mano ausente con robot detenido y rótulo ALTO; debajo de cada miniatura, la línea del código que la produce.
+> - **Elementos que deben señalarse:** conos de detección, dirección de giro de las ruedas, flecha de movimiento, las palabras del monitor, rótulo de zona muerta en el caso sin mano.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, página 43, comportamiento de seguimiento de objeto con dos sensores IR.
+> - **Texto alternativo sugerido:** "Cuatro vistas superiores muestran al robot avanzando hacia la mano centrada, girando hacia el lado que la detecta y deteniéndose cuando no hay mano".
+
+## Desafío: los secuestradores del seguidor
+
+Sin tocar el código, encuentra el punto débil del seguidor: objetos de la sala que lo "secuestran" (una silla cercana, tu rodilla, la luz del sol). Haz una lista de tres secuestradores potenciales y propón para cada uno una regla de uso del robot que lo evite (por ejemplo, no jugar frente a la ventana soleada). Un buen piloto conoce las trampas de su vehículo.
+
+## Si no funciona
+
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Avanza sin haber mano (en fase A dice AVANZAR despejado) | ¿Umbral demasiado sensible o luz solar directa? | Recalibra la ventana 10/15 (Lección 27) y repite la fase A; el sol es ruido |
+| Las palabras están al revés (NINGUNO con mano al frente) | ¿`LECTURA_AL_DETECTAR` contradice tu ley de la Lección 28? | Corrige la constante y repite la fase A antes de cualquier batería |
+| Gira al lado contrario de la mano | ¿Mano en el cono del sensor equivocado o izquierda/derecha invertidos? | Párate detrás del robot; confirma con los LEDs de señal; no cambies signos sin evidencia |
+| No se detiene al quitar la mano | ¿La mano sigue dentro de un cono (a los lados)? | Súbela saliendo de los conos; si persiste, es fallo de seguridad: corta energía y revisa la rama `else` cargada |
+| En fase B no gira ninguna rueda | ¿Se comprobó "MODO: MOVIMIENTO ACTIVO" durante la carga, antes de retirar el USB? | Falta `MOTOR_ACTIVO = true`; repite la carga con la bandera corregida y verifica el aviso antes de desconectar |
+| Se detiene a media persecución en el piso | ¿La mano salió de la distancia de calibración? | Mantén los 10 cm al retroceder; recuerda tu zona muerta anotada |
+| Reinicia o pierde fuerza | ¿Celdas con poca carga o conectores flojos? | Apaga; el adulto revisa baterías y ruta de potencia antes de reintentar |
+
+## Lecturas y videos para explorar
 
 - [El espectro electromagnético y el infrarrojo](https://science.nasa.gov/ems/07_infraredwaves/) — Inglés; lectura NASA; 8 min. Aprenderás el espectro electromagnético y el infrarrojo. Esencial.
 - [Sensores de PX-32](../../docs/reference/sensores.md) — Español; referencia interna; 6 min. Aprenderás sensores de px-32. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Acabas de cumplir la regla de integración de la referencia: primero datos en Serial, luego decisiones impresas, y solo al final motores. Guárdala como método para todos los sensores que vienen.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **política de control** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 42 y 43: calibración de los sensores a unos 10 cm y comportamiento de seguimiento (avanza con ambos, gira hacia el lado que detecta, se detiene sin objeto).
+- [Guía oficial del Model Y](https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/), pines de habilitación y dirección reutilizados de la Lección 20.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), `if...else`, `&&`, `digitalRead()` y `analogWrite()`.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Piloteen juntos la fase final y luego explícale la política de control con sus cuatro reglas, señalando por qué "no hay señal" lleva a ALTO y no a "seguir como si nada". Cuéntale qué fue la zona muerta en sus números y cuáles secuestradores descubrió tu desafío. Marca el hito 30 en [PROGRESS.md](../../PROGRESS.md): PX-32 ya siente el mundo con luz invisible.
 
-Hoy aprendiste a **combinar dos IR con movimiento lento y STOP seguro** y lo conectaste con **política de control, zona muerta y parada**. Pudiste observar correcciones izquierda/derecha y parada cuando no hay señal fiable. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 31: Anatomía del tracker de cinco canales](../04-line-tracking/31-anatomia-del-tracker-de-cinco-canales.md).
+Con el bloque de infrarrojo completo, PX-32 cambia de mirada: en la [Lección 31](../04-line-tracking/31-anatomia-del-tracker-de-cinco-canales.md) conocerás el tracker de cinco canales, que usa esta misma física mirando al piso para no perder una línea negra de vista.

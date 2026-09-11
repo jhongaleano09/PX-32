@@ -1,131 +1,81 @@
 # Lección 23 — Infrarrojo: luz que no vemos
 
-## 1. Tu misión de hoy
+## El misterio del control remoto
 
-Hoy vas a **mostrar una evidencia indirecta de emisión IR de un control remoto**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Toma el control del televisor. Aprieta un botón cualquieras veces: el televisor obedece desde el otro lado de la sala, pero del control no sale nada que tú puedas ver. ¿Cómo le habla? ¿Le llega magia, olor, sonido?
 
-## 2. Tiempo estimado
+Ninguna de las tres: sale luz infrarroja. Está justo después del rojo en tu regla del espectro de la Lección 22, fuera de la franja de 380 a 700 nm a la que tus ojos responden. Un control remoto típico emite alrededor de 940 nanómetros, apenas pasado el límite del rojo. Invisible para ti, perfectamente real.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+La historia de su descubrimiento es de las mejores de la ciencia. En 1800, el astrónomo William Herschel repartió la luz del sol con un prisma —un cristal que separa la luz en colores, como las gotas de lluvia del arcoíris— y puso termómetros en cada color, curioso por saber si el calor cambiaba con el color. Uno lo colocó más allá del rojo, donde no había color visible que medir. Ese termómetro sin luz marcó la temperatura más alta de todos: había energía escondida pasado el rojo. Herschel acababa de descubrir el infrarrojo sin verlo, midiendo su efecto.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Esa es exactamente tu estrategia de hoy: no puedes ver el infrarrojo, pero puedes detectar sus efectos con la herramienta correcta. Y la tienes en el bolsillo: el chip de una cámara responde a algo más de infrarrojo que tu retina. Muchos teléfonos le ponen un filtro a la cámara para bloquearlo y que las fotos salgan mejor; por eso algunas cámaras ven el control y otras no. Hoy vas a averiguar cuál de tus cámaras sirve.
 
-## 3. Lo que necesitas saber antes de empezar
+El infrarrojo no solo sale de los controles. Cualquier cuerpo tibio lo emite: el sol, una estufa, tú mismo. Por eso las cámaras "de visión nocturna" ven a las personas en la oscuridad, y por eso la lámpara de la Lección 21 calentaba tanto: buena parte de su energía viajaba como infrarrojo.
 
-[Lección 22: El espectro electromagnético](22-el-espectro-electromagnetico.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+## Lo que necesitas
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+- Cualquier control remoto de la casa (televisor, aire acondicionado, sonido).
+- Un teléfono con cámara frontal y cámara trasera.
+- Tu cuaderno y lápiz.
+- PX-32 apagado, sin USB y sin baterías: hoy tampoco lo encendemos, solo lo miramos al final.
+- Un adulto presente para prestarte el teléfono o el control si hace falta.
 
-## 4. Lectura principal
+🟢 Toda la actividad es segura: solo apuntas controles y cámaras. No apuntes el control al ojo de nadie a quemarropa por costumbre; un control no lastima, pero es buena práctica tratar cualquier emisor como algo que no se apunta a la cara.
 
-### La idea intuitiva
+## Caza el invisible con una cámara
 
-El tema de hoy es **radiación infrarroja, cercano y cámara**. En lenguaje cotidiano, buscamos una forma fiable de mostrar una evidencia indirecta de emisión IR de un control remoto. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+1. 🟢 **Predice primero.** Escribe en el cuaderno: "Creo que con mis ojos veré ___ al presionar el botón" y "Creo que con la cámara veré ___". Luego prueba; la predicción es parte del experimento.
 
-Un sensor infrarrojo no ve objetos como un ojo. Emite o recibe radiación y transforma una interacción física en una señal eléctrica. Superficie, ángulo, distancia, iluminación y umbral pueden cambiar la lectura. Por eso una detección es una medición bajo condiciones concretas, no una verdad universal sobre el mundo.
+2. 🟢 **Con los ojos.** Apunta el frente del control hacia ti en una habitación con poca luz y presiona varias veces el botón de subir volumen. Con los ojos: nada. Anótalo. (Si creías ver un destello débil, probablemente fue un reflejo del ambiente; repite tapando el frente con la mano y verás que no sale nada.)
 
-### De la intuición al concepto técnico
+3. 🟢 **Con la cámara frontal.** Abre la cámara selfies del teléfono. Apunta el frente del control directo a la lente, a unos 10 o 20 cm, y presiona el mismo botón varias veces. En la pantalla deberías ver un destello blanquecino o violáceo que parpadea cada vez que aprietas. Esa luz no existe para tu ojo: acabas de ver infrarrojo de ~940 nm.
 
-Los términos centrales son **radiación infrarroja, cercano y cámara**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+4. 🟢 **Cambia una sola cosa: la cámara.** Repite con la cámara trasera del mismo teléfono. En muchos modelos se ve más débil o no se ve, porque esa lente suele tener un filtro que bloquea el infrarrojo para que las fotos salgan mejor. Anota el resultado: "frontal: sí/no; trasera: sí/no". Si una cámara no ve nada, no es que el infrarrojo no exista: es una limitación del filtro de esa cámara, documentada en tu cuaderno.
 
-En PX-32, esta idea se usa para observar un control remoto con cámara compatible y comparar con el ojo. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+5. 🟢 **Cambia una sola cosa: el botón.** Con la cámara que sí funcionó, presiona botones distintos (volumen, canal, encendido). Observa que el parpadeo cambia: cada botón envía su propio patrón de destellos, un código. El televisor no ve "más luz" o "menos luz": lee el mensaje. Guarda esa idea: cuando PX-32 hable por Bluetooth y Wi-Fi, también será con mensajes codificados, aunque en la región de radio.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+6. 🟢 **Alcance.** Aleja el control poco a poco de la cámara mientras presionas. ¿Hasta qué distancia se distingue el destello? Anota el número y compáralo con la distancia a la que todavía obedece el televisor: el receptor del televisor es mucho más sensible que tu pantalla.
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+7. 🟢 **Conecta con PX-32.** Acércate al robot apagado y mira los dos sensores del frente. Adentro de cada uno hay un emisor infrarrojo parecido al del control —aunque encendido de forma continua, sin mensajes— y un receptor que sí responde al infrarrojo, como el chip de tu cámara. Tu teléfono demostró que existen "ojos" para esta luz; PX-32 trae dos de fábrica.
 
-## 5. Palabras nuevas
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** secuencia fotográfica comparativa.
+> - **Objetivo:** mostrar que el mismo control emite algo invisible al ojo y visible para la cámara.
+> - **Descripción:** tres fotos idénticas del frente del control con un botón presionado: vista directa del ojo (nada), pantalla de la cámara frontal con destello violáceo, y pantalla de la cámara trasera sin destello o con destello débil.
+> - **Elementos que deben señalarse:** botón presionado, LED emisor en la punta del control, destello en pantalla, rótulo de ~940 nm.
+> - **Fuente técnica:** NASA Science, https://science.nasa.gov/ems/07_infraredwaves/, párrafo del control remoto de televisión a ~940 nanómetros.
+> - **Texto alternativo sugerido:** "Un control remoto no muestra luz al ojo, pero la cámara del teléfono revela su destello infrarrojo".
 
-- **Radiación infrarroja:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+Tu cacería terminó bien cuando registraste al menos una cámara que ve los destellos y una comprobación de que cambiar de botón cambia el patrón. Si ninguna cámara de casa los ve, revisa la tabla siguiente antes de rendirte.
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+## Desafío: el inventario de emisores
 
-## 6. Así aparece en PX-32
+Recorre la casa con la cámara que funciona y busca otros equipos con control remoto o sensores infrarrojos (equipo de sonido, aire acondicionado, timbre con sensor). Anota cuáles emiten destello al presionar y cuáles tienen un "ojo" receptor pequeño detrás de una ventanita oscura. Estás haciendo un mapa de infrarrojos de tu casa.
 
-**Hardware:** HW-008.
+## Si algo no cuadra
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Ninguna cámara ve destellos | ¿Las dos cámaras del teléfono tienen filtro fuerte? | Prueba con otro teléfono o con una webcam vieja; también revisa las pilas del control |
+| El destello es muy tenue | ¿La habitación está muy iluminada? | Atenúa la luz y acércalo a 10 cm de la lente |
+| Veo una lucecita roja en la punta del control | ¿Es un LED indicador de encendido? | No es el haz: sigue presionando y observa la zona de la lente frontal oscura del control |
+| El televisor no responde aunque la cámara sí ve destellos | ¿El control apunta al televisor y tiene pilas? | El código viaja bien; revisa el receptor del televisor y el emparejamiento del equipo |
 
-La cadena exacta de hoy se concentra en **radiación infrarroja, cercano y cámara**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres mostrar una evidencia indirecta de emisión IR de un control remoto y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-008 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con radiación infrarroja, cercano y cámara. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a observar un control remoto con cámara compatible y comparar con el ojo. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: destellos en la cámara o una limitación del filtro documentada. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
-
-## 11. Qué deberías observar
-
-El resultado normal es **destellos en la cámara o una limitación del filtro documentada**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [El espectro electromagnético y el infrarrojo](https://science.nasa.gov/ems/07_infraredwaves/) — Inglés; lectura NASA; 8 min. Aprenderás el espectro electromagnético y el infrarrojo. Esencial.
 - [Sensores de PX-32](../../docs/reference/sensores.md) — Español; referencia interna; 6 min. Aprenderás sensores de px-32. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+En la página de NASA verás la foto del control remoto y la lámpara infrarroja: es exactamente el experimento que acabas de hacer, hecho por la agencia espacial.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **radiación infrarroja** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [NASA Science: ondas infrarrojas](https://science.nasa.gov/ems/07_infraredwaves/), control remoto típico a ~940 nm, cámaras sensibles al infrarrojo y el infrarrojo percibido como calor.
+- [Exploratorium: infrared remote](https://www.exploratorium.edu/snacks/infrared-remote/), actividad oficial que repite la observación del destello con cámara digital.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 39 a 43, emisores y receptores IR del kit.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Hazle la demostración completa: primero con los ojos, luego con la cámara, y cuéntale la historia de Herschel y su termómetro escondido pasado el rojo. Explícale por qué algunas cámaras no ven el destello (el filtro) y por qué eso no invalida el experimento. Pregúntale si conoce otros aparatos que "hablen" con luz invisible.
 
-Hoy aprendiste a **mostrar una evidencia indirecta de emisión IR de un control remoto** y lo conectaste con **radiación infrarroja, cercano y cámara**. Pudiste observar destellos en la cámara o una limitación del filtro documentada. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 24: Emisor y receptor infrarrojos](24-emisor-y-receptor-infrarrojos.md).
+Ya sabes que el infrarrojo existe y cómo verlo. En la [Lección 24](24-emisor-y-receptor-infrarrojos.md) abres el sensor de PX-32 pieza por pieza para encontrar su linterna y su ojo.
