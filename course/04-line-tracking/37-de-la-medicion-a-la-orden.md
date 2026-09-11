@@ -1,142 +1,189 @@
 # Lección 37 — De la medición a la orden
 
-## 1. Tu misión de hoy
+## Tres empleos, un robot
 
-Hoy vas a **imprimir AVANZA, CORRIGE o STOP sin mover motores**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Mira hacia atrás un momento. En la Lección 34 mediste: cinco lecturas y un patrón. En la Lección 36 interpretaste: pesos, promedio y una posición con signo. Hoy falta el tercer empleo de la cadena: **decidir**. Dada una posición —o la falta de ella—, ¿qué orden recibe el chasis: avanzar, corregir hacia un lado o detenerse?
 
-## 2. Tiempo estimado
+La tentación es escribir todo junto: leer, calcular y decidir en un solo bloque gigante. Los programas reales hacen lo contrario, y tienen un nombre bonito para el principio: **separación de responsabilidades**. Cada parte del programa tiene un solo trabajo y lo hace bien, como un equipo de expedición: el **explorador** mira el terreno y reporta; el **navegante** traduce el reporte en un rumbo; el **piloto** ejecuta la maniobra. Si la expedición se pierde, sabes a quién preguntar: ¿falló la vista, el cálculo o el volante?
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+En el programa de hoy serán tres funciones con esos tres empleos: `imprimirPatron()` reporta, `estimarPosicion()` calcula y `elegirOrden()` decide. El `loop()` se convierte en algo casi aburrido de tan claro: las tres llamadas en orden, una por línea. Eso es una victoria: cuando un programa se entiende por partes, los errores se encuentran por partes.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Y una decisión de diseño que ya conoces del bloque de infrarrojo: **hoy no hay motores**. El sketch ni siquiera tiene un pin de motor. La orden se imprime — `AVANZA`, `CORRIGE HACIA IR1`, `STOP` — y las ruedas ni se enteran. Es la regla de integración que te llevaste de la Lección 30: primero datos, luego decisiones impresas, y solo al final motores.
 
-## 3. Lo que necesitas saber antes de empezar
+## La política: cinco reglas y una zona muerta de decisión
 
-[Lección 20: Vectores para mover PX-32](../02-movimiento/20-vectores-para-mover-px-32.md), [Lección 36: Estimar dónde está la línea](36-estimar-donde-esta-la-linea.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+El corazón de la clase es la **política de control**: el conjunto completo de reglas que traduce cualquier situación posible en exactamente una orden. No "más o menos": una orden por situación, siempre. La política de hoy, escrita como tabla:
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+| Situación (posición) | Orden | Por qué |
+|---|---|---|
+| Ningún canal ve la línea | `STOP: linea perdida` | Sin testigos no hay rumbo; parar es lo único honesto |
+| Los cinco canales ven línea | `STOP: patron ambiguo` | Cruce o franja gigante: el promedio de -2..+2 no representa un rumbo (Lección 36) |
+| Posición menor o igual a -0.4 | `CORRIGE hacia IR1` | La línea está del lado IR1: girar hacia ella |
+| Posición mayor o igual a +0.4 | `CORRIGE hacia IR5` | La línea está del lado IR5: girar hacia ella |
+| Resto: -0.4 < posición < +0.4 | `AVANZA` | La línea está bastante centrada: seguir |
 
-## 4. Lectura principal
+Observa los bordes de la tabla. Los dos primeros casos no usan la posición para nada: miran directamente a los testigos, porque son situaciones donde la posición miente o no existe. Solo los tres últimos usan el número. Y el 0.4 no es magia: es la **banda de tolerancia**, el ancho de error que decidimos perdonar antes de corregir. Con tolerancia muy angosta (0.1) el robot zigzaguea nervioso corrigiendo cada milímetro; con tolerancia holgada (1.5) deja escaparse la línea antes de reaccionar. Hoy vale 0.4; en el hito podrás afinarla.
 
-### La idea intuitiva
+Nota también el orden de las preguntas: primero los casos sintestigos y ambiguos, después los signos de la posición. Si preguntaras al revés, un cruce (posición 0.0) recibiría `AVANZA` — exactamente la mentira aritmética que destapamos con la tira ancha. En una política, **el orden de las preguntas es parte de la política**.
 
-El tema de hoy es **política if/else, decisión y separación de responsabilidades**. En lenguaje cotidiano, buscamos una forma fiable de imprimir AVANZA, CORRIGE o STOP sin mover motores. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+## Lo que necesitas
 
-Cinco sensores producen un patrón espacial. El reto ya no es leer un 0 o un 1, sino interpretar una combinación, estimar dónde está la línea y elegir una corrección. Mantendremos separadas medición, interpretación y movimiento para poder probar cada capa sin que una rueda oculte un error de software.
+- PX-32 con tracker calibrado (Lección 33) y las lecciones 34–36 frescas en el cuaderno: ley digital, lado de IR1 y tabla de puestos de control.
+- Tu pista de práctica: hoja blanca, tira de 25 mm y la tira ancha de ~60 mm de la Lección 36.
+- Computador con Arduino IDE 2 y cable USB.
+- El sketch [37-de-la-medicion-a-la-orden.ino](../../code/educational/37-de-la-medicion-a-la-orden/37-de-la-medicion-a-la-orden.ino).
 
-### De la intuición al concepto técnico
+🟢 Programar, cargar, probar patrones y llenar la tabla es tuyo. 🟡 El adulto conecta el USB. 🔴 Nada de baterías: el sketch no puede mover una rueda aunque quisiera.
 
-Los términos centrales son **política if/else, decisión y separación de responsabilidades**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+## El programa, por dentro
 
-En PX-32, esta idea se usa para alimentar al programa patrones de prueba y revisar la orden elegida. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Política if/else:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-004 a HW-007.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **política if/else, decisión y separación de responsabilidades**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante prepara la predicción, el programa y la tabla de datos.
-- 🟡 Un adulto revisa el montaje antes de conectar USB o alimentar sensores.
-- 🔴 El adulto corrige cualquier cable, ruta de Serial1 o conexión de potencia. Se cablea únicamente con USB retirado y alimentación apagada.
-
-La actividad comienza sin movimiento. Si una lectura es extraña, no se cambian varios cables a la vez: se apaga, se compara con el mapa canónico y se modifica una sola variable.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres imprimir AVANZA, CORRIGE o STOP sin mover motores y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-004 a HW-007 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con política if/else, decisión y separación de responsabilidades. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a alimentar al programa patrones de prueba y revisar la orden elegida. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: cada patrón produce una sola orden y los ambiguos terminan en STOP. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [37-de-la-medicion-a-la-orden.ino](../../code/educational/37-de-la-medicion-a-la-orden/37-de-la-medicion-a-la-orden.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **política if/else**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y recórrelo completo; debe ser idéntico a este bloque:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 37
-// Cargar solo después de leer la sección de seguridad.
-const byte PINES[5]={A4,A3,A2,A1,A0}; const int LINEA=LOW;
-void setup(){ Serial.begin(9600); for(byte i=0;i<5;i++) pinMode(PINES[i],INPUT); }
-void loop(){ int suma=0,cuantos=0; for(byte i=0;i<5;i++){ if(digitalRead(PINES[i])==LINEA){ suma+=int(i)-2; cuantos++; } }
-  if(cuantos==0) Serial.println("STOP_LINEA_PERDIDA"); else { float pos=float(suma)/cuantos; if(pos<-0.4) Serial.println("CORRIGE_IZQ"); else if(pos>0.4) Serial.println("CORRIGE_DER"); else Serial.println("AVANZA"); } delay(100); }
+// Curso PX-32 - Leccion 37: del patron a la orden, sin tocar motores.
+// Tres funciones, tres empleos: reportar, estimar y decidir.
+// La orden solo se imprime: ningun pin de motor existe aqui.
+
+const int PINES[5] = { A4, A3, A2, A1, A0 };
+
+// Ley de tu cuaderno (Leccion 34): que imprime un canal sobre negro.
+const int LECTURA_SOBRE_NEGRO = LOW;
+
+// Banda de tolerancia: cuanto perdonamos antes de corregir.
+const float TOLERANCIA = 0.4;
+
+// La llena estimarPosicion() y la lee elegirOrden():
+// el puente de datos entre las dos funciones.
+int cuantosVenLinea;
+
+void imprimirPatron() {
+  for (int i = 0; i < 5; i++) {
+    Serial.print(digitalRead(PINES[i]));
+  }
+}
+
+float estimarPosicion() {
+  int sumaDePesos = 0;
+  cuantosVenLinea = 0;
+
+  for (int i = 0; i < 5; i++) {
+    if (digitalRead(PINES[i]) == LECTURA_SOBRE_NEGRO) {
+      sumaDePesos = sumaDePesos + (i - 2);
+      cuantosVenLinea = cuantosVenLinea + 1;
+    }
+  }
+
+  if (cuantosVenLinea == 0) {
+    return 0;
+  }
+
+  return float(sumaDePesos) / cuantosVenLinea;
+}
+
+void elegirOrden(float posicion) {
+  if (cuantosVenLinea == 0) {
+    Serial.println(" -> STOP: linea perdida");
+  } else if (cuantosVenLinea == 5) {
+    Serial.println(" -> STOP: patron ambiguo");
+  } else if (posicion < -TOLERANCIA) {
+    Serial.println(" -> CORRIGE hacia IR1");
+  } else if (posicion > TOLERANCIA) {
+    Serial.println(" -> CORRIGE hacia IR5");
+  } else {
+    Serial.println(" -> AVANZA");
+  }
+}
+
+void setup() {
+  for (int i = 0; i < 5; i++) {
+    pinMode(PINES[i], INPUT);
+  }
+  Serial.begin(9600);
+}
+
+void loop() {
+  imprimirPatron();
+  float posicion = estimarPosicion();
+  elegirOrden(posicion);
+  Serial.println();
+  delay(300);
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 **El `loop()` como organigrama.** Tres llamadas y ya: `imprimirPatron()`, `estimarPosicion()` y `elegirOrden(posicion)`. Compara con el `loop()` de la Lección 36, donde todo vivía amontonado. El comportamiento es el mismo; lo que cambió es que ahora el programa **declara su propia estructura**: se lee como la cadena explorador → navegante → piloto. Cuando en el hito algo falle, mirarás la función que corresponde y no el sketch entero.
 
-## 11. Qué deberías observar
+3. 🟢 **Una función que devuelve.** `estimarPosicion()` empieza con `float` en lugar de `void`: anuncia que **retorna** un número con decimal. Ya conocías la idea de la Lección 11 (una función puede entregar un resultado), y aquí la ves trabajar: el resultado viaja hacia `float posicion = ...` y de ahí como **argumento** a `elegirOrden(posicion)`. El dato fluye por las funciones como un informe que sube por la cadena de mando.
 
-El resultado normal es **cada patrón produce una sola orden y los ambiguos terminan en STOP**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+4. 🟢 **El puente `cuantosVenLinea`.** `elegirOrden()` necesita dos datos: la posición **y** si había testigos. La posición llega por argumento; `cuantosVenLinea` es una variable declarada fuera de toda función (una variable **global**) que `estimarPosicion()` llena y `elegirOrden()` lee. Las globales hay que manejarlas con cuidado —cualquier función puede escribirlas—, pero aquí hacen de puente limpio entre dos empleos que comparten un insumo.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+5. 🟢 **El `return 0` del caso perdido** parece devolver "centrada", pero fíjate que `elegirOrden()` nunca usa esa posición: revisa `cuantosVenLinea == 0` **antes** de mirar el número. El cero viaja, pero nadie lo escucha. Aun así, hay que devolver *algo* válido, y el cero es el pasajero inofensivo de siempre.
 
-## 12. Si no funciona
+6. 🟢 **`TOLERANCIA` como constante.** Podríamos escribir `0.4` directo en las comparaciones, pero la constante tiene nombre y vive arriba, donde se ve. Cambiar una sola línea para afinar el comportamiento del robot entero es el tipo de poder que dan las constantes bien nombradas (Lección 07).
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
+7. 🟢 **Predice la tabla completa.** Antes de cargar, copia la tabla de abajo y completa la columna "Orden que imprimirá" para TU ley digital. Después comprobarás con el monitor: siete aciertos de siete, sin mirar el código, es la meta.
+
+## El experimento de los siete patrones
+
+8. 🟡 El adulto conecta el USB. Carga el sketch, abre el monitor a 9600 baudios y espera la lluvia de líneas `patron -> orden`.
+
+9. 🟢 **Llena la tabla con tus manos.** Coloca bajo el robot, una a una, las siete situaciones y anota lo que imprime:
+
+| # | Qué pones bajo la fila | Patrón (con tu ley) | Orden que imprime |
 |---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+| 1 | Nada (todo blanco) | | |
+| 2 | Tira de 25 mm bajo IR3 | | |
+| 3 | Tira bajo IR2 (o entre IR2 e IR3) | | |
+| 4 | Tira bajo IR4 (o entre IR3 e IR4) | | |
+| 5 | Tira bajo IR1 | | |
+| 6 | Tira bajo IR5 | | |
+| 7 | Tira ancha de ~60 mm (los cinco canales) | | |
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+10. 🟢 **Contrasta la tabla.** Compara con tus predicciones del paso 7. Cada discrepancia es una joya: ¿no entendías la regla, o la regla no dice lo que creías? Relee la tabla de la política y el código de `elegirOrden()` hasta que la discrepancia muera.
 
-## 13. Desafío
+11. 🟢 **La frontera de la tolerancia.** Desliza la tira lentamente desde el centro hacia IR1. En algún punto la orden saltará de `AVANZA` a `CORRIGE hacia IR1`: esa es la banda de tolerancia en vivo. Estima con tus puestos de control (Lección 36) en qué posición ocurrió el salto: debería andar cerca de -0.4. ¿Te gustaría un robot más nervioso o más paciente? Cambia `TOLERANCIA` a 0.1, carga, repite el deslizamiento… y devuelve el 0.4 antes de la próxima lección.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+12. 🟢 **La orden dominante.** Termina siempre el experimento retirando la tira por completo: la orden debe ser `STOP: linea perdida` en menos de un segundo (el `delay(300)` es el techo). Repítelo tres veces. Esa maniobra es tu freno de mano del hito: si algún día el robot no se detiene al perder la línea, algo grave falla en la política y la sesión termina ahí.
 
-## 14. Lecturas y videos para explorar
+13. 🟢 **Cierra la sesión.** Monitor cerrado, USB desconectado (🟡 si lo prefiere el adulto). Tu cuaderno se queda con la tabla completa de siete filas: es el certificado de que la política funciona sobre papel antes de tocar un motor.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama de flujo de la política de decisión.
+> - **Objetivo:** mostrar el orden de las preguntas y por qué los casos sin testigos y ambiguos se atienden antes de mirar la posición.
+> - **Descripción:** flujo vertical con cuatro rombos de decisión en orden: "¿cuantosVenLinea == 0?" → STOP linea perdida; "¿== 5?" → STOP patron ambiguo; "¿posicion < -0.4?" → CORRIGE hacia IR1; "¿posicion > +0.4?" → CORRIGE hacia IR5; rombo final a AVANZA; cada salida lleva la línea de código exacta que la produce.
+> - **Elementos que deben señalarse:** las cinco órdenes finales, la constante TOLERANCIA en los umbrales, el orden secuencial de las preguntas.
+> - **Fuente técnica:** sketch 37 del repositorio, función `elegirOrden()`.
+> - **Texto alternativo sugerido:** "Diagrama de flujo con las preguntas de la política de línea en orden y las cinco órdenes posibles".
+
+## Desafío: el arquitecto de políticas
+
+Sin cargar nada, propón un cambio a la política y discútelo con tu padre: ¿debería el robot, al perder la línea, **recordar** hacia qué lado la vio por última vez y girar hacia allá para buscarla en lugar de parar? Ese es el truco de muchos seguidores reales (los rallies pierden la pista una fracción de segundo en las curvas). Dibuja la regla nueva y discutan el riesgo: ¿qué pasa si recuerda mal? Guarda la idea: es una mejora posible para después del hito, no para mañana.
+
+## Si no funciona
+
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Siempre imprime STOP o siempre AVANZA | ¿`LECTURA_SOBRE_NEGRO` contradice tu ley de la Lección 34? | Con la ley invertida, "todo es línea" o "nada es línea"; corrige la constante y repite la tabla |
+| CORRIGE hacia el lado que no esperabas | ¿Los pesos quedaron corridos? ¿IR1 es el extremo que crees? | Repite el paso 12 de la Lección 34 con la marca de cinta; la política sigue la fila, no la costumbre |
+| Con la tira al centro imprime CORRIGE | ¿La tira quedó entre IR3 y su vecino? | Centra mejor; si persiste, baja el titileo recalibrando (Lección 33) |
+| Con la tira ancha imprime AVANZA | ¿La tira cubre de verdad los cinco canales? | Ensánchala o alinéala; el caso ambiguo exige cinco testigos simultáneos |
+| No compila | ¿Copiaste las tres funciones completas y en orden? | Cada función necesita su tipo de retorno, sus llaves y vivir fuera de las otras |
+| Las órdenes llegan lentas | ¿`delay(300)` duplicado o muy grande? | Debe ser uno solo; el ritmo se ajusta en esa única línea |
+
+## Lecturas y videos para explorar
 
 - [Diagrama correcto del tracker de cinco canales](../../assets/osoyoo-manual/pagina-18-pinout-tracker-correcto.png) — Inglés; manual del fabricante; 8 min. Aprenderás diagrama correcto del tracker de cinco canales. Esencial.
 - [Erratas y decisión canónica IR1–IR5](../../docs/reference/errata-osoyoo.md) — Español; referencia interna; 8 min. Aprenderás erratas y decisión canónica ir1–ir5. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+La cadena está completa en papel: medir, estimar, decidir. En la [Lección 38](38-hito-seguir-una-linea.md) llega el cuarto empleo — el piloto — y con él las ruedas, las baterías y el hito del bloque.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **política if/else** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), declaración de funciones con tipo de retorno (`float`), `return`, argumentos y variables globales.
+- Regla de integración del curso: decisiones impresas antes de motores (Lección 30) y STOP dominante ante pérdida de señal.
+- Casos "sin línea" y "patrón ambiguo" verificados en la Lección 36 antes de convertirse en ramas de la política.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Muéstrale el juego de los siete patrones y explícale la tabla de la política: por qué perder la línea y el cruce terminan en STOP antes de que el número diga nada, y qué papel juega la tolerancia de 0.4. Pregúntale qué haría él si su GPS perdiera la señal en una curva: ¿seguir derecho, frenar o recordar el último rumbo? Conecta esa charla con el desafío. Marca la sesión en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **imprimir AVANZA, CORRIGE o STOP sin mover motores** y lo conectaste con **política if/else, decisión y separación de responsabilidades**. Pudiste observar cada patrón produce una sola orden y los ambiguos terminan en STOP. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 38: Hito: seguir una línea](38-hito-seguir-una-linea.md).
+Todo está probado en papel. La [Lección 38](38-hito-seguir-una-linea.md) enciende los motores: tres fases, una pista real y el día que PX-32 lee el piso solo.

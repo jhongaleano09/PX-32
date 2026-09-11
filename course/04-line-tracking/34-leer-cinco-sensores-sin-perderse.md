@@ -1,141 +1,130 @@
 # Lección 34 — Leer cinco sensores sin perderse
 
-## 1. Tu misión de hoy
+## Cinco testigos, una fila de números
 
-Hoy vas a **imprimir una lectura como 00100 en el monitor serie**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Ayer terminaste la clase con una ley escrita en tu cuaderno: sobre negro, el LED de señal de un canal se enciende; sobre blanco, se apaga. Pero los LED son para humanos. El programa de PX-32 no puede "mirar" la placa: necesita que cada canal le entregue su veredicto como número por un pin. Eso ya ocurrió una vez: en la Lección 28 leíste un sensor de mano con `digitalRead()` y obtuviste `1` o `0`. Hoy lo harás **cinco veces en la misma vuelta del `loop()`**.
 
-## 2. Tiempo estimado
+Cuando los cinco veredictos se escriben juntos, nacen cosas nuevas. Un canal decía `0` o `1`; cinco canales en fila forman un **patrón**: algo como `00100` o `10000`. Ese patrón es un mapa del piso bajo el frente del robot: dónde hay negro y dónde no, de un solo vistazo. La palabra **muestreo** nombra el acto de tomar esa foto: preguntarle a los cinco canales en un instante y anotar las cinco respuestas juntas.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Y hay una promesa pendiente de la Lección 31 que hoy se cumple: con la tira bajo un canal a la vez, verás **qué dígito del patrón cambia**. Dígito y canal quedan emparejados con evidencia, y por fin podrás contestar la pregunta incómoda: ¿IR1 queda a tu izquierda o a tu derecha cuando miras a PX-32 desde atrás?
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Lo que necesitas
 
-## 3. Lo que necesitas saber antes de empezar
+- PX-32 ensamblado, con el tracker calibrado con la luz de hoy (Lección 33) y su conector verificado (Lección 32).
+- Tu pista de práctica: la hoja blanca y la tira negra de 25 mm de la Lección 33.
+- Computador con Arduino IDE 2 y el cable USB.
+- El sketch [34-leer-cinco-sensores-sin-perderse.ino](../../code/educational/34-leer-cinco-sensores-sin-perderse/34-leer-cinco-sensores-sin-perderse.ino).
+- Tu cuaderno con el mapa del frente y la ley de LED.
 
-[Lección 08: PX-32 aprende a hablarnos](../01-programacion/08-px-32-aprende-a-hablarnos.md), [Lección 33: Calibrar negro y blanco](33-calibrar-negro-y-blanco.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+🟢 Programar, cargar, mover la tira y leer el monitor es cosa tuya. 🟡 El adulto conecta el USB. 🔴 Las baterías siguen fuera: hoy no se mueve nada.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+## El programa, por dentro
 
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **muestreo, patrón y formato**. En lenguaje cotidiano, buscamos una forma fiable de imprimir una lectura como 00100 en el monitor serie. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Cinco sensores producen un patrón espacial. El reto ya no es leer un 0 o un 1, sino interpretar una combinación, estimar dónde está la línea y elegir una corrección. Mantendremos separadas medición, interpretación y movimiento para poder probar cada capa sin que una rueda oculte un error de software.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **muestreo, patrón y formato**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para leer A4 a A0 y formar una línea de cinco dígitos. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Muestreo:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001, HW-007.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **muestreo, patrón y formato**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante prepara la predicción, el programa y la tabla de datos.
-- 🟡 Un adulto revisa el montaje antes de conectar USB o alimentar sensores.
-- 🔴 El adulto corrige cualquier cable, ruta de Serial1 o conexión de potencia. Se cablea únicamente con USB retirado y alimentación apagada.
-
-La actividad comienza sin movimiento. Si una lectura es extraña, no se cambian varios cables a la vez: se apaga, se compara con el mapa canónico y se modifica una sola variable.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres imprimir una lectura como 00100 en el monitor serie y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001, HW-007 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con muestreo, patrón y formato. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a leer A4 a A0 y formar una línea de cinco dígitos. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: patrones legibles que cambian al desplazar manualmente la pista. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [34-leer-cinco-sensores-sin-perderse.ino](../../code/educational/34-leer-cinco-sensores-sin-perderse/34-leer-cinco-sensores-sin-perderse.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **muestreo**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y recórrelo completo; debe ser idéntico a este bloque:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 34
-// Cargar solo después de leer la sección de seguridad.
-const byte PINES[5]={A4,A3,A2,A1,A0};
-void setup(){ Serial.begin(9600); for(byte i=0;i<5;i++) pinMode(PINES[i],INPUT); }
-void loop(){ for(byte i=0;i<5;i++) Serial.print(digitalRead(PINES[i])); Serial.println(); delay(100); }
+// Curso PX-32 - Leccion 34: leer los cinco canales del tracker
+// e imprimirlos como un patron de cinco digitos.
+// El digito de la izquierda es IR1; el de la derecha, IR5.
+
+const int CANAL_IR1 = A4;
+const int CANAL_IR2 = A3;
+const int CANAL_IR3 = A2;
+const int CANAL_IR4 = A1;
+const int CANAL_IR5 = A0;
+
+void setup() {
+  pinMode(CANAL_IR1, INPUT);
+  pinMode(CANAL_IR2, INPUT);
+  pinMode(CANAL_IR3, INPUT);
+  pinMode(CANAL_IR4, INPUT);
+  pinMode(CANAL_IR5, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int lecturaIR1 = digitalRead(CANAL_IR1);
+  int lecturaIR2 = digitalRead(CANAL_IR2);
+  int lecturaIR3 = digitalRead(CANAL_IR3);
+  int lecturaIR4 = digitalRead(CANAL_IR4);
+  int lecturaIR5 = digitalRead(CANAL_IR5);
+
+  Serial.print(lecturaIR1);
+  Serial.print(lecturaIR2);
+  Serial.print(lecturaIR3);
+  Serial.print(lecturaIR4);
+  Serial.println(lecturaIR5);
+
+  delay(200);
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 **Lo conocido.** No hay ni una instrucción nueva: `const`, `pinMode(..., INPUT)`, `digitalRead()`, `Serial.print()` y `delay()` ya son tuyos desde las Lecciones 07, 08 y 28. Lo nuevo es la **cantidad**: lo mismo cinco veces, en orden de fila.
 
-## 11. Qué deberías observar
+3. 🟢 **Las constantes siguen el mapa.** `CANAL_IR1 = A4` … `CANAL_IR5 = A0`: exactamente la escalera que verificaste en la Lección 32 contra el diagrama de la página 18. Si algún día dudas de un pin, no lo cambies por gusto: vuelve al mapa canónico.
 
-El resultado normal es **patrones legibles que cambian al desplazar manualmente la pista**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+4. 🟢 **Las cinco lecturas ocurren "a la vez".** En realidad el procesador las hace una tras otra en millonésimas de segundo; para lo que importa aquí, las cinco describen el mismo instante. Después de leerlas, el programa no decide nada: solo imprime. Medir y decidir son trabajos distintos, y hoy solo medimos.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+5. 🟢 **El formato del patrón.** Cuatro `print` y un `println` final: los cinco dígitos quedan pegados en una línea (`00100`) y el `println` hace el salto de línea para la próxima foto. Elegimos imprimir IR1 primero para que el patrón se lea como tu dibujo del frente: de IR1 a IR5. Esa decisión de **formato** —cómo se muestra un dato— la tomamos nosotros y la mantendremos en todo el bloque.
 
-## 12. Si no funciona
+6. 🟢 **`delay(200)`**: cinco fotos por segundo. Suficiente para tu ojo en la mesa; en el hito bajaremos esta pausa porque el robot necesitará decidir más rápido.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+7. 🟢 **Predice antes de cargar.** En el cuaderno, con la tira bajo el canal central: ¿qué patrón esperas? ¿Y con la tira bajo IR1? No sigas hasta tener tu apuesta escrita.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+## El experimento del dígito que cambia
 
-## 13. Desafío
+8. 🟡 El adulto conecta el USB. Carga el sketch, elige la placa Mega 2560 y el puerto correcto, y abre el monitor serie a 9600 baudios (Lección 08). Debe comenzar a llover una línea tras otra con el patrón del momento.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+9. 🟢 **Condiciones de partida.** Pon la hoja blanca bajo el robot y observa el patrón "todo blanco": anótalo. Debe ser cinco dígitos iguales (`00000` o `11111`, según tu módulo). Esa es tu línea base.
 
-## 14. Lecturas y videos para explorar
+10. 🟢 **La ley digital.** Desliza la tira bajo el canal central hasta que el LED de IR3 encienda (Lección 33). Mira el monitor: ¿qué dígito cambió respecto de la línea base? Si sobre negro el patrón muestra `1` en el canal, tu tracker entrega `HIGH` sobre negro; si muestra `0`, entrega `LOW`. Escríbelo con fecha en el cuaderno: "**En mi tracker, sobre negro el canal imprime ___**". Esta ley digital es la gemela de la ley de LED de la Lección 33 y será una constante en los programas de las Lecciones 36, 37 y 38.
+
+11. 🟢 **Empareja dígitos y canales.** Ahora la parte detective: colócate **detrás del robot**, como su piloto, mirando en la misma dirección en la que avanzaría PX-32 (su frente queda lejos de ti). Sin perder esa posición, desliza la tira bajo el canal de tu marca de cinta (IR1) y observa el monitor: el dígito que cambia es el primero de la izquierda. Repite con IR2, IR4 e IR5: cada tira bajo un canal debe cambiar un único dígito, en orden. Anota la correspondencia completa en tu mapa del cuaderno.
+
+12. 🟢 **La pregunta incómoda, respondida.** Sigues detrás del robot: la tira está bajo IR1, a tu izquierda o a tu derecha. Esa es la respuesta que dos lecciones esperaban. Escribe en el cuaderno, en grande: "**IR1 queda a mi ____ cuando miro a PX-32 desde atrás**". A partir de este momento, cuando el curso diga "extremo IR1" podrás traducirlo a izquierda o derecha con tu propia evidencia.
+
+13. 🟢 **Fotos que el ojo no alcanza.** Desliza la tira lentamente entre IR3 e IR4 y observa el momento en que dos dígitos valen "negro" a la vez (`01100` o su gemelo, según tu ley). Esa zona de transición —la línea entre dos canales— es la que el robot del hito cruzará cientos de veces por segundo. Verla en números ahora es entender su corrección después.
+
+14. 🟢 **Cierra la sesión.** Cierra el monitor, desconecta el USB (🟡 si lo prefiere el adulto) y guarda la pista. El cuaderno debe quedar con tres tesoros: la línea base, la ley digital y el lado de IR1.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** captura anotada del monitor serie.
+> - **Objetivo:** que el niño asocie cada posición de la tira con su patrón de cinco dígitos antes de intentarlo en el robot real.
+> - **Descripción:** captura del monitor con cuatro patrones característicos apilados (línea base en blanco, tira bajo IR3, tira bajo IR1, tira entre IR3 e IR4); a la derecha de cada patrón, un mini-dibujo del frente del robot con la tira en la posición correspondiente y el canal activo resaltado.
+> - **Elementos que deben señalarse:** dígitos individuales del patrón, canal correspondiente a cada dígito, posición de la tira en cada mini-dibujo.
+> - **Fuente técnica:** sketch 34 del repositorio, formato de impresión IR1→IR5.
+> - **Texto alternativo sugerido:** "Monitor serie mostrando cuatro patrones de cinco dígitos junto al dibujo de la posición de la tira que produce cada uno".
+
+## Desafío: el patrón imposible
+
+Sin poner la tira bajo el robot, escribe en el cuaderno los patrones que **no** podrían aparecer jamás con una sola tira de 25 mm. ¿`10101`? ¿`11111`? ¿`01010`? Razona por ancho: la tira cabe en uno o dos canales vecinos, no en tres alternados. Guarda tu lista: en la Lección 37 servirá para reconocer lecturas imposibles o ambiguas y enviarlas a STOP.
+
+## Si no funciona
+
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| El monitor no muestra nada | ¿Velocidad del monitor en 9600? ¿Placa y puerto correctos? | Repite la verificación de la Lección 08; desconectar y reconectar el USB renombra a veces el puerto |
+| El patrón nunca cambia al mover la tira | ¿Está cargado el sketch correcto y el conector de 7 pines bien sentado? | Revisa el mapa de la Lección 32; si el conector se movió, 🔴 el adulto lo revisa sin energía |
+| Cambian varios dígitos a la vez con la tira en un solo canal | ¿La tira es más ancha que 25 mm o está torcida? | Mide de nuevo; una tira ancha tapa dos canales legítimamente |
+| El patrón salta entre dos valores sin mover nada | ¿Estás en el borde del umbral o hay sombra parpadeante? | Aleja la tira del borde, iguala la luz de la sala; si persiste, recalibra (Lección 33) |
+| Los dígitos parecen al revés (tira bajo IR5 cambia el primero) | ¿Estás mirando el robot desde adelante en vez de desde atrás? | Vuelve a colocarte detrás del robot; el formato IR1-primero fue tu decisión en el paso 5 |
+| Todo marca "negro" siempre | ¿La tira o la sombra de tu cuerpo cubre toda la fila? | Aléjate; el secuestro de luz de la Lección 33 también aplica aquí |
+
+## Lecturas y videos para explorar
 
 - [Diagrama correcto del tracker de cinco canales](../../assets/osoyoo-manual/pagina-18-pinout-tracker-correcto.png) — Inglés; manual del fabricante; 8 min. Aprenderás diagrama correcto del tracker de cinco canales. Esencial.
 - [Erratas y decisión canónica IR1–IR5](../../docs/reference/errata-osoyoo.md) — Español; referencia interna; 8 min. Aprenderás erratas y decisión canónica ir1–ir5. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+El patrón ya vive en tu monitor y en tu cuaderno. En la [Lección 35](35-arrays-cinco-datos-bajo-un-nombre.md) mirarás este programa con otros ojos y preguntarás: ¿veintiuna líneas para cinco lecturas… no habrá una forma más elegante?
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **muestreo** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), `digitalRead()`, `pinMode()` con `INPUT`, `Serial.print()`/`println()`.
+- Uso de A0–A4 como entradas digitales en la Mega 2560: [pinout oficial](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf) y mapa canónico del repositorio.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 34–38: el proyecto del fabricante lee los mismos cinco canales para seguir la línea.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Muéstrale el juego de la tira y el dígito que cambia, y explícale tu descubrimiento del paso 12: de qué lado quedó IR1 y cómo lo sabes (no lo que dice el manual: lo que tú mediste). Cuéntale qué patrón apareció con la tira entre dos canales. Pregúntale qué cree que debería hacer el robot si ve ese patrón. Marca la sesión en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **imprimir una lectura como 00100 en el monitor serie** y lo conectaste con **muestreo, patrón y formato**. Pudiste observar patrones legibles que cambian al desplazar manualmente la pista. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 35: Arrays: cinco datos bajo un nombre](35-arrays-cinco-datos-bajo-un-nombre.md).
+El programa de hoy funciona, pero te invito a contar sus líneas: en la [Lección 35](35-arrays-cinco-datos-bajo-un-nombre.md) aprenderás la estructura de datos favorita de todos los lenguajes y el programa encogerá sin perder nada.

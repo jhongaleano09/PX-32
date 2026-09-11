@@ -1,131 +1,96 @@
 # Lección 32 — IR1 a IR5: un mapa espacial
 
-## 1. Tu misión de hoy
+## El manual se contradice a sí mismo
 
-Hoy vas a **relacionar cada canal con A4, A3, A2, A1 y A0**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Hoy te toca ser detective de documentación. Ábrelo con cuidado, porque el caso es real.
 
-## 2. Tiempo estimado
+Para que la Mega pueda escuchar a los cinco canales del tracker, cada uno necesita llegar a un pin propio. La lista oficial está en el manual de OSOYOO, y el curso la verificó contra los diagramas. Resultado: **el texto del manual está mal y el diagrama está bien**.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+En la página 17, la lista de texto dice que los cinco canales se conectan a `A4, A3, A2, A3, A1`. Léela dos veces: hay un `A3` repetido y el `A0` no aparece. En la página 34, la lista del proyecto de seguimiento de línea dice `A4, A3, A2, A2, A1`: ahora el repetido es `A2`. Las dos listas de texto se contradicen entre sí, y además serían un desastre técnico: con `A3` repetido, dos canales distintos terminarían en el mismo pin y la Mega jamás podría distinguirlos.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+El diagrama de la página 18 no comete ese error. Ahí cada cable sale del tracker y llega a un pin distinto: **IR1 a A4, IR2 a A3, IR3 a A2, IR4 a A1, IR5 a A0**, más la alimentación VCC a 5V y GND a GND. Los diagramas de las páginas siguientes coinciden con él. Esa es la tabla que este curso adoptó como **mapa canónico**, y la discrepancia quedó registrada formalmente como errata E-001 para que nadie la corrija en silencio.
 
-## 3. Lo que necesitas saber antes de empezar
+¿Por qué dedicarle una clase entera a un error ajeno? Porque te acaba de suceder algo que le pasa a todos los ingenieros: dos fuentes dicen cosas distintas, y tocaría decidir. La regla que usamos es simple: **gana la fuente que se puede verificar por más caminos**. El diagrama coincide consigo mismo en dos páginas y es eléctricamente posible; el texto se contradice y es imposible. Cuando dos fuentes se pelean, no eliges la más bonita: eliges la que sobrevive a las preguntas.
 
-[Lección 31: Anatomía del tracker de cinco canales](31-anatomia-del-tracker-de-cinco-canales.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+## Un mapa, dos formas de nombrar
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+Fíjate en una propiedad curiosa de la tabla canónica. Los canales están ordenados en fila — IR1, IR2, IR3, IR4, IR5 — y sus pines también bajan en orden — A4, A3, A2, A1, A0. El mapa no es una ensalada: es una escalera. Si sabes dónde está un canal, sabes qué pin usa, sin memorizar nada.
 
-## 4. Lectura principal
+| Canal | Orden en la fila | Pin en la Mega/shield |
+|---|---|---|
+| IR1 | extremo 1 | A4 |
+| IR2 | interior 1 | A3 |
+| IR3 | centro | A2 |
+| IR4 | interior 2 | A1 |
+| IR5 | extremo 2 | A0 |
+| VCC | alimentación | 5V |
+| GND | referencia | GND |
 
-### La idea intuitiva
+Dos detalles finos antes de tocar el robot:
 
-El tema de hoy es **orden espacial, índice y patrón binario**. En lenguaje cotidiano, buscamos una forma fiable de relacionar cada canal con A4, A3, A2, A1 y A0. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+- Los pines A0 a A4 son de la fila "analógica" de la Mega, pero recuerda de la Lección 28 que el tracker no entrega una medida suave: cada canal tiene su comparador que ya decidió negro-o-no-negro, y entrega un nivel digital `HIGH` o `LOW`. La Mega puede leer esos niveles digitales también en los pines analógicos: A0–A4 funcionan como entradas digitales perfectamente normales cuando se los usa así. La fila "analógica" es una fila de pines con doble talento.
+- El orden de la fila física IR1→IR5 sí está garantizado por el diagrama y la serigrafía de la placa. Lo que **sigue sin estar verificado** es qué extremo de esa fila queda hacia la izquierda del robot montado. Por eso la tabla habla de "extremo 1" y "extremo 2", no de izquierda y derecha. La respuesta llegará con evidencia en la Lección 34.
 
-Cinco sensores producen un patrón espacial. El reto ya no es leer un 0 o un 1, sino interpretar una combinación, estimar dónde está la línea y elegir una corrección. Mantendremos separadas medición, interpretación y movimiento para poder probar cada capa sin que una rueda oculte un error de software.
+## Lo que necesitas
 
-### De la intuición al concepto técnico
+- PX-32 ensamblado, **apagado, sin baterías y sin USB**. Sigue siendo observación sin energía.
+- Tu cuaderno con el dibujo del frente de la Lección 31 y la marca de cinta en IR1.
+- El [diagrama de la página 18 del manual](../../assets/osoyoo-manual/pagina-18-pinout-tracker-correcto.png), en pantalla o impreso.
+- Buena luz y, si tienen, una linterna.
 
-Los términos centrales son **orden espacial, índice y patrón binario**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+🟢 Puedes hacer toda la verificación tú. Solo si un conector está mal conectado o un cable suelto exige intervenir: 🔴 detente y llama a tu padre.
 
-En PX-32, esta idea se usa para cubrir un canal por vez y construir el patrón de cinco posiciones. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+## Verifica el mapa cable por cable
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+1. 🟢 **Abre el diagrama** de la página 18 y tenlo al lado. Identifica los dos extremos: a la izquierda el tracker con sus siete pines etiquetados; a la derecha, la tira de pines del shield. Cada línea del dibujo es un cable real de tu robot.
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+2. 🟢 **Localiza el conector en el tracker.** Con PX-32 apagado, mira el extremo de la placa del tracker donde llega el cable de siete vías. Son siete pines en fila: dos de alimentación (GND y VCC) y cinco de señal (IR1 a IR5). La serigrafía de la placa —letras pequeñas impresas junto a cada pin— te dice cuál es cuál: léela con calma y emparéjala pin por pin con las etiquetas del diagrama, sin asumir que tu placa los ordena igual de izquierda a derecha que el dibujo.
 
-## 5. Palabras nuevas
+3. 🟢 **Confirma la orientación del conector.** Un conector hembra de siete pines puede, en teoría, insertarse en cualquier orientación si se fuerza. Mira el conector del tracker y el del shield: ambos deben estar totalmente insertados y sin pines asomando. El manual conecta GND del tracker a GND del shield y VCC a 5V; si el conector estuviera volteado, la alimentación llegaría cruzada y el tracker no funcionaría. Hoy solo verificas que está bien sentado y alineado.
 
-- **Orden espacial:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+4. 🟢 **Sigue cada línea con el dedo**, primero en el diagrama y luego en el aire sobre el robot: IR1 viaja hasta la posición A4 del shield, IR2 hasta A3, IR3 hasta A2, IR4 hasta A1, IR5 hasta A0. No tires del cable para seguirlo: los cables se siguen con la mirada y se tocan con suavidad.
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+5. 🟢 **Completa tu mapa del cuaderno.** Debajo del dibujo de la Lección 31, agrega a cada canal su pin: `IR1 → A4`, `IR2 → A3`, `IR3 → A2`, `IR4 → A1`, `IR5 → A0`. Escribe también la fecha y la fuente: "verificado contra el diagrama de la p. 18". Tu cuaderno se está convirtiendo en tu propio manual, con la diferencia de que el tuyo ya pasó la prueba del detective.
 
-## 6. Así aparece en PX-32
+6. 🟢 **La prueba del error.** Para cerrar, explica en voz alta con tus palabras qué estaba mal en la lista de texto del manual y por qué el diagrama gana la discusión. Si puedes explicárselo a tu padre esta noche, el concepto es tuyo.
 
-**Hardware:** HW-007.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama de conexión anotado del cable de siete pines.
+> - **Objetivo:** mostrar la correspondencia tracker→shield con la errata del texto señalada para que el niño distinga fuente confiable de fuente defectuosa.
+> - **Descripción:** reproducción limpia del conector de 7 vías del tracker y la tira de pines del shield unidos por siete líneas de colores; sobre la tabla resultante, una nota roja que muestre la lista errónea del texto (A4,A3,A2,A3,A1) tachada junto a la correcta del diagrama.
+> - **Elementos que deben señalarse:** pines GND, VCC, IR1–IR5; pines A4–A0 del shield; tachado de la lista errónea.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 17–18 y errata E-001 del repositorio.
+> - **Texto alternativo sugerido:** "Diagrama del cable de siete pines que conecta IR1–IR5 con A4–A0, con la lista errónea del manual tachada".
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+## Desafío: el detective de otros manuales
 
-La cadena exacta de hoy se concentra en **orden espacial, índice y patrón binario**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+La errata E-001 no es la única del manual: en el [registro de erratas](../../docs/reference/errata-osoyoo.md) hay más casos (voltímetros con nombre de placa equivocado, tornillos que no coinciden con el inventario). Lee dos de ellas y anota: ¿qué evidencia usó el curso para resolver cada una? Estás practicando la habilidad más silenciosa de la ingeniería: desconfiar con método.
 
-## 7. Seguridad y participación del adulto
+## Si no funciona
 
-- 🟢 El estudiante prepara la predicción, el programa y la tabla de datos.
-- 🟡 Un adulto revisa el montaje antes de conectar USB o alimentar sensores.
-- 🔴 El adulto corrige cualquier cable, ruta de Serial1 o conexión de potencia. Se cablea únicamente con USB retirado y alimentación apagada.
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| No puedo leer la serigrafía del conector | ¿Las letras son mínusculas o están tapadas por el conector? | Usa linterna en ángulo; el diagrama de la p. 18 da el orden si tu placa no se deja leer |
+| El conector parece a medias o torcido | ¿Algún pin metálico asoma fuera del plástico del conector? | 🔴 Detente y llama a tu padre: no fuerces el conector; se revisa con calma y sin energía |
+| Un cable no llega donde dice el diagrama | ¿Estás siguiendo el cable correcto? El de siete vías es el único del tracker | Verifica contar siete cables; si el montaje real difiere del diagrama, regístralo como posible errata nueva y coméntalo con el adulto |
+| Me pierdo entre A0 y A4 | ¿Estás leyendo el shield al revés? | Ubica primero el conector USB de la Mega como referencia de orientación (Lección 04) y cuenta los pines analógicos desde allí |
 
-La actividad comienza sin movimiento. Si una lectura es extraña, no se cambian varios cables a la vez: se apaga, se compara con el mapa canónico y se modifica una sola variable.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres relacionar cada canal con A4, A3, A2, A1 y A0 y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-007 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con orden espacial, índice y patrón binario. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a cubrir un canal por vez y construir el patrón de cinco posiciones. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: cambio en una sola posición del patrón y orden confirmado por el diagrama de página 18. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
-
-## 11. Qué deberías observar
-
-El resultado normal es **cambio en una sola posición del patrón y orden confirmado por el diagrama de página 18**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [Diagrama correcto del tracker de cinco canales](../../assets/osoyoo-manual/pagina-18-pinout-tracker-correcto.png) — Inglés; manual del fabricante; 8 min. Aprenderás diagrama correcto del tracker de cinco canales. Esencial.
 - [Erratas y decisión canónica IR1–IR5](../../docs/reference/errata-osoyoo.md) — Español; referencia interna; 8 min. Aprenderás erratas y decisión canónica ir1–ir5. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Ya conoces el mapa completo del cableado. En la [Lección 33](33-calibrar-negro-y-blanco.md) le llegará energía por primera vez al tracker y ajustarás su potenciómetro para que distinga el negro del blanco exactamente en tu piso.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **orden espacial** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 17–18: diagrama canónico del tracker (IR1→A4 … IR5→A0) y texto defectuoso de la lista.
+- [Errata E-001 del repositorio](../../docs/reference/errata-osoyoo.md): evidencia y decisión canónica sobre la duplicación de pines en el texto del manual.
+- [Mapa canónico de conexiones de PX-32](../../docs/reference/mapa-conexiones-robot.md), sección tracker de cinco canales.
+- Uso de los pines A0–A5 como entradas digitales en la Mega 2560: [pinout oficial de Arduino](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf).
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Cuéntale el caso del detective: dos listas del manual que se contradicen y un diagrama que salva el día. Explícale por qué un pin repetido habría sido un problema técnico y no solo una errata estética. Pregúntale si alguna vez le pasó en su trabajo que dos documentos dijeran cosas distintas y cómo decidió a quién creer. Marca la sesión en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **relacionar cada canal con A4, A3, A2, A1 y A0** y lo conectaste con **orden espacial, índice y patrón binario**. Pudiste observar cambio en una sola posición del patrón y orden confirmado por el diagrama de página 18. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 33: Calibrar negro y blanco](33-calibrar-negro-y-blanco.md).
+Con el mapa verificado, la [Lección 33](33-calibrar-negro-y-blanco.md) enciende el tracker por primera vez: los LED de la placa te dirán si ve negro o blanco, y tú ajustarás el umbral para tu piso real.

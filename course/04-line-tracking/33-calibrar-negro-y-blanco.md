@@ -1,131 +1,85 @@
 # Lección 33 — Calibrar negro y blanco
 
-## 1. Tu misión de hoy
+## El mismo árbitro, una nueva cancha
 
-Hoy vas a **comparar lecturas sobre pista clara y línea oscura**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+En la Lección 26 conociste al árbitro silbador: el comparador LM393 que convierte una señal suave en un veredicto seco. En la Lección 27 moviste su barra con el potenciómetro de los sensores de mano. Pues bien: cada canal del tracker tiene dentro el mismo tipo de árbitro, y la placa completa tiene un potenciómetro que hoy vas a girar.
 
-## 2. Tiempo estimado
+La pregunta que resuelve la calibración es antigua: ¿dónde queda la frontera entre "esto es negro" y "esto es blanco"? Pensemos en lo que ya sabemos de la Lección 25: el blanco refleja mucha luz infrarroja de vuelta y el negro absorbe casi toda. Pero "casi toda" no es "toda": una cartulina negra reflectante, un piso claro apagado o una sombra fuerte corren la frontera de lugar. El comparador no mide "negro": mide "menos reflexión que el umbral". El umbral lo pone el potenciómetro, y **tu piso real manda**: calibrar en la mesa con luz cálida y correr el hito en un pasillo con otra luz es la receta del desastre.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+El manual del fabricante describe el objetivo exacto de la calibración con los indicadores de la propia placa: **el LED de señal de un canal se enciende cuando ese canal está sobre negro y se apaga cuando está sobre blanco**. Hoy buscaremos ese comportamiento en los cinco canales, con tu tira de prueba y tu luz.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Tu pista de práctica
 
-## 3. Lo que necesitas saber antes de empezar
+El hito de la Lección 38 usará una línea negra de entre 20 y 30 mm de ancho sobre piso claro — lo recomienda el propio fabricante para su proyecto de seguimiento. Calibrar con la misma geometría que la prueba final no es casualidad: es controlar la variable (Lección 01).
 
-[Lección 27: El potenciómetro ajusta el umbral](../03-infrarrojo/27-el-potenciometro-ajusta-el-umbral.md), [Lección 32: IR1 a IR5: un mapa espacial](32-ir1-a-ir5-un-mapa-espacial.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+Construye ahora tu tira de calibración:
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+- Un rectángulo de cartulina o papel negro opaco de **25 mm de ancho** (el punto medio de la ventana recomendada de 20 a 30 mm) por unos 15 cm de largo. Mídelo con regla y recorta con tijeras; pide ayuda si la tijera no coopera.
+- Una hoja o cartulina blanca como piso de práctica, al menos del tamaño de una hoja de carta.
+- La tira debe ser **mate**, no brillante: un papel muy satinado refleja como un espejo aunque sea negro y confunde al sensor (¿recuerdas la Lección 25? la reflexión no solo depende del color).
 
-## 4. Lectura principal
+🟢 La construcción de la tira es toda tuya. 🟡 La conexión del USB la hace el adulto. 🔴 Las baterías siguen guardadas: hoy no hacen falta.
 
-### La idea intuitiva
+## El experimento del umbral
 
-El tema de hoy es **contraste, umbral, iluminación ambiente y calibración**. En lenguaje cotidiano, buscamos una forma fiable de comparar lecturas sobre pista clara y línea oscura. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+1. 🟢 **Prepara la pista.** Pon la hoja blanca sobre la mesa y la tira negra en el centro, bien apoyada y sin arrugas. Acerca PX-32 apagado y ubícalo de pie junto a la pista, con el frente hacia ella.
 
-Cinco sensores producen un patrón espacial. El reto ya no es leer un 0 o un 1, sino interpretar una combinación, estimar dónde está la línea y elegir una corrección. Mantendremos separadas medición, interpretación y movimiento para poder probar cada capa sin que una rueda oculte un error de software.
+2. 🟡 **Energía lógica.** El adulto conecta el cable USB. La Mega despierta, su 5V alimenta el shield y de ahí el tracker: la placa enciende sus LED. Sin baterías, ningún motor puede girar: la única energía del día es la del USB, la misma que usaste para leer sensores en la Lección 28. No te preocupes por distinguir ahora cuál LED es de alimentación y cuáles son de señal: lo que observarás en el siguiente paso es cuál LED **cambia** al mover la tira, y eso no necesita etiquetas.
 
-### De la intuición al concepto técnico
+3. 🟢 **Primera lectura, sin tocar nada.** Sostén PX-32 con las dos manos por los costados del chasis —jamás por los cables ni por el tracker— y deslízalo suavemente hasta que el canal central (IR3, tu dibujo de la Lección 31) quede flotando sobre la tira negra, a la altura normal de trabajo. Observa los LED de señal de la placa: el del canal central debería encenderse sobre el negro. Desliza hasta el blanco: debería apagarse. Anota qué ves, sea lo que sea: esto es tu línea base.
 
-Los términos centrales son **contraste, umbral, iluminación ambiente y calibración**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+4. 🟢 **Ajusta en pasitos.** Si sobre el negro no enciende, o sobre el blanco no se apaga, llegó la hora del tornillo azul. Gíralo con la yema del dedo (o un destornillador pequeño de punta en estrella si el tornillo resiste) en **pasitos de menos de un octavo de vuelta**, exactamente como en la Lección 27, y observa los LED después de cada pasito. Nunca fuerces el tope del potenciómetro: es el mismo componente delicado de entonces. La meta del fabricante, recuerda, es simple y doble: negro → encendido, blanco → apagado.
 
-En PX-32, esta idea se usa para medir a altura fija negro/blanco y ajustar solo si es necesario. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+5. 🟢 **Recorre los cinco canales.** Logrado el equilibrio en el centro, desliza el robot de modo que la tira pase bajo IR1, luego IR2, y así hasta IR5. Cada canal, a su turno sobre el negro, debe encender su LED; al volver al blanco, apagarse. Con un solo potenciómetro para los cinco, la calibración es un prometido de equipo: ajustas hasta que **todos** cumplan, no solo tu favorito. Si un canal se resiste, puede haber algo físico: suciedad en su lente, una sombra particular o una tira más angosta que su campo de visión.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+6. 🟢 **Prueba el secuestro de la luz.** Sin mover el robot del blanco, tapa la luz de la sala con tu cuerpo y observa: ¿cambian los LED? Acércate a una ventana o a una lámpara: ¿ahora? La iluminación ambiente es ruido (Lección 25) y la calibración vale para las condiciones donde la hiciste. Anota en el cuaderno: "calibrado con [la luz que había]".
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+7. 🟢 **La frontera viva.** Para terminar, desliza el robot MUY despacio sobre el borde de la tira, del blanco al negro. Observa el LED: existe una franja diminuta donde el veredicto cambia de un lado al otro y puede titilar. Ahí está el umbral físico, la "barra del salto alto" de la Lección 27, ahora bajo tu robot.
 
-## 5. Palabras nuevas
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía cenital de la calibración con anotaciones.
+> - **Objetivo:** mostrar la posición de sostén del robot, la tira de 25 mm y el LED de señal encendido sobre el negro.
+> - **Descripción:** manos sosteniendo el chasis por los costados sobre la pista blanca con tira negra; zoom insertado del tracker con el LED del canal central iluminado; cota de 25 mm sobre la tira; flecha señalando el potenciómetro azul.
+> - **Elementos que deben señalarse:** tira negra de 25 mm, canal IR3 sobre la tira, LED de señal encendido, potenciómetro, forma correcta de sostener el chasis.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 34–38, ajuste de sensibilidad del tracker y ancho de pista de 20–30 mm.
+> - **Texto alternativo sugerido:** "Robot sostenido sobre una pista blanca con tira negra de 25 mm mientras el LED del canal central del tracker se enciende".
 
-- **Contraste:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+## Cierre de la sesión
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+8. 🟢 **Guarda el estado.** Al terminar, el adulto desconecta el USB. El potenciómetro queda donde lo dejaste: es tu calibración. Guarda la tira de papel: la usarás en las próximas tres lecciones como pista de pruebas en la mesa.
 
-## 6. Así aparece en PX-32
+9. 🟢 **Anota la ley visual.** En el cuaderno, con fecha: "Sobre negro, el LED de señal ____. Sobre blanco, ____". Esa ley de LED es la versión visible de lo que la Lección 34 medirá con números: qué valor (`0` o `1`) entrega cada canal al ponerse sobre negro.
 
-**Hardware:** HW-007.
+## Desafío: la tira que no puede
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+Busca por casa tres "negros" distintos: un jean, una funda de cuero, un cartón café oscuro, la pantalla apagada del televisor. Pasa el canal central sobre cada uno con el robot en USB: ¿encienden el LED? Clasifícalos en "suficientemente negro para mi calibración" y "demasiado claro". Estás descubriendo que negro y blanco no son propiedades absolutas de los objetos, sino de cuánta luz devuelven comparada con tu umbral.
 
-La cadena exacta de hoy se concentra en **contraste, umbral, iluminación ambiente y calibración**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+## Si no funciona
 
-## 7. Seguridad y participación del adulto
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Ningún LED responde en ninguna superficie | ¿El LED de alimentación del tracker encendió con el USB? | Si no: 🔴 llama al adulto a revisar el conector de siete pines (Lección 32); si sí: sigue ajustando, el umbral puede estar muy lejos |
+| Enciende sobre blanco Y sobre negro | Umbral demasiado sensible | Gira pasitos hacia el lado que apaga sobre el blanco y verifica de nuevo el negro |
+| No enciende ni sobre la tira | ¿La tira es brillante o muy angosta? | Usa cartulina negra mate de 25 mm; prueba también a diferentes alturas sosteniendo el robot |
+| Un solo canal no coopera | ¿Suciedad o sombra sobre ese canal? | Límpiate el dedo y pasa suavemente sobre las lentes del canal; repite bajo luz pareja |
+| Los LED titilan en medio del borde | ¿Estás en la franja del umbral? | Es normal: ahí el veredicto cambia; muévete unos milímetros hacia un lado u otro |
+| La calibración que servía anoche hoy no sirve | ¿Cambió la luz ambiente? | Recalibra con la luz actual y anótalo; la calibración pertenece a sus condiciones |
 
-- 🟢 El estudiante prepara la predicción, el programa y la tabla de datos.
-- 🟡 Un adulto revisa el montaje antes de conectar USB o alimentar sensores.
-- 🔴 El adulto corrige cualquier cable, ruta de Serial1 o conexión de potencia. Se cablea únicamente con USB retirado y alimentación apagada.
-
-La actividad comienza sin movimiento. Si una lectura es extraña, no se cambian varios cables a la vez: se apaga, se compara con el mapa canónico y se modifica una sola variable.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres comparar lecturas sobre pista clara y línea oscura y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-007 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con contraste, umbral, iluminación ambiente y calibración. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a medir a altura fija negro/blanco y ajustar solo si es necesario. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: separación repetible entre superficies en las condiciones reales de la pista. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
-
-## 11. Qué deberías observar
-
-El resultado normal es **separación repetible entre superficies en las condiciones reales de la pista**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [Diagrama correcto del tracker de cinco canales](../../assets/osoyoo-manual/pagina-18-pinout-tracker-correcto.png) — Inglés; manual del fabricante; 8 min. Aprenderás diagrama correcto del tracker de cinco canales. Esencial.
 - [Erratas y decisión canónica IR1–IR5](../../docs/reference/errata-osoyoo.md) — Español; referencia interna; 8 min. Aprenderás erratas y decisión canónica ir1–ir5. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Los LED ya te cuentan la historia del negro y el blanco. En la [Lección 34](34-leer-cinco-sensores-sin-perderse.md) le enseñarás a la Mega a escucharla también, imprimiendo el patrón de cinco dígitos en el monitor serie.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **contraste** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 34–38: ajuste de sensibilidad del tracker (LED de señal encendido sobre negro, apagado sobre blanco) y ancho de pista recomendado de 20–30 mm.
+- [Lección 27](../03-infrarrojo/27-el-potenciometro-ajusta-el-umbral.md): técnica de ajuste en pasitos y funcionamiento del potenciómetro.
+- [Lección 26](../03-infrarrojo/26-lm393-convertir-una-senal-en-decision.md): el comparador y el umbral como barra de salto alto.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Muéstrale la calibración en vivo: el robot sobre la tira, el LED encendiendo y apagando. Explícale por qué la calibración depende de la luz de la habitación y qué le pasaría al robot si corre el hito en otro ambiente sin recalibrar. Cuéntale cuál de los tres "negros" del desafío resultó ser negro de verdad para el sensor. Marca la sesión en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **comparar lecturas sobre pista clara y línea oscura** y lo conectaste con **contraste, umbral, iluminación ambiente y calibración**. Pudiste observar separación repetible entre superficies en las condiciones reales de la pista. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 34: Leer cinco sensores sin perderse](34-leer-cinco-sensores-sin-perderse.md).
+Con el umbral ajustado, el tracker está listo para hablar con la Mega: en la [Lección 34](34-leer-cinco-sensores-sin-perderse.md) aparecerá el primer programa del bloque y una sorpresa: descubrirás por fin de qué lado físico está IR1.

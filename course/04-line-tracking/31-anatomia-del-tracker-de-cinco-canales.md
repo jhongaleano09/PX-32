@@ -1,131 +1,95 @@
 # Lección 31 — Anatomía del tracker de cinco canales
 
-## 1. Tu misión de hoy
+## Un sensor que solo sabe decir sí o no
 
-Hoy vas a **explicar por qué cinco mediciones ofrecen más información que una**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+En el bloque de infrarrojo PX-32 aprendió a seguir tu mano con dos sensores que miran hacia adelante. Funcionó, pero con una limitación que quizá notaste: cada sensor solo sabía dos cosas, "veo algo" o "no veo nada". Con esa información el robot puede acercarse o girar, pero nunca sabe *dónde* está exactamente lo que busca.
 
-## 2. Tiempo estimado
+Hoy empieza un reto nuevo: PX-32 va a seguir una **línea negra pintada en el piso**. Y para eso necesita algo más que sí y no. Imagina jugar a mantener el equilibrio sobre una viga mirando por un solo agujero: sabrías si hay viga o no bajo ese punto, pero no hacia qué lado caerte. Con cinco agujeros en fila, uno al lado del otro, sabrías exactamente dónde está la viga y hacia dónde corregir.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Eso es exactamente lo que tiene PX-32 bajo el frente del chasis: **cinco sensores infrarrojos en fila**, mirando al piso. El fabricante lo llama *tracker de cinco canales* (HW-007), y durante las próximas ocho lecciones va a convertirse en el ojo con el que PX-32 lee el piso.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Cinco preguntas sí/no son mucho más que una
 
-## 3. Lo que necesitas saber antes de empezar
+Piensa en lo que ya sabes de la Lección 25: un par infrarrojo emite luz invisible y mide cuánta regresa. Sobre una superficie blanca vuelve mucha; sobre una negra, casi nada, porque el negro absorbe. Cada uno de los cinco pares del tracker hace esa misma pregunta de reflexión, pero cada uno la hace **en su propio punto del piso**, un poquito más a un lado que el anterior.
 
-[Lección 25: Reflexión y absorción](../03-infrarrojo/25-reflexion-y-absorcion.md), [Lección 30: Seguir una mano con prudencia](../03-infrarrojo/30-seguir-una-mano-con-prudencia.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+Un **canal** es cada par emisor-receptor con su propio circuito: cinco canales, cinco mediciones independientes al mismo tiempo. Y una fila de sensores iguales trabajando juntos tiene nombre técnico: una **matriz de sensores**. No es una pantalla ni un tablero de ajedrez: es simplemente "varios sensores del mismo tipo ordenados en línea" para cubrir un frente completo.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+¿Por qué cinco y no uno? Haz la cuenta de la información:
 
-## 4. Lectura principal
+- Con **un** sensor: "hay negro debajo" o "no hay negro". Si el robot se desvía, no sabes hacia dónde.
+- Con **tres**: negro al centro, negro a la izquierda, negro a la derecha. Ya hay dirección.
+- Con **cinco**: dirección **y** también cuánto. Negro solo en el extremo no es lo mismo que negro en el extremo y su vecino: uno dice "me estoy saliendo", el otro dice "ya me salí bastante". El robot puede corregir suave o fuerte.
 
-### La idea intuitiva
+Cada canal además no ve un punto infinitamente pequeño: la luz infrarroja sale en un cono y regresa en un cono. Ese cono que ilumina y escucha cada sensor es su **campo de visión**. Como el tracker va montado a una altura fija bajo el chasis, cada canal ve un círculo pequeño del piso, y los cinco círculos forman una franja bajo el frente del robot. El ancho de la línea del hito final (entre 20 y 30 mm, según el fabricante) está elegido para que la tape al menos un círculo completo, pero no a los cinco a la vez.
 
-El tema de hoy es **tracker, canal, matriz de sensores y campo de visión**. En lenguaje cotidiano, buscamos una forma fiable de explicar por qué cinco mediciones ofrecen más información que una. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+## Lo que necesitas
 
-Cinco sensores producen un patrón espacial. El reto ya no es leer un 0 o un 1, sino interpretar una combinación, estimar dónde está la línea y elegir una corrección. Mantendremos separadas medición, interpretación y movimiento para poder probar cada capa sin que una rueda oculte un error de software.
+- PX-32 ensamblado, **apagado, sin baterías y sin USB**. Hoy no hay energía de ningún tipo: es una clase de pura observación.
+- Buena iluminación sobre la mesa (la necesitarás para ver debajo del chasis).
+- Un trocito de cinta adhesiva o de mascarilla, para marcar un canal.
+- Tu cuaderno y lápiz.
+- La ficha [HW-007: tracker de cinco canales](../../docs/hardware/HW-007-ir-tracker-5ch.md) a mano, para consultar.
 
-### De la intuición al concepto técnico
+🟢 Toda la clase la puedes hacer tú: hoy PX-32 es un objeto de museo y nadie corre ningún riesgo. Solo pide ayuda a un adulto si la mesa está incómoda para agacharte a mirar.
 
-Los términos centrales son **tracker, canal, matriz de sensores y campo de visión**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+## La expedición bajo el chasis
 
-En PX-32, esta idea se usa para identificar los cinco pares ópticos y su orden sobre el robot apagado. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+1. 🟢 **Posiciona el robot.** Coloca PX-32 en el borde de la mesa con el frente sobresaliendo un poco, de modo que puedas agacharte y ver por debajo sin levantarlo. Nunca lo voltees sobre el techo ni lo apoyes sobre los sensores: los cables y las ruedas Mecanum no deben cargar el peso.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+2. 🟢 **Encuentra el tracker.** Mira debajo del frente del chasis. Vas a ver una placa horizontal que mira al piso, con una fila de componentes hacia abajo. Esa placa es HW-007. Está fijada al chasis inferior con tornillos y separadores plásticos (tubitos que mantienen la placa a una altura fija del piso). No intentes desmontarla: esa altura es parte de la calibración.
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+3. 🟢 **Cuenta los ojos.** En el borde de la placa que mira al piso encontrarás cinco pares repetidos: en cada par, un LED emisor de infrarrojo (invisible para ti, Lección 24) junto a su receptor. Cuenta los cinco con el dedo, de un extremo de la fila al otro. Cada par es **un canal**, con su nombre serigrafiado o asociado: IR1, IR2, IR3, IR4, IR5.
 
-## 5. Palabras nuevas
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía anotada del tracker montado en PX-32.
+> - **Objetivo:** que el niño localice la placa, los cinco canales, el conector de siete pines y el potenciómetro sin ayuda.
+> - **Descripción:** fotografía en picada del frente inferior del chasis con el tracker visible; las cinco posiciones de canal numeradas IR1 a IR5 sobre la imagen; flecha hacia el conector de 7 pines y hacia el potenciómetro azul; línea punteada indicando la altura fija entre placa y piso.
+> - **Elementos que deben señalarse:** canales IR1–IR5, conector de siete cables, potenciómetro, chasis, sentido "hacia el piso".
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 16–18, montaje del módulo tracker en el chasis inferior.
+> - **Texto alternativo sugerido:** "Vista inferior del frente de PX-32 con la placa tracker y sus cinco canales IR1 a IR5 señalados".
 
-- **Tracker:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+4. 🟢 **Marca el extremo IR1.** Busca en la placa la serigrafía que identifica los pines (letras pequeñas impresas). Uno de los extremos de la fila es IR1 y el otro es IR5. Con el robot apagado, pega el trocito de cinta en el chasis, justo al lado del canal IR1. Esta marca te ahorrá confusiones en las próximas lecciones: cuando el robot esté en movimiento no habrá tiempo de adivinar cuál canal es cuál.
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+5. 🟢 **Encuentra el cerebro del umbral.** En la placa del tracker hay un componente que ya conoces de la Lección 27: un **potenciómetro** azul con tornillo (en el tracker hay uno que ajusta la sensibilidad del conjunto). No lo toques hoy: lo calibraremos en la Lección 33. Solo confírmalo con la vista.
 
-## 6. Así aparece en PX-32
+6. 🟢 **Sigue el cable.** Del extremo de la placa sale un conector de siete cables que sube hacia el shield. Pon el dedo sobre el conector del tracker y sigue el cable con la mirada hasta el shield de la Mega. Son siete porque son cinco canales más la alimentación (VCC y GND). No desconectes nada: en la próxima lección verificaremos este cable con lupa.
 
-**Hardware:** HW-007.
+7. 🟢 **Dibuja tu mapa.** En el cuaderno, dibuja el frente de PX-32 visto desde abajo: una fila de cinco círculos. Escribe IR1 bajo el círculo de tu marca de cinta, IR5 en el otro extremo, y numera los del medio. Este dibujo es el plano que usaremos durante todo el bloque.
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+## La pregunta incómoda de la clase
 
-La cadena exacta de hoy se concentra en **tracker, canal, matriz de sensores y campo de visión**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+Mira tu dibujo y respóndete con honestidad: ¿IR1 quedó a tu izquierda o a tu derecha cuando miras a PX-32 desde atrás, como su piloto?
 
-## 7. Seguridad y participación del adulto
+Si no puedes responder con seguridad, estás en buena compañía: el diagrama del fabricante muestra el módulo por separado, no montado en el robot, y no indica qué extremo queda hacia el lado izquierdo del chasis. El curso no va a inventar la respuesta. Hasta que la midamos con evidencia en la Lección 34, llamaremos a los lados **extremo IR1** y **extremo IR5**, sin izquierda ni derecha. No es un rodeo: es la diferencia entre saber y suponer.
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
+## Desafío: la línea entre dos ojos
 
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
+Sin encender nada, desliza un lápiz (o el dedo) lentamente bajo la fila de canales, de un extremo al otro, y estima: ¿cuántos canales cubre el lápiz a la vez si su grueso es parecido al de un lápiz? ¿Y si usaras algo tan angosto como un palillo? Escribe tu estimación. En la Lección 36 la responderemos con números: los canales que ven negro a la vez son los que nos dirán dónde está la línea exactamente.
 
-## 8. Predice antes de probar
+## Si no funciona
 
-1. ¿Qué esperas observar cuando logres explicar por qué cinco mediciones ofrecen más información que una y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| No encuentro ninguna placa bajo el frente | ¿Estás mirando el frente o la parte trasera del chasis? | El tracker está en el frente inferior; sigue la fila de ruedas delanteras hacia abajo |
+| Veo menos de cinco canales | ¿Algún par queda oculto detrás de un soporte o cable? | Mira con linterna lateral; no muevas cables para ver mejor, pide ayuda al adulto |
+| No encuentro la serigrafía IR1–IR5 | ¿Las letras son diminutas o están en el conector? | Usa el diagrama de la Lección 32; la marca de cinta puede ir en el canal del extremo que tú definas como IR1 mientras lo verifiques |
+| El conector de siete cables está suelto o a medio conectar | No lo presiones con energía | 🔴 Detente y llama a tu padre: un conector mal sentado se revisa con calma y sin forzar |
 
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-007 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con tracker, canal, matriz de sensores y campo de visión. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a identificar los cinco pares ópticos y su orden sobre el robot apagado. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: cinco canales localizados sin confundir IR1 con el lado físico no verificado. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
-
-## 11. Qué deberías observar
-
-El resultado normal es **cinco canales localizados sin confundir IR1 con el lado físico no verificado**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [Diagrama correcto del tracker de cinco canales](../../assets/osoyoo-manual/pagina-18-pinout-tracker-correcto.png) — Inglés; manual del fabricante; 8 min. Aprenderás diagrama correcto del tracker de cinco canales. Esencial.
 - [Erratas y decisión canónica IR1–IR5](../../docs/reference/errata-osoyoo.md) — Español; referencia interna; 8 min. Aprenderás erratas y decisión canónica ir1–ir5. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Hoy viste el tracker por fuera; el diagrama del fabricante te espera para la próxima clase, donde descubrirás que ese mismo diagrama corrige un error del texto del manual.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **tracker** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 16–18: montaje del módulo tracker en el chasis inferior con tornillos y separadores plásticos, y vista del módulo.
+- [Ficha HW-007 del repositorio](../../docs/hardware/HW-007-ir-tracker-5ch.md), componentes y función del tracker de cinco canales.
+- Física de reflexión y absorción infrarroja aplicada: [Lección 25](../03-infrarrojo/25-reflexion-y-absorcion.md).
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Muéstrale el dibujo de tu mapa del frente y explícale por qué cinco canales dan más información que uno solo — la comparación de la viga y los agujeros puede ayudarte. Señala en el robot real tu marca de cinta y dile qué vamos a verificar con ella más adelante: si IR1 queda a la izquierda o a la derecha. Pregúntale si él habría marcado el canal de otra forma. Marca la sesión en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **explicar por qué cinco mediciones ofrecen más información que una** y lo conectaste con **tracker, canal, matriz de sensores y campo de visión**. Pudiste observar cinco canales localizados sin confundir IR1 con el lado físico no verificado. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 32: IR1 a IR5: un mapa espacial](32-ir1-a-ir5-un-mapa-espacial.md).
+En la [Lección 32](32-ir1-a-ir5-un-mapa-espacial.md) convertiremos tu dibujo en un mapa eléctrico: cada canal viajará por un cable hasta un pin con nombre de la Mega. Y descubrirás que el manual del fabricante se contradice a sí mismo.

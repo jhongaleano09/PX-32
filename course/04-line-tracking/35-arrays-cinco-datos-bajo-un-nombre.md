@@ -1,141 +1,143 @@
 # Lección 35 — Arrays: cinco datos bajo un nombre
 
-## 1. Tu misión de hoy
+## Un programa con cinco gemelos
 
-Hoy vas a **recorrer los cinco pines con un bucle for**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Vuelve a abrir el sketch de la Lección 34 y míralo con ojos de diseñador. ¿Ves el patrón? Cinco constantes que solo difieren en el número; cinco `pinMode` idénticos salvo el nombre; cinco `digitalRead` gemelos; cinco `Serial.print` que solo cambian de variable. Contaste veintiuna líneas y ninguna idea nueva después de la segunda. Funciona, sí. Pero imaginemos el tracker de 32 canales de una impresora industrial: ¿escribirías treinta y dos `pinMode` a mano? ¿Y si luego cambiaran el pin 27?
 
-## 2. Tiempo estimado
+Los programadores detestan la repetición tanto como tú copiar veinte veces la misma frase en el cuaderno. Y C++ tiene la herramienta exacta para este problema: el **array**, una fila de casillas que viven bajo **un solo nombre** y se distinguen por un **índice** numerado.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Si hiciste listas en Scratch —esa caja donde guardabas puntajes o nombres y los leías por posición— ya conocías la idea. En C++ la lista se escribe distinto, pero la esencia es la misma: **un nombre, muchas casillas, y el índice para elegir una**. La diferencia importante es que en C++ la fila tiene un largo fijo que tú declaras, y las casillas se cuentan desde **cero**.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Cómo se escribe una fila de pines
 
-## 3. Lo que necesitas saber antes de empezar
-
-[Lección 10: Repeticiones contadas con for](../01-programacion/10-repeticiones-contadas-con-for.md), [Lección 34: Leer cinco sensores sin perderse](34-leer-cinco-sensores-sin-perderse.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
-
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
-
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **array, índice, longitud y límite**. En lenguaje cotidiano, buscamos una forma fiable de recorrer los cinco pines con un bucle for. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Cinco sensores producen un patrón espacial. El reto ya no es leer un 0 o un 1, sino interpretar una combinación, estimar dónde está la línea y elegir una corrección. Mantendremos separadas medición, interpretación y movimiento para poder probar cada capa sin que una rueda oculte un error de software.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **array, índice, longitud y límite**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para sustituir cinco variables repetidas por arrays de pines y lecturas. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Array:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001, HW-007.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **array, índice, longitud y límite**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante prepara la predicción, el programa y la tabla de datos.
-- 🟡 Un adulto revisa el montaje antes de conectar USB o alimentar sensores.
-- 🔴 El adulto corrige cualquier cable, ruta de Serial1 o conexión de potencia. Se cablea únicamente con USB retirado y alimentación apagada.
-
-La actividad comienza sin movimiento. Si una lectura es extraña, no se cambian varios cables a la vez: se apaga, se compara con el mapa canónico y se modifica una sola variable.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres recorrer los cinco pines con un bucle for y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001, HW-007 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con array, índice, longitud y límite. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a sustituir cinco variables repetidas por arrays de pines y lecturas. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: mismo patrón con código más corto y sin acceder fuera de 0..4. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [35-arrays-cinco-datos-bajo-un-nombre.ino](../../code/educational/35-arrays-cinco-datos-bajo-un-nombre/35-arrays-cinco-datos-bajo-un-nombre.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **array**. Lee el programa de arriba abajo y predice su salida.
+Mira la línea que reemplaza a las cinco constantes de ayer:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 35
-// Cargar solo después de leer la sección de seguridad.
-const byte PINES[5]={A4,A3,A2,A1,A0};
-void setup(){ Serial.begin(9600); for(byte i=0;i<5;i++) pinMode(PINES[i],INPUT); }
-void loop(){ for(byte i=0;i<5;i++) Serial.print(digitalRead(PINES[i])); Serial.println(); delay(100); }
+const int PINES[5] = { A4, A3, A2, A1, A0 };
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+Léela por partes, de derecha a izquierda:
 
-## 11. Qué deberías observar
+- `{ A4, A3, A2, A1, A0 }` es el contenido: los cinco pines del mapa canónico, en orden de fila IR1 a IR5.
+- `PINES` es el nombre de la fila completa.
+- `[5]` declara cuántas casillas tiene: su **longitud**. Fija, declarada de una vez.
+- `const int` dice que cada casilla guarda un `int` y que no vamos a cambiarlos.
 
-El resultado normal es **mismo patrón con código más corto y sin acceder fuera de 0..4**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+Ahora la parte que más conviene entender bien: las casillas se numeran **desde cero**. `PINES[0]` es `A4` (el pin de IR1), `PINES[1]` es `A3`, `PINES[2]` es `A2`, `PINES[3]` es `A1` y `PINES[4]` es `A0` (IR5). La primera casilla no es `PINES[1]` sino `PINES[0]`, y por eso la última de una fila de cinco es la número 4, no la 5. Contar desde cero parece exótico la primera vez, pero tiene una razón útil: el índice mide **cuántos pasos das desde el inicio**. Cero pasos = primera casilla.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+| Expresión | Vale | Es el pin de |
+|---|---|---|
+| `PINES[0]` | `A4` | IR1 |
+| `PINES[1]` | `A3` | IR2 |
+| `PINES[2]` | `A2` | IR3 |
+| `PINES[3]` | `A1` | IR4 |
+| `PINES[4]` | `A0` | IR5 |
 
-## 12. Si no funciona
+Y la casilla que **no existe**: `PINES[5]`. En una fila de cinco, los índices válidos van de 0 a 4. Pedir `PINES[5]` es preguntar por una casilla fuera de la fila: el compilador no te detiene, y el programa leerá lo que haya en esa dirección de memoria, que puede ser cualquier cosa. Es la primera vez en el curso que un error **no se ve como error**: el programa compila y corre, pero lee un dato absurdo. Los límites del array los cuidas tú; por eso la condición del bucle de hoy se escribe con tanto cuidado.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+## El bucle que recorre la fila
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+La segunda herramienta es un viejo conocido: el `for` de la Lección 10, que repetía un bloque contando. Ahora el contador `i` no solo cuenta: **es el índice**. En cada vuelta del bucle, `i` vale 0, luego 1, luego 2, 3, 4, y `PINES[i]` va siendo cada casilla por turno:
 
-## 13. Desafío
+```cpp
+for (int i = 0; i < 5; i++) {
+  pinMode(PINES[i], INPUT);
+}
+```
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+Una línea que hace el trabajo de cinco. Y lo mejor: si el tracker tuviera 32 canales, la misma línea serviría cambiando el 5 por 32. Los datos cambiaron; el programa no.
 
-## 14. Lecturas y videos para explorar
+## Lo que necesitas
+
+- Todo lo de la Lección 34: PX-32 con tracker calibrado, pista de práctica (hoja blanca y tira de 25 mm), computador con Arduino IDE 2, cable USB, cuaderno con tu ley digital y tu mapa.
+- El sketch [35-arrays-cinco-datos-bajo-un-nombre.ino](../../code/educational/35-arrays-cinco-datos-bajo-un-nombre/35-arrays-cinco-datos-bajo-un-nombre.ino).
+
+🟢 Todo el trabajo de hoy es tuyo: programar, cargar y probar. 🟡 El adulto conecta el USB. 🔴 Nada de baterías: sigue siendo un experimento de mesa.
+
+## El programa, por dentro
+
+1. 🟢 Abre el `.ino` nuevo y ponlo junto al de la Lección 34 en dos ventanas. Debe ser idéntico a este bloque:
+
+```cpp
+// Curso PX-32 - Leccion 35: el mismo patron de la Leccion 34,
+// ahora con un array y un bucle for.
+// PINES[0] es IR1 (A4) ... PINES[4] es IR5 (A0).
+
+const int PINES[5] = { A4, A3, A2, A1, A0 };
+
+void setup() {
+  for (int i = 0; i < 5; i++) {
+    pinMode(PINES[i], INPUT);
+  }
+  Serial.begin(9600);
+}
+
+void loop() {
+  for (int i = 0; i < 5; i++) {
+    Serial.print(digitalRead(PINES[i]));
+  }
+  Serial.println();
+
+  delay(200);
+}
+```
+
+2. 🟢 **El contrato de igualdad.** Este programa debe comportarse exactamente igual que el de la Lección 34: mismo patrón, mismo formato IR1-primero, mismo ritmo. Un cambio de estructura —de cinco variables a un array— no debería cambiar nada visible. Esa es la definición de un buen **refactor**: mismo comportamiento, mejor forma. Si algo cambia en el monitor, el refactor falló y hay un error escondido.
+
+3. 🟢 **Sigue una vuelta completa con el dedo.** En el `loop()`, primera vuelta del `for`: `i` vale 0, entonces `digitalRead(PINES[0])` lee A4 (IR1) y lo imprime. Segunda vuelta: `i` vale 1, lee A3. Y así hasta `i = 4`, que lee A0. Cuando `i` llega a 5, la condición `i < 5` es falsa, el bucle termina, el `println` cierra la línea y el `delay` espera. Todo el trabajo de ayer, en dos líneas.
+
+4. 🟢 **¿Por qué `i < 5` y no `i <= 5`?** Escribe la respuesta antes de seguir. Con `i <= 5`, la última vuelta usaría `PINES[5]`: la casilla que no existe, el dato absurdo. El `<` sin `=` es el guardián del límite. Cuando tus bucles recorran arrays, esta será tu primera sospecha en todo error raro. Si la curiosidad te gana, puedes hacer el experimento **una vez y con cuidado**: cambia `i < 5` por `i <= 5` en una copia, carga y mira llegar el sexto dígito absurdo. Luego devuelve el guardián a su puesto antes de seguir la lección.
+
+5. 🟢 **Predice.** Antes de cargar: ¿qué imprimirá el monitor con la tira bajo IR4? ¿Y con el robot totalmente sobre blanco? Anota tus dos apuestas.
+
+## El experimento del refactor honesto
+
+6. 🟡 El adulto conecta el USB. Carga el sketch y abre el monitor a 9600 baudios.
+
+7. 🟢 **Repite la batería de pruebas de la Lección 34**: línea base sobre blanco, tira bajo el centro, tira bajo cada canal por turno, tira entre dos canales. Cada patrón debe ser idéntico al que anotaste ayer con el sketch de las cinco variables. Marca cada coincidencia en tu cuaderno con una ✔. Si un patrón difiere, detente: algo se movió entre las dos versiones (¿un pin mal copiado? ¿el orden del contenido del array?).
+
+8. 🟢 **La prueba del dedo fantasma.** Sin cargar nada, señala en el código el `PINES[i]` del `loop()` y explica en voz alta qué casilla se lee en la tercera vuelta del bucle y a qué canal físico corresponde (respuestas: `PINES[2]`, pin A2, canal IR3, el del centro). Si puedes responder sin mirar la tabla de arriba, el índice ya es tuyo.
+
+9. 🟢 **Cambia una sola cosa: el ritmo.** Como variación controlada, sube el `delay(200)` a `delay(500)`. El patrón debe llegar más lento, idéntico en contenido. Devuélvelo luego a 200: el ritmo de muestreo no cambia qué se mide, solo cuán seguido.
+
+10. 🟢 **Cierra la sesión.** Cierra el monitor y desconecta el USB (🟡 si lo prefiere el adulto). Este sketch es la base de las Lecciones 36, 37 y 38: no lo pierdas de vista.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama conceptual del array y el bucle.
+> - **Objetivo:** visualizar la fila de casillas, los índices 0–4 y el bucle que las recorre una por una.
+> - **Descripción:** fila horizontal de cinco casillas etiquetadas PINES[0] a PINES[4] con los pines A4–A0 dentro y debajo el canal (IR1–IR5); sobre la fila, una flecha del bucle `for` que entra por la casilla 0 y sale tras la 4; una casilla fantasma PINES[5] fuera de la fila, en gris y tachada, con la nota "no existe".
+> - **Elementos que deben señalarse:** índices 0–4, pines, canales, condición `i < 5` junto a la salida del bucle, casilla 5 tachada.
+> - **Fuente técnica:** referencia del lenguaje Arduino, https://docs.arduino.cc/language-reference/, secciones array y for.
+> - **Texto alternativo sugerido:** "Fila de cinco casillas PINES con índices del 0 al 4 y una casilla 5 tachada que no existe".
+
+## Desafío: leer la fila al revés
+
+Sin romper nada, haz una copia del sketch en tu computador y modifícala para que el patrón se imprima de IR5 a IR1 (el dígito de la izquierda pasaría a ser IR5). Pista: el bucle puede contar hacia atrás: `for (int i = 4; i >= 0; i--)`. Carga la copia y verifica con la tira bajo IR1: ahora ¿qué dígito cambia? Este ejercicio entrena la diferencia entre el orden físico de la fila y el orden en que tú decides recorrerla — y explica por qué el curso fija el formato IR1-primero como convención.
+
+## Si no funciona
+
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| No compila | ¿Puntos y comas o llaves perdidas al copiar? | Revisa que el array termine en `};` y que cada `for` tenga sus llaves |
+| El patrón salió en otro orden (A0 primero) | ¿Copiaste el contenido del array en orden? | Debe ser exactamente `{ A4, A3, A2, A1, A0 }`; cuenta desde la izquierda |
+| Los patrones no coinciden con los de la Lección 34 | ¿Cambió algo más además de la estructura? | Compara las dos ventanas línea por línea; el contrato de igualdad del paso 2 no admite excepciones |
+| El monitor muestra caracteres extraños | ¿Velocidad distinta de 9600 baudios? | Ajústala en el selector del monitor (Lección 08) |
+| Nada se imprime pero compila bien | ¿Placa y puerto correctos tras reconectar el USB? | Verifica con la prueba de desconexión de la Lección 05 |
+
+## Lecturas y videos para explorar
 
 - [Diagrama correcto del tracker de cinco canales](../../assets/osoyoo-manual/pagina-18-pinout-tracker-correcto.png) — Inglés; manual del fabricante; 8 min. Aprenderás diagrama correcto del tracker de cinco canales. Esencial.
 - [Erratas y decisión canónica IR1–IR5](../../docs/reference/errata-osoyoo.md) — Español; referencia interna; 8 min. Aprenderás erratas y decisión canónica ir1–ir5. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Misma salida, la mitad del código: eso es haber ganado una herramienta. En la [Lección 36](36-estimar-donde-esta-la-linea.md) le sacarás provecho de verdad, cuando los cinco dígitos se conviertan en un solo número con signo que dice hacia dónde se desvió la línea.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **array** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), secciones `array` y `for`: declaración con longitud fija, indexación desde cero y recorrido con contador.
+- El array `PINES[5]` y su orden reproducen el mapa canónico verificado en la [Lección 32](32-ir1-a-ir5-un-mapa-espacial.md) contra el diagrama de la página 18 del [manual OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf).
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Enséñale las dos ventanas lado a lado: el programa de las cinco variables y el del array. Cuéntale qué se repite en el primero y cómo el bucle lo reemplaza. Explícale por qué la fila cuenta desde cero y qué pasa si pides la casilla 5 — el error que no se ve como error. Si él programa en su trabajo, pregúntale cómo llaman a este tipo de mejora que no cambia lo que se ve. Marca la sesión en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **recorrer los cinco pines con un bucle for** y lo conectaste con **array, índice, longitud y límite**. Pudiste observar mismo patrón con código más corto y sin acceder fuera de 0..4. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 36: Estimar dónde está la línea](36-estimar-donde-esta-la-linea.md).
+Con la fila de casillas dominada, la [Lección 36](36-estimar-donde-esta-la-linea.md) le pone números a la posición de la línea: pesos, promedio y el primer número con decimal del curso.
