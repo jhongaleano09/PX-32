@@ -17,7 +17,7 @@ Depurar no es probar cosas al azar. Es reducir posibilidades mediante evidencia.
 3. ¿El cable transporta datos?
 4. ¿Otra aplicación tiene abierto el puerto?
 5. ¿El código compila sin error antes de subir?
-6. Copiar el primer mensaje de error útil a la bitácora.
+6. Copiar el primer mensaje de error útil al cuaderno físico, si se desea, o leerlo en voz alta al adulto.
 
 ## No aparece el puerto
 

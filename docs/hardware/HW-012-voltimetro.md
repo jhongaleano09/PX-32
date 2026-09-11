@@ -46,7 +46,7 @@ Confundir lectura con porcentaje exacto de carga, invertir polaridad o asumir pr
 
 ## Proyectos
 
-Bitácora de batería y velocímetro conceptual.
+Conversación sobre variación de la alimentación y velocímetro conceptual.
 
 ## Fuente
 

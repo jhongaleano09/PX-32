@@ -1,101 +1,51 @@
-# Lección NN - Título
+# Lección NN — Título
 
-## Misión
+## 1. Tu misión de hoy
+Objetivo observable dirigido al estudiante.
 
-Una frase observable y verificable.
+## 2. Tiempo estimado
+Desglose de lectura, preparación, actividad, desafío y conversación. Total habitual: 30–45 minutos.
 
-## Antes de tocar a PX-32
+## 3. Lo que necesitas saber antes de empezar
+Prerrequisitos explicados y enlazados; términos ya disponibles.
 
-Explicación intuitiva, luego término científico correcto. Enlazar lecturas sin duplicarlas.
+## 4. Lectura principal
+Narrativa progresiva: intuición → concepto técnico → aplicación en PX-32 → límites y preguntas de reflexión.
 
-## La pregunta
+## 5. Palabras nuevas
+Glosario breve y enlace al glosario general.
 
-¿Pregunta que el experimento puede ayudar a responder?
+## 6. Así aparece en PX-32
+Componentes, pines, rutas de señal y diagramas útiles; nunca inventar conexiones.
 
-## Nuestra predicción
+## 7. Seguridad y participación del adulto
+- 🟢 Puede hacerlo el estudiante.
+- 🟡 Debe estar presente un adulto.
+- 🔴 El adulto manipula esta parte.
 
-Escribe qué crees que ocurrirá y por qué antes de ejecutar.
+## 8. Predice antes de probar
+Una o dos predicciones causales y una observación que podría contradecirlas.
 
-## Conceptos nuevos
+## 9. Actividad o experimento guiado
+Pasos completos: acción, observación, criterio para continuar, señal para detenerse y restauración.
 
-Máximo razonable para una sesión.
+## 10. Código
+Sketch mínimo enlazado y explicado; una idea nueva; sintaxis, comportamiento, propósito y errores probables.
 
-## Hardware utilizado
+## 11. Qué deberías observar
+Resultado normal, variación aceptable y señales de fallo.
 
-- `HW-NNN` - enlazar aquí la ficha real del componente.
+## 12. Si no funciona
+Tabla: síntoma → prueba sencilla → interpretación → siguiente acción segura.
 
-## Conexiones
+## 13. Desafío
+Extensión breve sin solución completa inmediata.
 
-| Desde | Hacia | Tipo | Fuente/estado |
-|---|---|---|---|
-| - | - | - | - |
+## 14. Lecturas y videos para explorar
+Uno a tres recursos verificados con idioma, formato, duración, aprendizaje y carácter esencial/opcional.
 
-## Seguridad
+## 15. Cuéntale a papá
+Tres a cinco invitaciones naturales para explicar, mostrar y conversar; nunca un examen.
 
-Nivel verde/amarillo/rojo y acción concreta del adulto.
-
-## Experimento
-
-1. Paso que cambia una cosa.
-2. Observación o medición.
-3. Registro.
-
-## Código
-
-```cpp
-// Programa mínimo y legible
-```
-
-## Código explicado
-
-Explicar bloques o líneas que introducen conceptos nuevos.
-
-## Antes de ejecutar
-
-¿Qué crees que ocurrirá? ¿Qué resultado refutaría tu predicción?
-
-## Resultado esperado
-
-Resultado observable, incluyendo variación normal.
-
-## Observaciones
-
-| Prueba | Cambio | Predicción | Resultado |
-|---|---|---|---|
-| 1 | - | - | - |
-
-## Cambia una cosa
-
-Un solo parámetro independiente.
-
-## ¿Qué ocurrió?
-
-Comparación explícita entre predicción y dato.
-
-## Desafío
-
-Problema pequeño sin solución inmediata.
-
-## Depuración
-
-Síntoma -> prueba de aislamiento -> interpretación.
-
-## Quiz
-
-3-8 preguntas. Respuestas solo en `solutions/`.
-
-## Bitácora
-
-Qué registrar, incluida nueva pregunta.
-
-## Lo que ya sabemos
-
-Conexión con aprendizajes previos.
-
-## Próxima misión
-
-Anticipo breve.
-
-## Fuentes
-
-Separar manual OSOYOO, documentación oficial y material PX-32.
+## 16. Resumen de la jornada
+Aprendizaje, evidencia, regla de seguridad y conexión con la próxima lección.

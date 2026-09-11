@@ -20,7 +20,7 @@ Los precios no se incluyen en esta fase porque no se verificaron país, proveedo
 | Sensor ToF | Tiempo de vuelo óptico | Distancia estrecha y precisa | Media | Tras ultrasónico | Frecuentemente 2.8/3.3 V con breakout | Láser/clase y nivel lógico a verificar |
 | Sensor de color | Espectro, calibración | Clasificar marcas de pista | Media | Tras IR | I2C y tensión según módulo | Luz ambiente |
 | MicroSD | Almacenamiento, archivos, SPI | Registrador de telemetría | Media-alta | Nivel 5 | Módulo con adaptación a 5 V | Corrupción por retirar energía |
-| RTC | Tiempo absoluto, respaldo | Bitácora con fecha | Media | Nivel 5 | I2C; batería tipo botón | Cuidado con celda y zona horaria |
+| RTC | Tiempo absoluto, respaldo | Registro de eventos con fecha | Media | Nivel 5 | I2C; batería tipo botón | Cuidado con celda y zona horaria |
 | Segundo microcontrolador | Sistemas distribuidos | Control remoto físico | Alta | Nivel 5 | Elegir tras decidir radio/niveles | Dos fuentes y protocolos |
 
 ## Lo que no hay que comprar ahora

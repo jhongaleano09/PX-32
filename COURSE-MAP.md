@@ -1,62 +1,103 @@
-# Mapa del curso PX-32
+# Mapa canónico del curso PX-32
 
-## Dónde estoy
+Esta es la **única ruta obligatoria**. PX-32 parte completamente ensamblado; se conserva así siempre que el objetivo lo permita. Cada sesión dura aproximadamente 40 minutos y se completa al realizar la actividad, aplicar la regla de seguridad y conversar “Cuéntale a papá”. El cuaderno físico es opcional; no existen evaluaciones tradicionales ni diario digital obligatorio.
 
-Marca la casilla de la misión actual en [PROGRESS.md](PROGRESS.md). Una lección se considera terminada solo cuando se hizo su predicción, experimento, observación, desafío, quiz y registro de bitácora.
+## Progresión
 
 ```text
-EXPLORADOR -> CONSTRUCTOR -> PROGRAMADOR -> TÉCNICO DE SENSORES
-           -> NAVEGADOR -> COMUNICADOR -> INGENIERO DE PX-32
+robot y electricidad → Mega y Arduino → programa → decisiones → bucles → funciones
+→ driver y motores → PWM → Mecanum → infrarrojo → línea → ultrasonido y servo
+→ Bluetooth → Wi-Fi → estados y prioridades → proyecto final
 ```
 
-## Ruta completa
+## Las 75 sesiones
 
-| Bloque | Misiones | Hito |
-|---|---|---|
-| A. Fundamentos | 01 laboratorio; 02 inventario; 03 electricidad; 04 Mega2560 | Reconocer y cuidar el sistema |
-| B. Programación | 05 Arduino IDE; 06 Blink; 07 variables y tiempo; 08 monitor serial; 09 decisiones; 10 bucles; 11 funciones | PX-32 ejecuta y explica programas pequeños |
-| C. Movimiento | 12 motor DC; 13 Model Y; 14 puente H; 15 primer motor; 16 dirección; 17 PWM; 18 cuatro motores; 19 Mecanum; 20 vectores | HITO 1: movimiento completo |
-| D. Infrarrojo | 21 luz; 22 espectro; 23 IR; 24 emisor/receptor; 25 reflexión; 26 LM393; 27 potenciómetro; 28 un sensor; 29 dos sensores | HITO 2: seguir una mano |
-| E. Línea | 30 tracker de cinco canales; 31 IR1-IR5; 32 calibración; 33 cinco lecturas; 34 posición; 35 decisiones; 36 control | HITO 3: seguir una línea |
-| F. Ultrasonido | 37 sonido; 38 frecuencia; 39 ultrasonido; 40 eco; 41 TRIG; 42 ECHO; 43 microsegundos; 44 distancia; 45 centímetros; 46 servo; 47 ángulos; 48 escaneo; 49 decisión | HITO 4: evitar obstáculos |
-| G. Bluetooth | 50 ondas de radio; 51 comunicación; 52 Bluetooth; 53 HC-02; 54 UART; 55 TX/RX; 56 recibir una letra; 57 comandos F/B/L/R/S | HITO 5: control Bluetooth |
-| H. Wi-Fi e IoT | 58 Wi-Fi vs Bluetooth; 59 ESP8266; 60 red; 61 router; 62 SSID; 63 IP; 64 cliente/servidor; 65 conexión; 66 comandos; 67 telemetría | HITO 6: control Wi-Fi |
-| I. Integración | 68 modos; 69 sensor + movimiento; 70 radar; 71 estacionamiento; 72 laberinto; 73 línea + obstáculos; 74 telemetría; 75 proyecto libre | HITO FINAL: PX-32 integrado |
+| Nº | Bloque | Lección | Duración | Estado |
+|---:|---|---|---:|---|
+| 01 | Fundamentos | [¿Qué es un robot?](course/00-fundamentos/01-que-es-un-robot.md) | 40 min | Desarrollada |
+| 02 | Fundamentos | [Inventario razonado de PX-32](course/00-fundamentos/02-inventario-razonado-de-px-32.md) | 40 min | Desarrollada |
+| 03 | Fundamentos | [Electricidad sin misterios](course/00-fundamentos/03-electricidad-sin-misterios.md) | 40 min | Desarrollada |
+| 04 | Fundamentos | [La Mega2560: una computadora pequeña](course/00-fundamentos/04-la-mega2560-una-computadora-pequena.md) | 40 min | Desarrollada |
+| 05 | Programación | [Preparar Arduino IDE](course/01-programacion/05-preparar-arduino-ide.md) | 40 min | Desarrollada |
+| 06 | Programación | [Primer programa: Blink](course/01-programacion/06-primer-programa-blink.md) | 40 min | Desarrollada |
+| 07 | Programación | [Variables para representar tiempo](course/01-programacion/07-variables-para-representar-tiempo.md) | 40 min | Desarrollada |
+| 08 | Programación | [PX-32 aprende a hablarnos](course/01-programacion/08-px-32-aprende-a-hablarnos.md) | 40 min | Desarrollada |
+| 09 | Programación | [Decisiones con if y else](course/01-programacion/09-decisiones-con-if-y-else.md) | 40 min | Desarrollada |
+| 10 | Programación | [Repeticiones contadas con for](course/01-programacion/10-repeticiones-contadas-con-for.md) | 40 min | Desarrollada |
+| 11 | Programación | [Funciones: enseñar una acción reutilizable](course/01-programacion/11-funciones-ensenar-una-accion-reutilizable.md) | 40 min | Desarrollada |
+| 12 | Movimiento | [Del electrón al giro: motor DC](course/02-movimiento/12-del-electron-al-giro-motor-dc.md) | 40 min | Desarrollada |
+| 13 | Movimiento | [Por qué existe el driver Model Y](course/02-movimiento/13-por-que-existe-el-driver-model-y.md) | 40 min | Desarrollada |
+| 14 | Movimiento | [Puente H: cambiar la polaridad](course/02-movimiento/14-puente-h-cambiar-la-polaridad.md) | 40 min | Desarrollada |
+| 15 | Movimiento | [Primera prueba de un motor](course/02-movimiento/15-primera-prueba-de-un-motor.md) | 40 min | Desarrollada |
+| 16 | Movimiento | [Invertir el sentido por software](course/02-movimiento/16-invertir-el-sentido-por-software.md) | 40 min | Desarrollada |
+| 17 | Movimiento | [PWM: regular energía en el tiempo](course/02-movimiento/17-pwm-regular-energia-en-el-tiempo.md) | 40 min | Desarrollada |
+| 18 | Movimiento | [Cuatro motores, cuatro identidades](course/02-movimiento/18-cuatro-motores-cuatro-identidades.md) | 40 min | Desarrollada |
+| 19 | Movimiento | [Ruedas Mecanum y fuerzas diagonales](course/02-movimiento/19-ruedas-mecanum-y-fuerzas-diagonales.md) | 40 min | Desarrollada |
+| 20 | Movimiento | [Vectores para mover PX-32](course/02-movimiento/20-vectores-para-mover-px-32.md) | 40 min | Desarrollada |
+| 21 | Infrarrojo | [La luz transporta energía](course/03-infrarrojo/21-la-luz-transporta-energia.md) | 40 min | Desarrollada |
+| 22 | Infrarrojo | [El espectro electromagnético](course/03-infrarrojo/22-el-espectro-electromagnetico.md) | 40 min | Desarrollada |
+| 23 | Infrarrojo | [Infrarrojo: luz que no vemos](course/03-infrarrojo/23-infrarrojo-luz-que-no-vemos.md) | 40 min | Desarrollada |
+| 24 | Infrarrojo | [Emisor y receptor infrarrojos](course/03-infrarrojo/24-emisor-y-receptor-infrarrojos.md) | 40 min | Desarrollada |
+| 25 | Infrarrojo | [Reflexión y absorción](course/03-infrarrojo/25-reflexion-y-absorcion.md) | 40 min | Desarrollada |
+| 26 | Infrarrojo | [LM393: convertir una señal en decisión](course/03-infrarrojo/26-lm393-convertir-una-senal-en-decision.md) | 40 min | Desarrollada |
+| 27 | Infrarrojo | [El potenciómetro ajusta el umbral](course/03-infrarrojo/27-el-potenciometro-ajusta-el-umbral.md) | 40 min | Desarrollada |
+| 28 | Infrarrojo | [Leer un sensor IR por un pin digital](course/03-infrarrojo/28-leer-un-sensor-ir-por-un-pin-digital.md) | 40 min | Desarrollada |
+| 29 | Infrarrojo | [Dos sensores, cuatro situaciones](course/03-infrarrojo/29-dos-sensores-cuatro-situaciones.md) | 40 min | Desarrollada |
+| 30 | Infrarrojo | [Seguir una mano con prudencia](course/03-infrarrojo/30-seguir-una-mano-con-prudencia.md) | 40 min | Desarrollada |
+| 31 | Seguimiento de línea | [Anatomía del tracker de cinco canales](course/04-line-tracking/31-anatomia-del-tracker-de-cinco-canales.md) | 40 min | Desarrollada |
+| 32 | Seguimiento de línea | [IR1 a IR5: un mapa espacial](course/04-line-tracking/32-ir1-a-ir5-un-mapa-espacial.md) | 40 min | Desarrollada |
+| 33 | Seguimiento de línea | [Calibrar negro y blanco](course/04-line-tracking/33-calibrar-negro-y-blanco.md) | 40 min | Desarrollada |
+| 34 | Seguimiento de línea | [Leer cinco sensores sin perderse](course/04-line-tracking/34-leer-cinco-sensores-sin-perderse.md) | 40 min | Desarrollada |
+| 35 | Seguimiento de línea | [Arrays: cinco datos bajo un nombre](course/04-line-tracking/35-arrays-cinco-datos-bajo-un-nombre.md) | 40 min | Desarrollada |
+| 36 | Seguimiento de línea | [Estimar dónde está la línea](course/04-line-tracking/36-estimar-donde-esta-la-linea.md) | 40 min | Desarrollada |
+| 37 | Seguimiento de línea | [De la medición a la orden](course/04-line-tracking/37-de-la-medicion-a-la-orden.md) | 40 min | Desarrollada |
+| 38 | Seguimiento de línea | [Hito: seguir una línea](course/04-line-tracking/38-hito-seguir-una-linea.md) | 40 min | Desarrollada |
+| 39 | Ultrasonido y servo | [El sonido es una onda mecánica](course/05-ultrasonido/39-el-sonido-es-una-onda-mecanica.md) | 40 min | Desarrollada |
+| 40 | Ultrasonido y servo | [Frecuencia y período](course/05-ultrasonido/40-frecuencia-y-periodo.md) | 40 min | Desarrollada |
+| 41 | Ultrasonido y servo | [Ultrasonido: más allá del oído](course/05-ultrasonido/41-ultrasonido-mas-alla-del-oido.md) | 40 min | Desarrollada |
+| 42 | Ultrasonido y servo | [Eco y tiempo de vuelo](course/05-ultrasonido/42-eco-y-tiempo-de-vuelo.md) | 40 min | Desarrollada |
+| 43 | Ultrasonido y servo | [TRIG: enviar un pulso breve](course/05-ultrasonido/43-trig-enviar-un-pulso-breve.md) | 40 min | Desarrollada |
+| 44 | Ultrasonido y servo | [ECHO: medir una duración](course/05-ultrasonido/44-echo-medir-una-duracion.md) | 40 min | Desarrollada |
+| 45 | Ultrasonido y servo | [De microsegundos a centímetros](course/05-ultrasonido/45-de-microsegundos-a-centimetros.md) | 40 min | Desarrollada |
+| 46 | Ultrasonido y servo | [Medir objetos conocidos](course/05-ultrasonido/46-medir-objetos-conocidos.md) | 40 min | Desarrollada |
+| 47 | Ultrasonido y servo | [Un servo apunta el sensor](course/05-ultrasonido/47-un-servo-apunta-el-sensor.md) | 40 min | Desarrollada |
+| 48 | Ultrasonido y servo | [Escaneo espacial](course/05-ultrasonido/48-escaneo-espacial.md) | 40 min | Desarrollada |
+| 49 | Ultrasonido y servo | [Evitar obstáculos](course/05-ultrasonido/49-evitar-obstaculos.md) | 40 min | Desarrollada |
+| 50 | Bluetooth | [Radio: otra región del espectro](course/06-bluetooth/50-radio-otra-region-del-espectro.md) | 40 min | Desarrollada |
+| 51 | Bluetooth | [Todo enlace necesita un protocolo](course/06-bluetooth/51-todo-enlace-necesita-un-protocolo.md) | 40 min | Desarrollada |
+| 52 | Bluetooth | [Qué hace Bluetooth](course/06-bluetooth/52-que-hace-bluetooth.md) | 40 min | Desarrollada |
+| 53 | Bluetooth | [Conocer el HC-02 y su zócalo](course/06-bluetooth/53-conocer-el-hc-02-y-su-zocalo.md) | 40 min | Desarrollada |
+| 54 | Bluetooth | [UART: hablar por turnos y a la misma velocidad](course/06-bluetooth/54-uart-hablar-por-turnos-y-a-la-misma-velocidad.md) | 40 min | Desarrollada |
+| 55 | Bluetooth | [TX y RX se cruzan](course/06-bluetooth/55-tx-y-rx-se-cruzan.md) | 40 min | Desarrollada |
+| 56 | Bluetooth | [Recibir una letra](course/06-bluetooth/56-recibir-una-letra.md) | 40 min | Desarrollada |
+| 57 | Bluetooth | [Control Bluetooth con parada dominante](course/06-bluetooth/57-control-bluetooth-con-parada-dominante.md) | 40 min | Desarrollada |
+| 58 | Wi-Fi e IoT | [Wi-Fi y Bluetooth no son lo mismo](course/07-wifi-iot/58-wi-fi-y-bluetooth-no-son-lo-mismo.md) | 40 min | Desarrollada |
+| 59 | Wi-Fi e IoT | [El ESP8266/ESP-12S](course/07-wifi-iot/59-el-esp8266-esp-12s.md) | 40 min | Desarrollada |
+| 60 | Wi-Fi e IoT | [Una red está hecha de nodos y enlaces](course/07-wifi-iot/60-una-red-esta-hecha-de-nodos-y-enlaces.md) | 40 min | Desarrollada |
+| 61 | Wi-Fi e IoT | [El router organiza la red local](course/07-wifi-iot/61-el-router-organiza-la-red-local.md) | 40 min | Desarrollada |
+| 62 | Wi-Fi e IoT | [SSID y credenciales seguras](course/07-wifi-iot/62-ssid-y-credenciales-seguras.md) | 40 min | Desarrollada |
+| 63 | Wi-Fi e IoT | [Direcciones IP y DHCP](course/07-wifi-iot/63-direcciones-ip-y-dhcp.md) | 40 min | Desarrollada |
+| 64 | Wi-Fi e IoT | [Cliente, servidor y UDP](course/07-wifi-iot/64-cliente-servidor-y-udp.md) | 40 min | Desarrollada |
+| 65 | Wi-Fi e IoT | [Conectar en modo estación](course/07-wifi-iot/65-conectar-en-modo-estacion.md) | 40 min | Desarrollada |
+| 66 | Wi-Fi e IoT | [Comandos Wi-Fi seguros](course/07-wifi-iot/66-comandos-wi-fi-seguros.md) | 40 min | Desarrollada |
+| 67 | Wi-Fi e IoT | [Telemetría: el robot informa](course/07-wifi-iot/67-telemetria-el-robot-informa.md) | 40 min | Desarrollada |
+| 68 | Integración | [Pensar en modos y estados](course/08-integracion/68-pensar-en-modos-y-estados.md) | 40 min | Desarrollada |
+| 69 | Integración | [La seguridad tiene prioridad](course/08-integracion/69-la-seguridad-tiene-prioridad.md) | 40 min | Desarrollada |
+| 70 | Integración | [Radar ultrasónico](course/08-integracion/70-radar-ultrasonico.md) | 40 min | Desarrollada |
+| 71 | Integración | [Estacionamiento por distancia](course/08-integracion/71-estacionamiento-por-distancia.md) | 40 min | Desarrollada |
+| 72 | Integración | [Navegar un laberinto](course/08-integracion/72-navegar-un-laberinto.md) | 40 min | Desarrollada |
+| 73 | Integración | [Línea con obstáculos](course/08-integracion/73-linea-con-obstaculos.md) | 40 min | Desarrollada |
+| 74 | Integración | [Telemetría integrada](course/08-integracion/74-telemetria-integrada.md) | 40 min | Desarrollada |
+| 75 | Integración | [Proyecto final: tu propio PX-32](course/08-integracion/75-proyecto-final-tu-propio-px-32.md) | 40 min | Desarrollada |
 
-Los seis proyectos del manual OSOYOO aparecen como hitos y no como primeras experiencias. Cada subsistema se observa y prueba por separado antes de combinarlo.
+## Hitos
 
-## Niveles y requisitos
+- 20: movimiento Mecanum seguro.
+- 30: seguimiento de una mano mediante dos sensores IR.
+- 38: seguimiento de línea con cinco canales.
+- 49: evasión de obstáculos por ultrasonido y servo.
+- 57: control Bluetooth con timeout y STOP.
+- 67: mando y telemetría Wi-Fi sin credenciales versionadas.
+- 75: proyecto integrado reproducible y seguro.
 
-| Nivel | Insignia | Requisitos objetivos |
-|---|---|---|
-| 0 | Explorador | Identifica 15 componentes, diferencia sensor/actuador y aplica las cinco reglas críticas de seguridad |
-| 1 | Constructor | Monta o inspecciona PX-32 con un adulto, sigue un diagrama y documenta una conexión sin energizar |
-| 2 | Programador | Escribe Blink, usa variables, `if`, bucles, funciones y explica `setup()`/`loop()` |
-| 3 | Técnico de sensores | Lee por Serial IR, tracker y ultrasonido; calibra y distingue medición de decisión |
-| 4 | Navegador | Controla motores y Mecanum; completa línea y evasión con pruebas aisladas |
-| 5 | Comunicador | Explica UART, recibe comandos Bluetooth y usa Wi-Fi sin publicar credenciales |
-| 6 | Ingeniero de PX-32 | Integra dos o más subsistemas, usa una bitácora de fallos y presenta su propio proyecto |
-
-## Qué ya aprendí y qué viene después
-
-Al terminar cada lección, responde:
-
-1. ¿Qué puedo explicar sin mirar el texto?
-2. ¿Qué medí u observé realmente?
-3. ¿Qué cambió entre mi predicción y el resultado?
-4. ¿Qué pieza anterior necesita la próxima misión?
-
-La columna `Prerrequisito` de la [matriz curricular](docs/curriculum-matrix.md) muestra las dependencias exactas.
-
-## Proyectos disponibles por etapa
-
-| Después de | Proyectos posibles |
-|---|---|
-| Lección 08 | SOS luminoso, metrónomo LED, contador Serial |
-| Hito 1 | pista Mecanum, precisión lateral, coreografía |
-| Hito 2 | seguidor de mano, alarma IR |
-| Hito 3 | circuito de línea, desafío de calibración |
-| Hito 4 | radar con servo, estacionamiento, laberinto |
-| Hito 5 | control Bluetooth, robot por comandos |
-| Hito 6 | telemetría Wi-Fi, panel de control local |
-| Hito final | robot multimodo, línea + obstáculos |
+La dependencia exacta aparece dentro de cada lección y en [docs/curriculum-matrix.md](docs/curriculum-matrix.md).

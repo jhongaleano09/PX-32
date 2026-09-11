@@ -40,7 +40,7 @@ abrir terminal -> entrar al repositorio -> git status
                -> si está limpio, git pull -> abrir la lección
 ```
 
-El estudiante no necesita `commit` o `push` para comenzar. Sus primeras bitácoras pueden ser guardadas por el adulto.
+El estudiante no necesita `commit` o `push` para comenzar. El avance se marca en `PROGRESS.md`; cualquier nota adicional puede quedar en el cuaderno físico.
 
 ## Microlección futura: guardar la historia
 

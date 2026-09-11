@@ -23,6 +23,6 @@ Una señal que representa “avanza” no tiene potencia suficiente para mover e
 
 Si la ruta está abierta, no hay corriente sostenida. Si se unen directamente dos puntos que no deben unirse, aparece un cortocircuito: la resistencia puede ser tan baja que la corriente produzca calor y daño.
 
-## Pregunta para la bitácora
+## Pregunta para conversar
 
 ¿Qué partes de PX-32 llevan principalmente información y cuáles llevan principalmente energía?

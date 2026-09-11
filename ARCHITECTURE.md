@@ -21,7 +21,7 @@ flowchart LR
     E --> F[Medir o controlar]
     F --> G[Comparar resultado]
     G --> H[Depurar]
-    H --> I[Registrar]
+    H --> I[Explicar a papá]
     I --> J[Combinar]
 ```
 
@@ -41,8 +41,6 @@ flowchart LR
 ├── code/
 │   ├── educational/     ejemplos pequeños
 │   └── osoyoo-original/ fuentes del proveedor sin editar
-├── quizzes/ y solutions/
-├── journal/
 ├── templates/
 ├── assets/osoyoo-manual/
 └── reference/original/
@@ -55,6 +53,7 @@ flowchart LR
 - Un programa Arduino vive en una carpeta con el mismo nombre que su archivo `.ino`.
 - Toda tabla de conexiones indica fuente y estado.
 - Una imagen extraída conserva `pagina-NN` en el nombre y se enlaza con ruta relativa.
+- El cierre de sesión es conversado; el cuaderno físico es opcional y no existe una arquitectura paralela de evaluaciones o diario digital.
 
 ## Estrategia de imágenes del PDF
 

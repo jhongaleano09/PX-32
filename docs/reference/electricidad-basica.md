@@ -40,4 +40,4 @@ Conexiones siempre con USB retirado, baterías fuera o interruptores apagados se
 
 ## Lectura relacionada
 
-[Lección 03](../../course/00-fundamentos/03-electricidad-basica.md) y [alimentación de PX-32](alimentacion.md).
+[Lección 03](../../course/00-fundamentos/03-electricidad-sin-misterios.md) y [alimentación de PX-32](alimentacion.md).
