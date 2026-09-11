@@ -1,154 +1,173 @@
 # Lección 18 — Cuatro motores, cuatro identidades
 
-## 1. Tu misión de hoy
+## “La rueda de atrás” ya no es suficiente
 
-Hoy vas a **verificar qué conector corresponde a cada rueda**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+PX-32 tiene dos ruedas traseras y dos delanteras. Para coordinar un desplazamiento lateral, el programa necesita distinguir las cuatro sin ambigüedad. El manual les asigna un conector y tres señales a cada una:
 
-## 2. Tiempo estimado
+| Orden de prueba | Posición mirando en el sentido de avance | Model Y | PWM | Entradas de dirección |
+|---:|---|---|---:|---:|
+| 1 | frontal derecha | BK1 | D9 | D22, D24 |
+| 2 | frontal izquierda | BK3 | D10 | D26, D28 |
+| 3 | trasera derecha | AK1 | D11 | D5, D6 |
+| 4 | trasera izquierda | AK3 | D12 | D7, D8 |
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+**Derecha e izquierda pertenecen al robot**, no a la persona que lo mira. Si te colocas frente a PX-32, tu derecha queda enfrentada a su izquierda. Para evitar esa trampa, harás toda la actividad mirando desde atrás hacia el frente, como si fueras quien conduce.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Prepara un mapa que pueda contradecirte
 
-## 3. Lo que necesitas saber antes de empezar
+Necesitas:
 
-[Lección 17: PWM: regular energía en el tiempo](17-pwm-regular-energia-en-el-tiempo.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+- PX-32 y sus dos soportes rígidos, con las cuatro ruedas libres.
+- Cuatro tarjetas: `BK1`, `BK3`, `AK1` y `AK3`.
+- Una hoja con una vista superior del chasis y el frente marcado.
+- Computador, Arduino IDE 2, cable USB y [18-cuatro-motores-cuatro-identidades.ino](../../code/educational/18-cuatro-motores-cuatro-identidades/18-cuatro-motores-cuatro-identidades.ino).
+- El manual OSOYOO abierto en las páginas 7 y 13.
+- Baterías verificadas y un adulto encargado de toda la potencia.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+🔴 El adulto deja el robot sin celdas ni USB y con interruptores apagados. Comprueba soportes, cables alejados de ruedas y acceso inmediato al apagado.
 
-## 4. Lectura principal
+## Predice el orden leyendo las llamadas
 
-### La idea intuitiva
+1. 🟢 Colócate detrás del robot. Pon cada tarjeta junto a la esquina que indica la tabla. Copia esos nombres en tu dibujo antes de abrir el programa.
 
-El tema de hoy es **motor frontal/trasero, izquierdo/derecho y prueba aislada**. En lenguaje cotidiano, buscamos una forma fiable de verificar qué conector corresponde a cada rueda. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Mover un robot exige coordinar lógica y potencia. La Mega produce señales pequeñas; el Model Y dirige energía hacia los motores; los engranajes cambian velocidad por par; y las ruedas Mecanum convierten giros en fuerzas oblicuas. Esta separación protege la placa y ayuda a depurar: primero se comprueba la orden, luego el canal de potencia y por último el resultado mecánico.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **motor frontal/trasero, izquierdo/derecho y prueba aislada**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para activar una rueda por vez con pulsos breves y completar el mapa BK1/BK3/AK1/AK3. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Motor frontal/trasero:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-004 a HW-006.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **motor frontal/trasero, izquierdo/derecho y prueba aislada**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante predice, lee el código y registra observaciones.
-- 🟡 Un adulto permanece presente durante USB, calibración o cualquier prueba física.
-- 🔴 El adulto manipula baterías 18650, interruptores de potencia, driver y cables. Toda conexión se revisa sin USB y con alimentación apagada.
-
-Para movimiento: primero ruedas levantadas sobre una base estable, velocidad baja, área despejada y el interruptor accesible. Cabello, mangas y dedos lejos de ruedas. Si hay calor, olor, humo, chispa, zumbido fuerte o movimiento inesperado, el adulto corta energía; no se intenta frenar con la mano.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres verificar qué conector corresponde a cada rueda y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-004 a HW-006 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con motor frontal/trasero, izquierdo/derecho y prueba aislada. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a activar una rueda por vez con pulsos breves y completar el mapa BK1/BK3/AK1/AK3. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: cada orden coincide con la posición canónica o se detiene para revisión adulta. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [18-cuatro-motores-cuatro-identidades.ino](../../code/educational/18-cuatro-motores-cuatro-identidades/18-cuatro-motores-cuatro-identidades.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **motor frontal/trasero**. Lee el programa de arriba abajo y predice su salida.
+2. 🟢 Compara el `.ino` con el bloque completo:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 18
-// Cargar solo después de leer la sección de seguridad.
-const byte EN[4]={9,10,11,12};
-const byte P1[4]={22,26,5,7};
-const byte P2[4]={24,28,6,8};
-// Orden: frontal derecha, frontal izquierda, trasera derecha, trasera izquierda.
-void rueda(byte i,int sentido,byte pwm){
-  digitalWrite(P1[i],sentido>0?HIGH:LOW);
-  digitalWrite(P2[i],sentido<0?HIGH:LOW);
-  analogWrite(EN[i],sentido==0?0:pwm);
+// Curso PX-32 - Leccion 18: identificar los cuatro motores.
+// El sketch queda detenido hasta cambiar EJECUTAR_PRUEBA a true.
+const bool EJECUTAR_PRUEBA = false;
+
+// Orden fisico confirmado por el manual OSOYOO.
+const byte PWM_BK1 = 9;   // Frontal derecho
+const byte BK1_IN1 = 22;
+const byte BK1_IN2 = 24;
+const byte PWM_BK3 = 10;  // Frontal izquierdo
+const byte BK3_IN3 = 26;
+const byte BK3_IN4 = 28;
+const byte PWM_AK1 = 11;  // Trasero derecho
+const byte AK1_IN1 = 5;
+const byte AK1_IN2 = 6;
+const byte PWM_AK3 = 12;  // Trasero izquierdo
+const byte AK3_IN3 = 7;
+const byte AK3_IN4 = 8;
+
+void detenerTodos() {
+  analogWrite(PWM_BK1, 0);
+  analogWrite(PWM_BK3, 0);
+  analogWrite(PWM_AK1, 0);
+  analogWrite(PWM_AK3, 0);
+
+  digitalWrite(BK1_IN1, LOW);
+  digitalWrite(BK1_IN2, LOW);
+  digitalWrite(BK3_IN3, LOW);
+  digitalWrite(BK3_IN4, LOW);
+  digitalWrite(AK1_IN1, LOW);
+  digitalWrite(AK1_IN2, LOW);
+  digitalWrite(AK3_IN3, LOW);
+  digitalWrite(AK3_IN4, LOW);
 }
-void parar(){ for(byte i=0;i<4;i++) rueda(i,0,0); }
-void mover(int fd,int fi,int td,int ti,byte pwm){
-  int s[4]={fd,fi,td,ti}; for(byte i=0;i<4;i++) rueda(i,s[i],pwm);
+
+void prepararMotores() {
+  pinMode(PWM_BK1, OUTPUT);
+  pinMode(PWM_BK3, OUTPUT);
+  pinMode(PWM_AK1, OUTPUT);
+  pinMode(PWM_AK3, OUTPUT);
+  pinMode(BK1_IN1, OUTPUT);
+  pinMode(BK1_IN2, OUTPUT);
+  pinMode(BK3_IN3, OUTPUT);
+  pinMode(BK3_IN4, OUTPUT);
+  pinMode(AK1_IN1, OUTPUT);
+  pinMode(AK1_IN2, OUTPUT);
+  pinMode(AK3_IN3, OUTPUT);
+  pinMode(AK3_IN4, OUTPUT);
+  detenerTodos();
 }
-void prepararMotores(){ for(byte i=0;i<4;i++){ pinMode(EN[i],OUTPUT); pinMode(P1[i],OUTPUT); pinMode(P2[i],OUTPUT); } parar(); }
-void setup(){ prepararMotores(); delay(2000); for(byte i=0;i<4;i++){ rueda(i,1,70); delay(400); parar(); delay(700); } }
-void loop(){ parar(); }
+
+void probarMotor(byte pinPwm, byte pin1, byte pin2) {
+  digitalWrite(pin1, HIGH);
+  digitalWrite(pin2, LOW);
+  analogWrite(pinPwm, 100);
+  delay(500);
+  detenerTodos();
+  delay(1200);
+}
+
+void setup() {
+  prepararMotores();
+
+  if (!EJECUTAR_PRUEBA) {
+    return;
+  }
+
+  // Da tiempo para retirar el USB y, despues, energizar desde baterias.
+  delay(15000);
+  probarMotor(PWM_BK1, BK1_IN1, BK1_IN2);
+  probarMotor(PWM_BK3, BK3_IN3, BK3_IN4);
+  probarMotor(PWM_AK1, AK1_IN1, AK1_IN2);
+  probarMotor(PWM_AK3, AK3_IN3, AK3_IN4);
+  detenerTodos();
+}
+
+void loop() {
+  detenerTodos();
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+3. 🟢 Observa que `probarMotor()` recibe tres parámetros. En cada llamada cambian el pin PWM y las dos entradas; la potencia `100`, el pulso de 500 ms y la pausa de 1200 ms permanecen iguales.
 
-## 11. Qué deberías observar
+4. 🟢 Lee las cuatro llamadas de `setup()` y levanta las tarjetas en ese orden. Predice: `BK1 -> BK3 -> AK1 -> AK3`. Si no puedes señalar cada esquina sin girar el robot, corrige primero tu posición.
 
-El resultado normal es **cada orden coincide con la posición canónica o se detiene para revisión adulta**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** plano cenital anotado.
+> - **Objetivo:** fijar una orientación canónica para nombres, conectores y pines de los cuatro motores.
+> - **Descripción:** PX-32 visto desde arriba, frente en la parte superior y una silueta del estudiante detrás; cada esquina une posición, conector y trío de pines.
+> - **Elementos que deben señalarse:** frontal derecha BK1 D9/D22/D24; frontal izquierda BK3 D10/D26/D28; trasera derecha AK1 D11/D5/D6; trasera izquierda AK3 D12/D7/D8.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 7 y 13; guía Model Y, https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/.
+> - **Texto alternativo sugerido:** “Plano superior de PX-32 que asigna un conector y tres pines a cada esquina”.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+## Deja que el robot responda una esquina a la vez
 
-## 12. Si no funciona
+5. 🟢 Cambia solo `EJECUTAR_PRUEBA` a `true`.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+6. 🟡 Con baterías fuera, conecta USB, selecciona Mega y el puerto identificado, verifica y sube. Retira el USB al finalizar.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+7. 🟢 Colócate otra vez detrás de PX-32 y ensaya el orden con las tarjetas. No sostengas ninguna tarjeta encima de una rueda.
 
-## 13. Desafío
+8. 🔴 El adulto instala las celdas y energiza el robot elevado. Después de la espera de quince segundos, cada motor debe girar 500 ms y quedar separado del siguiente por una pausa clara.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+9. 🟢 Señala en tu dibujo la esquina que realmente se mueve en cada pulso. Registra `coincide` o escribe la posición observada; no cambies los rótulos para hacer que el resultado parezca correcto.
 
-## 14. Lecturas y videos para explorar
+10. 🔴 Si dos ruedas giran juntas, una posición no coincide, una rueda no se detiene o el soporte se mueve, el adulto apaga. No continúes la secuencia para reunir “más datos” si ya apareció un resultado inseguro.
+
+11. 🟢 El mapa queda validado solo si los cuatro pulsos coinciden con la tabla en el orden exacto. Si el sentido de giro no parece avance, anótalo aparte: esta clase confirma **identidad**, no recalibra el cableado.
+
+12. 🔴 El adulto apaga y retira baterías. Restaura `EJECUTAR_PRUEBA = false` y sube la versión neutral usando únicamente USB.
+
+## Cuando el mapa y el robot discuten
+
+| Resultado | Decisión |
+|---|---|
+| BK1 mueve una esquina distinta | Detén; compara la conexión física con la tabla de la página 7. Solo el adulto corrige cableado sin fuentes |
+| K1 y K2 del mismo canal se mueven juntos | Es coherente con salidas sincronizadas del Model Y; PX-32 debería usar el K1 documentado para cada motor |
+| Un pulso falta | Revisa la llamada y luego, sin energía, el conector correspondiente y el cable de seis posiciones de su zona |
+| El orden es correcto pero un sentido está invertido | Regístralo; no intercambies cables durante esta clase. Contrasta la convención `IN1=HIGH, IN2=LOW` |
+| Dos pulsos parecen uno largo | Verifica `detenerTodos(); delay(1200);` dentro de `probarMotor()` |
+
+## Lecturas y videos para explorar
 
 - [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
 - [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Prueba a reconstruir la tabla sin mirar y luego corrígela con la fuente. Recordar no sustituye verificar.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **motor frontal/trasero** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 7 y 13, posición de motores y cableado Model Y.
+- [Guía oficial del Model Y](https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/), pares de salidas, control independiente y código de ejemplo.
+- [Pinout oficial de Arduino Mega 2560](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf), identificación de D5-D12 y D22-D28.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Colócate detrás del robot y nombra las cuatro esquinas en menos de un minuto, pero justifica cada una con conector y pines. Si alguna no coincidió, muéstrale el registro sin proponer un recableado improvisado.
 
-Hoy aprendiste a **verificar qué conector corresponde a cada rueda** y lo conectaste con **motor frontal/trasero, izquierdo/derecho y prueba aislada**. Pudiste observar cada orden coincide con la posición canónica o se detiene para revisión adulta. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 19: Ruedas Mecanum y fuerzas diagonales](19-ruedas-mecanum-y-fuerzas-diagonales.md).
+La [Lección 19](19-ruedas-mecanum-y-fuerzas-diagonales.md) cambia la pregunta: ya sabes cuál rueda gira; ahora descubrirás por qué sus rodillos empujan en diagonal.

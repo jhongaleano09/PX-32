@@ -1,142 +1,177 @@
 # Lección 15 — Primera prueba de un motor
 
-## 1. Tu misión de hoy
+## Un giro de medio segundo, no una carrera
 
-Hoy vas a **hacer girar brevemente un motor con las ruedas elevadas y parada conocida**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Hasta ahora todo el bloque ha ocurrido sin energía. La primera prueba activa será deliberadamente pequeña: solo el motor **AK1**, ubicado en la esquina trasera derecha, girará durante medio segundo. Los otros tres canales quedarán deshabilitados.
 
-## 2. Tiempo estimado
+El programa tendrá tres barreras de seguridad:
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+1. comienza con `EJECUTAR_PRUEBA = false`;
+2. configura y detiene los cuatro canales antes de cualquier movimiento;
+3. espera quince segundos, aplica PWM `100` durante 500 ms y vuelve a `detenerTodos()`.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+El número `100` no significa 100 % ni 100 revoluciones. `analogWrite()` usa aquí una escala de 0 a 255. Es un mando moderado para una prueba corta; la velocidad real depende también de batería, rozamiento, carga y del motor concreto.
 
-## 3. Lo que necesitas saber antes de empezar
+## Todo lo que debe estar listo
 
-[Lección 11: Funciones: enseñar una acción reutilizable](../01-programacion/11-funciones-ensenar-una-accion-reutilizable.md), [Lección 14: Puente H: cambiar la polaridad](14-puente-h-cambiar-la-polaridad.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+- PX-32 ensamblado.
+- Dos soportes rígidos de la misma altura que sostengan el **chasis**, no las ruedas; las cuatro ruedas deben quedar al menos 2 cm sobre la mesa.
+- Computador con Arduino IDE 2 y cable USB de datos.
+- El archivo [15-primera-prueba-de-un-motor.ino](../../code/educational/15-primera-prueba-de-un-motor/15-primera-prueba-de-un-motor.ino).
+- Las dos celdas 18650 y su cargador compatible, manipulados únicamente por el adulto.
+- El mapa [AK1 -> motor trasero derecho](../../docs/reference/mapa-conexiones-robot.md#motores).
+- Área despejada, cabello recogido, mangas y cordones lejos de las ruedas.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+Necesitas recordar de la [Lección 14](14-puente-h-cambiar-la-polaridad.md) que `HIGH/LOW` establece un sentido y PWM habilita el canal.
 
-## 4. Lectura principal
+🔴 Tu padre retira las celdas, desconecta el USB y apaga los interruptores. Después comprueba que los soportes son estables, que ninguna rueda los toca y que el interruptor queda accesible. Si el robot se bambolea, no se programa todavía.
 
-### La idea intuitiva
+## Lee el programa antes de permitir movimiento
 
-El tema de hoy es **salida digital, habilitación y parada física**. En lenguaje cotidiano, buscamos una forma fiable de hacer girar brevemente un motor con las ruedas elevadas y parada conocida. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Mover un robot exige coordinar lógica y potencia. La Mega produce señales pequeñas; el Model Y dirige energía hacia los motores; los engranajes cambian velocidad por par; y las ruedas Mecanum convierten giros en fuerzas oblicuas. Esta separación protege la placa y ayuda a depurar: primero se comprueba la orden, luego el canal de potencia y por último el resultado mecánico.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **salida digital, habilitación y parada física**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para cargar un pulso corto de avance seguido de STOP bajo control adulto. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Salida digital:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001, HW-004, HW-005.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **salida digital, habilitación y parada física**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante predice, lee el código y registra observaciones.
-- 🟡 Un adulto permanece presente durante USB, calibración o cualquier prueba física.
-- 🔴 El adulto manipula baterías 18650, interruptores de potencia, driver y cables. Toda conexión se revisa sin USB y con alimentación apagada.
-
-Para movimiento: primero ruedas levantadas sobre una base estable, velocidad baja, área despejada y el interruptor accesible. Cabello, mangas y dedos lejos de ruedas. Si hay calor, olor, humo, chispa, zumbido fuerte o movimiento inesperado, el adulto corta energía; no se intenta frenar con la mano.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres hacer girar brevemente un motor con las ruedas elevadas y parada conocida y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001, HW-004, HW-005 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con salida digital, habilitación y parada física. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a cargar un pulso corto de avance seguido de STOP bajo control adulto. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: un motor gira menos de un segundo y queda detenido de forma estable. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [15-primera-prueba-de-un-motor.ino](../../code/educational/15-primera-prueba-de-un-motor/15-primera-prueba-de-un-motor.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **salida digital**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y compáralo línea por línea con este bloque completo:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 15
-// Cargar solo después de leer la sección de seguridad.
-const byte ENA=11, IN1=5, IN2=6;
-void parar(){ analogWrite(ENA,0); digitalWrite(IN1,LOW); digitalWrite(IN2,LOW); }
-void setup(){ pinMode(ENA,OUTPUT); pinMode(IN1,OUTPUT); pinMode(IN2,OUTPUT); parar(); delay(2000); digitalWrite(IN1,HIGH); digitalWrite(IN2,LOW); analogWrite(ENA,80); delay(600); parar(); }
-void loop(){ parar(); }
+// Curso PX-32 - Leccion 15: primera prueba del motor AK1.
+// El sketch queda detenido hasta cambiar EJECUTAR_PRUEBA a true.
+const bool EJECUTAR_PRUEBA = false;
+
+// Model Y, zona B: motores delanteros.
+const byte PWM_BK1 = 9;
+const byte BK1_IN1 = 22;
+const byte BK1_IN2 = 24;
+const byte PWM_BK3 = 10;
+const byte BK3_IN3 = 26;
+const byte BK3_IN4 = 28;
+
+// Model Y, zona A: motores traseros.
+const byte PWM_AK1 = 11;
+const byte AK1_IN1 = 5;
+const byte AK1_IN2 = 6;
+const byte PWM_AK3 = 12;
+const byte AK3_IN3 = 7;
+const byte AK3_IN4 = 8;
+
+void detenerTodos() {
+  // Primero se deshabilita la potencia de los cuatro canales.
+  analogWrite(PWM_BK1, 0);
+  analogWrite(PWM_BK3, 0);
+  analogWrite(PWM_AK1, 0);
+  analogWrite(PWM_AK3, 0);
+
+  // Luego las entradas de direccion quedan en LOW.
+  digitalWrite(BK1_IN1, LOW);
+  digitalWrite(BK1_IN2, LOW);
+  digitalWrite(BK3_IN3, LOW);
+  digitalWrite(BK3_IN4, LOW);
+  digitalWrite(AK1_IN1, LOW);
+  digitalWrite(AK1_IN2, LOW);
+  digitalWrite(AK3_IN3, LOW);
+  digitalWrite(AK3_IN4, LOW);
+}
+
+void prepararMotores() {
+  pinMode(PWM_BK1, OUTPUT);
+  pinMode(PWM_BK3, OUTPUT);
+  pinMode(PWM_AK1, OUTPUT);
+  pinMode(PWM_AK3, OUTPUT);
+
+  pinMode(BK1_IN1, OUTPUT);
+  pinMode(BK1_IN2, OUTPUT);
+  pinMode(BK3_IN3, OUTPUT);
+  pinMode(BK3_IN4, OUTPUT);
+  pinMode(AK1_IN1, OUTPUT);
+  pinMode(AK1_IN2, OUTPUT);
+  pinMode(AK3_IN3, OUTPUT);
+  pinMode(AK3_IN4, OUTPUT);
+
+  detenerTodos();
+}
+
+void girarAK1Adelante(byte potenciaPwm) {
+  digitalWrite(AK1_IN1, HIGH);
+  digitalWrite(AK1_IN2, LOW);
+  analogWrite(PWM_AK1, potenciaPwm);
+}
+
+void setup() {
+  prepararMotores();
+
+  if (!EJECUTAR_PRUEBA) {
+    return;
+  }
+
+  // Da tiempo para retirar el USB y, despues, energizar desde baterias.
+  delay(15000);
+  girarAK1Adelante(100);
+  delay(500);
+  detenerTodos();
+}
+
+void loop() {
+  detenerTodos();
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 Localiza los tres nombres de AK1. `PWM_AK1 = 11` controla habilitación/potencia media; `AK1_IN1 = 5` y `AK1_IN2 = 6` establecen dirección. Confirma esos números en el mapa, no por memoria.
 
-## 11. Qué deberías observar
+3. 🟢 Lee `detenerTodos()` de arriba abajo. Primero escribe `0` en las cuatro habilitaciones; después deja las ocho entradas en `LOW`. Aunque solo probaremos AK1, el programa da un estado conocido a todos los canales.
 
-El resultado normal es **un motor gira menos de un segundo y queda detenido de forma estable**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+4. 🟢 Explica la barrera `if (!EJECUTAR_PRUEBA)`. El signo `!` significa “no”: mientras la constante sea `false`, la condición es verdadera y `return` termina `setup()` antes del pulso.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+5. 🟢 Predice la secuencia con `true`: quince segundos sin giro, AK1 durante medio segundo y luego silencio. Señala qué función mantiene la parada dentro de `loop()`.
 
-## 12. Si no funciona
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía superior anotada.
+> - **Objetivo:** permitir que el niño identifique sin duda el motor AK1 antes de la primera energización.
+> - **Descripción:** PX-32 visto desde arriba con el frente marcado; resaltar la esquina trasera derecha, el conector AK1 del Model Y y la ruta D11/D5/D6.
+> - **Elementos que deben señalarse:** frente, derecha del robot, motor trasero derecho, AK1, D11 PWM, D5 IN1, D6 IN2 y zona segura de soportes bajo el chasis.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 7 y 13.
+> - **Texto alternativo sugerido:** “Vista superior de PX-32 con el motor trasero derecho y su conector AK1 destacados”.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+## Autoriza una sola prueba
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+6. 🟢 Cambia únicamente la línea de autorización a `const bool EJECUTAR_PRUEBA = true;`.
 
-## 13. Desafío
+7. 🟡 Con el adulto presente y las baterías todavía fuera, conecta solo el USB. En Arduino IDE verifica `Arduino Mega or Mega 2560`, selecciona el puerto que aparece al conectar y pulsa **Verificar**. Continúa únicamente si termina sin errores.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+8. 🟡 Pulsa **Subir** y espera el mensaje de carga completada. Retira el USB. El programa quedó guardado en la memoria flash de la Mega y se ejecutará de nuevo cuando reciba energía.
 
-## 14. Lecturas y videos para explorar
+9. 🔴 Con el robot ya elevado, tu padre revisa polaridad y estado de las celdas, las instala y enciende los interruptores documentados del portabaterías y del shield. Nadie toca el robot. La espera de quince segundos existe para separar la carga por USB de la prueba con baterías; no la reduzcas.
+
+10. 🟢 Observa únicamente la rueda trasera derecha. El criterio de éxito es: empieza después de la espera, gira cerca de medio segundo y se detiene; las otras tres permanecen quietas.
+
+11. 🔴 Si gira otra rueda, el robot se desplaza sobre los soportes, hay zumbido sin giro, reinicio, calor, olor o cables que se acercan a una rueda, tu padre apaga de inmediato. No detengas la rueda con la mano.
+
+12. 🔴 Aunque la prueba salga bien, tu padre apaga y retira las celdas. Conecta de nuevo solo el USB, restaura `EJECUTAR_PRUEBA = false`, verifica y sube. Así un encendido futuro comienza detenido.
+
+La misión termina cuando puedes nombrar AK1, sus tres pines, la duración del pulso y las tres instrucciones que impiden que se repita.
+
+## Diagnóstico de esta prueba concreta
+
+| Síntoma | Revisión pequeña y segura |
+|---|---|
+| Ninguna rueda gira | Confirma que se subió la versión con `EJECUTAR_PRUEBA = true`; luego el adulto revisa interruptores y carga de baterías |
+| Gira una rueda distinta | No cambies el código para “compensar”; compara el conector físico con `AK1 -> trasero derecho` |
+| Giran varias ruedas | Apaga; verifica que las otras tres llamadas `analogWrite(..., 0)` estén presentes y que no se cargó otro sketch |
+| AK1 zumba pero no arranca | Apaga sin esperar; puede existir un umbral de arranque, roce o batería baja. No aumentes PWM hasta revisar mecánica y alimentación |
+| Gira y no se detiene | Apaga; comprueba `delay(500); detenerTodos();` y que `loop()` solo llame a `detenerTodos()` |
+| Arduino IDE muestra un error | Lee la primera línea útil: revisa punto y coma, llaves, nombre de constante y placa seleccionada |
+
+## Lecturas y videos para explorar
 
 - [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
 - [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+En el manual, encuentra el nombre AK1 en la tabla de motores y luego sus tres señales en la tabla de la página 13.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **salida digital** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Guía oficial del Model Y](https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/), AK1, entradas, PWM y ejemplo de parada.
+- [Pinout oficial de Arduino Mega 2560](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf), D5, D6 y D11 con capacidad PWM de la placa oficial.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), `pinMode()`, `digitalWrite()`, `analogWrite()` y `delay()`.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Sin volver a encender, señala el motor que giró y recorre `D11/D5/D6 -> AK1 -> motor trasero derecho`. Después explícale por qué dejar `EJECUTAR_PRUEBA` en `false` es parte del resultado, no una tarea de limpieza.
 
-Hoy aprendiste a **hacer girar brevemente un motor con las ruedas elevadas y parada conocida** y lo conectaste con **salida digital, habilitación y parada física**. Pudiste observar un motor gira menos de un segundo y queda detenido de forma estable. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 16: Invertir el sentido por software](16-invertir-el-sentido-por-software.md).
+La [Lección 16](16-invertir-el-sentido-por-software.md) usará el mismo motor y los mismos cables, pero intercambiará `HIGH` y `LOW` después de una parada completa.

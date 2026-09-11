@@ -1,142 +1,178 @@
 # Lección 16 — Invertir el sentido por software
 
-## 1. Tu misión de hoy
+## La misma rueda, dos recorridos de corriente
 
-Hoy vas a **invertir un motor sin cambiar cables**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+En la prueba anterior, AK1 recibió `HIGH` en D5 y `LOW` en D6. Para invertir el giro no hace falta tocar el conector: el programa puede pedir `LOW` en D5 y `HIGH` en D6.
 
-## 2. Tiempo estimado
+Hay una condición importante entre ambos sentidos: **detener primero**. Cambiar de avance a retroceso mientras el rotor todavía gira aplica un par contrario brusco. El sketch separa los pulsos con 1200 ms de parada.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+La palabra **invariante** nombra una regla que debe mantenerse aunque cambie el sentido: antes, entre y después de los movimientos, los cuatro motores tienen una ruta conocida hacia `detenerTodos()`.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Monta el puesto de observación
 
-## 3. Lo que necesitas saber antes de empezar
+Necesitas los mismos soportes rígidos de la [Lección 15](15-primera-prueba-de-un-motor.md), PX-32, computador, cable USB, baterías bajo control adulto y el archivo [16-invertir-el-sentido-por-software.ino](../../code/educational/16-invertir-el-sentido-por-software/16-invertir-el-sentido-por-software.ino).
 
-[Lección 15: Primera prueba de un motor](15-primera-prueba-de-un-motor.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+Añade dos tarjetas con flechas opuestas. Colócalas en la mesa junto a la rueda AK1, sin pegarlas al robot. No necesitas saber aún cuál flecha corresponde al avance del chasis: solo comprobarás que los dos giros son opuestos.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+🔴 Tu padre deja el robot sin USB, sin celdas y con los interruptores apagados. Revisa que las cuatro ruedas queden libres y que los soportes no puedan volcar.
 
-## 4. Lectura principal
+## Encuentra la inversión dentro del código
 
-### La idea intuitiva
-
-El tema de hoy es **dirección, inversión lógica e invariante de seguridad**. En lenguaje cotidiano, buscamos una forma fiable de invertir un motor sin cambiar cables. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Mover un robot exige coordinar lógica y potencia. La Mega produce señales pequeñas; el Model Y dirige energía hacia los motores; los engranajes cambian velocidad por par; y las ruedas Mecanum convierten giros en fuerzas oblicuas. Esta separación protege la placa y ayuda a depurar: primero se comprueba la orden, luego el canal de potencia y por último el resultado mecánico.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **dirección, inversión lógica e invariante de seguridad**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para alternar IN1/IN2 con pausa completa entre sentidos. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Dirección:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-004, HW-005.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **dirección, inversión lógica e invariante de seguridad**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante predice, lee el código y registra observaciones.
-- 🟡 Un adulto permanece presente durante USB, calibración o cualquier prueba física.
-- 🔴 El adulto manipula baterías 18650, interruptores de potencia, driver y cables. Toda conexión se revisa sin USB y con alimentación apagada.
-
-Para movimiento: primero ruedas levantadas sobre una base estable, velocidad baja, área despejada y el interruptor accesible. Cabello, mangas y dedos lejos de ruedas. Si hay calor, olor, humo, chispa, zumbido fuerte o movimiento inesperado, el adulto corta energía; no se intenta frenar con la mano.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres invertir un motor sin cambiar cables y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-004, HW-005 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con dirección, inversión lógica e invariante de seguridad. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a alternar IN1/IN2 con pausa completa entre sentidos. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: giro opuesto sin reconectar potencia ni tocar la rueda. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [16-invertir-el-sentido-por-software.ino](../../code/educational/16-invertir-el-sentido-por-software/16-invertir-el-sentido-por-software.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **dirección**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y confirma que coincide con el programa completo:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 16
-// Cargar solo después de leer la sección de seguridad.
-const byte ENA=11, IN1=5, IN2=6;
-void parar(){ analogWrite(ENA,0); digitalWrite(IN1,LOW); digitalWrite(IN2,LOW); }
-void setup(){ pinMode(ENA,OUTPUT); pinMode(IN1,OUTPUT); pinMode(IN2,OUTPUT); parar(); delay(2000); digitalWrite(IN1,HIGH); digitalWrite(IN2,LOW); analogWrite(ENA,80); delay(600); parar(); }
-void loop(){ parar(); }
+// Curso PX-32 - Leccion 16: invertir el motor AK1 por software.
+// El sketch queda detenido hasta cambiar EJECUTAR_PRUEBA a true.
+const bool EJECUTAR_PRUEBA = false;
+
+const byte PWM_BK1 = 9;
+const byte BK1_IN1 = 22;
+const byte BK1_IN2 = 24;
+const byte PWM_BK3 = 10;
+const byte BK3_IN3 = 26;
+const byte BK3_IN4 = 28;
+const byte PWM_AK1 = 11;
+const byte AK1_IN1 = 5;
+const byte AK1_IN2 = 6;
+const byte PWM_AK3 = 12;
+const byte AK3_IN3 = 7;
+const byte AK3_IN4 = 8;
+
+void detenerTodos() {
+  analogWrite(PWM_BK1, 0);
+  analogWrite(PWM_BK3, 0);
+  analogWrite(PWM_AK1, 0);
+  analogWrite(PWM_AK3, 0);
+
+  digitalWrite(BK1_IN1, LOW);
+  digitalWrite(BK1_IN2, LOW);
+  digitalWrite(BK3_IN3, LOW);
+  digitalWrite(BK3_IN4, LOW);
+  digitalWrite(AK1_IN1, LOW);
+  digitalWrite(AK1_IN2, LOW);
+  digitalWrite(AK3_IN3, LOW);
+  digitalWrite(AK3_IN4, LOW);
+}
+
+void prepararMotores() {
+  pinMode(PWM_BK1, OUTPUT);
+  pinMode(PWM_BK3, OUTPUT);
+  pinMode(PWM_AK1, OUTPUT);
+  pinMode(PWM_AK3, OUTPUT);
+  pinMode(BK1_IN1, OUTPUT);
+  pinMode(BK1_IN2, OUTPUT);
+  pinMode(BK3_IN3, OUTPUT);
+  pinMode(BK3_IN4, OUTPUT);
+  pinMode(AK1_IN1, OUTPUT);
+  pinMode(AK1_IN2, OUTPUT);
+  pinMode(AK3_IN3, OUTPUT);
+  pinMode(AK3_IN4, OUTPUT);
+  detenerTodos();
+}
+
+void girarAK1Adelante(byte potenciaPwm) {
+  digitalWrite(AK1_IN1, HIGH);
+  digitalWrite(AK1_IN2, LOW);
+  analogWrite(PWM_AK1, potenciaPwm);
+}
+
+void girarAK1Atras(byte potenciaPwm) {
+  digitalWrite(AK1_IN1, LOW);
+  digitalWrite(AK1_IN2, HIGH);
+  analogWrite(PWM_AK1, potenciaPwm);
+}
+
+void setup() {
+  prepararMotores();
+
+  if (!EJECUTAR_PRUEBA) {
+    return;
+  }
+
+  // Da tiempo para retirar el USB y, despues, energizar desde baterias.
+  delay(15000);
+  girarAK1Adelante(100);
+  delay(500);
+
+  // La pausa evita invertir mientras la rueda todavia gira.
+  detenerTodos();
+  delay(1200);
+
+  girarAK1Atras(100);
+  delay(500);
+  detenerTodos();
+}
+
+void loop() {
+  detenerTodos();
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 Pon un dedo sobre las líneas de `girarAK1Adelante()` y otro sobre las de `girarAK1Atras()`, sin tocar el robot. La habilitación D11 y el valor PWM `100` no cambian. Solo se intercambian los estados de D5 y D6.
 
-## 11. Qué deberías observar
+3. 🟢 Lee la secuencia de `setup()` como si fueran fotogramas:
 
-El resultado normal es **giro opuesto sin reconectar potencia ni tocar la rueda**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+```text
+STOP -> espera 15 s -> sentido 1 durante 0,5 s -> STOP durante 1,2 s
+     -> sentido 2 durante 0,5 s -> STOP permanente
+```
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+4. 🟢 Antes de energizar, señala cuál de tus tarjetas usarás para el primer pulso y cuál para el segundo. El criterio no es “derecha” o “izquierda” desde tu posición, sino que ambos sentidos sean opuestos al mirar la misma rueda desde el mismo lugar.
 
-## 12. Si no funciona
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** secuencia de cuatro fotogramas.
+> - **Objetivo:** hacer visible que la inversión ocurre después de una parada, sin cambiar cables.
+> - **Descripción:** acercamiento a AK1 en cuatro estados: D5 HIGH/D6 LOW, PWM 0 con rueda detenida, pausa de 1200 ms y D5 LOW/D6 HIGH; flechas del borde de la rueda cambian de dirección.
+> - **Elementos que deben señalarse:** D5, D6, D11, `girarAK1Adelante()`, `detenerTodos()`, 1200 ms, `girarAK1Atras()` y sentidos opuestos.
+> - **Fuente técnica:** guía del Model Y, https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/; manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, página 13.
+> - **Texto alternativo sugerido:** “Cuatro momentos muestran a AK1 girando, detenido y girando en sentido contrario después de una pausa”.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+## Ejecuta y compara
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+5. 🟢 Cambia solo `EJECUTAR_PRUEBA` a `true`.
 
-## 13. Desafío
+6. 🟡 Con baterías fuera y el adulto presente, conecta USB, selecciona Mega y el puerto comprobado, verifica y sube. Si Arduino IDE no muestra carga completada, no pases al hardware.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+7. 🟡 Retira el USB. Relee en voz alta el orden de los dos pulsos y muestra al adulto dónde está `detenerTodos()` entre ellos.
 
-## 14. Lecturas y videos para explorar
+8. 🔴 Tu padre instala las celdas verificadas y enciende el robot ya elevado. Durante los quince segundos iniciales todos apartan manos, cabello, ropa y cables. Esa espera no se reduce.
+
+9. 🟢 Mira AK1 desde una posición fija. Levanta una tarjeta durante el primer pulso, bájala durante la pausa y levanta la flecha contraria durante el segundo. Las otras ruedas deben permanecer inmóviles.
+
+10. 🟢 La evidencia correcta tiene tres partes: dos giros opuestos, una parada visible entre ellos y parada estable al final. Si solo recuerdas que “se movió”, repite la explicación usando los estados de D5 y D6; no repitas aún la energización.
+
+11. 🔴 Tu padre apaga y retira las celdas. Con USB como única fuente, restaura `EJECUTAR_PRUEBA = false`, verifica y sube la versión neutral.
+
+## Si la película no tiene cuatro momentos
+
+| Lo observado | Qué revisar antes de otra prueba |
+|---|---|
+| Los dos pulsos van en el mismo sentido | Compara las dos funciones: deben intercambiar exactamente `HIGH` y `LOW` |
+| No existe una pausa clara | Confirma `detenerTodos(); delay(1200);` entre las llamadas |
+| Solo funciona un sentido | Apaga; el adulto revisa el cable de seis posiciones M_A y el conector AK1, como indica OSOYOO para fallos de un solo sentido |
+| La rueda cambia bruscamente sin detenerse | No repitas; confirma que se cargó este archivo y no una versión modificada sin pausa |
+| Otra rueda se mueve | Verifica que las cuatro líneas PWM de `detenerTodos()` escriban `0` y que AK1 use D11/D5/D6 |
+| Hay ruido fuerte, atasco, calor u olor | El adulto corta la energía; esto no se corrige aumentando el tiempo ni el PWM |
+
+## Prueba mental: una sola modificación
+
+Sin volver a encender, predice qué cambiaría si `delay(1200)` fuera `delay(2000)`. Los sentidos y la potencia serían iguales; solo aumentaría el intervalo neutral. Esta es una buena modificación experimental porque cambia una variable.
+
+## Lecturas y videos para explorar
 
 - [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
 - [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Busca la diferencia entre una tabla de conexiones —qué pin llega dónde— y una tabla lógica —qué combinación produce cada acción—.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **dirección** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Guía oficial del Model Y](https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/), estados de avance y retroceso de AK1.
+- [Datasheet oficial PT5126A](https://www.princeton.com.tw/LinkClick.aspx?fileticket=n1QmI7KLyEk%3D&language=en-US&mid=5406&portalid=0&tabid=3542), tabla funcional y protección frente a conmutación simultánea de la familia del driver.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/), funciones, `digitalWrite()` y `delay()`.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Usa las dos tarjetas para representar los pulsos y deja un espacio entre ellas para la pausa. Explícale qué cambió en el software, qué permaneció igual en el hardware y por qué “primero STOP” será una regla permanente.
 
-Hoy aprendiste a **invertir un motor sin cambiar cables** y lo conectaste con **dirección, inversión lógica e invariante de seguridad**. Pudiste observar giro opuesto sin reconectar potencia ni tocar la rueda. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 17: PWM: regular energía en el tiempo](17-pwm-regular-energia-en-el-tiempo.md).
+En la [Lección 17](17-pwm-regular-energia-en-el-tiempo.md) conservarás el sentido y cambiarás cuánto tiempo permanece habilitado el canal dentro de cada ciclo rápido.

@@ -1,131 +1,92 @@
 # Lección 12 — Del electrón al giro: motor DC
 
-## 1. Tu misión de hoy
+## La rueda no es el motor
 
-Hoy vas a **explicar cómo un motor convierte energía eléctrica en movimiento**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Mira una esquina de PX-32. Lo más visible es la rueda azul y negra, pero detrás hay una caja amarilla y, pegado a ella, un cilindro metálico. ¿Cuál de esas tres piezas crea el giro?
 
-## 2. Tiempo estimado
+El cilindro es el **motor DC**. Las letras DC significan *direct current*, o corriente continua: la corriente conserva un sentido mientras la fuente mantenga la misma polaridad. Dentro del motor hay una parte fija, el **estator**, y una parte que gira, el **rotor**. La corriente que atraviesa las bobinas produce un campo magnético; su interacción con los imanes ejerce una fuerza giratoria llamada **par** o *torque*.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+El motor puede girar con rapidez, pero una rueda de robot necesita fuerza para arrancar y vencer el roce. La caja amarilla es la **reductora**: un tren de engranajes disminuye la velocidad de salida y aumenta el par disponible. No crea energía; parte se pierde en rozamiento, sonido y calor.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
-
-## 3. Lo que necesitas saber antes de empezar
-
-[Lección 03: Electricidad sin misterios](../00-fundamentos/03-electricidad-sin-misterios.md), [Lección 11: Funciones: enseñar una acción reutilizable](../01-programacion/11-funciones-ensenar-una-accion-reutilizable.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
-
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
-
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **motor DC, campo magnético, par y engranaje**. En lenguaje cotidiano, buscamos una forma fiable de explicar cómo un motor convierte energía eléctrica en movimiento. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Mover un robot exige coordinar lógica y potencia. La Mega produce señales pequeñas; el Model Y dirige energía hacia los motores; los engranajes cambian velocidad por par; y las ruedas Mecanum convierten giros en fuerzas oblicuas. Esta separación protege la placa y ayuda a depurar: primero se comprueba la orden, luego el canal de potencia y por último el resultado mecánico.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **motor DC, campo magnético, par y engranaje**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para observar motor y reductora con PX-32 apagado y girar suavemente una rueda. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Motor dc:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-005.
+La cadena mecánica de PX-32 es esta:
 
 ```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
+rotor del motor -> engranajes de la reductora -> eje blanco -> rueda
 ```
 
-La cadena exacta de hoy se concentra en **motor DC, campo magnético, par y engranaje**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+Cuando más adelante cambies el sentido de la corriente, cambiará el sentido del par y, por tanto, el giro del eje. Hoy no hace falta aplicar energía: primero vas a reconocer la máquina que deseas controlar.
 
-## 7. Seguridad y participación del adulto
+## Prepara una inspección sin desmontar
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
+Necesitas:
 
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
+- PX-32 ensamblado.
+- Una hoja y un lápiz.
+- Una linterna pequeña o la del teléfono, sin apoyar el teléfono sobre el robot.
+- El [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) abierto como consulta.
+- Un adulto para confirmar que no hay ninguna fuente conectada.
 
-## 8. Predice antes de probar
+Debes recordar de la [Lección 03](../00-fundamentos/03-electricidad-sin-misterios.md) que la corriente necesita un circuito cerrado. También usarás la idea de función de la [Lección 11](../01-programacion/11-funciones-ensenar-una-accion-reutilizable.md): cada pieza de esta cadena tiene un trabajo distinto.
 
-1. ¿Qué esperas observar cuando logres explicar cómo un motor convierte energía eléctrica en movimiento y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
+🔴 Detente y llama a tu padre. Él retira las dos celdas 18650, desconecta el USB y comprueba que los interruptores estén apagados. No continúes si queda una fuente conectada.
 
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
+## Sigue el movimiento con los ojos y los dedos
 
-## 9. Actividad o experimento guiado
+1. 🟢 Coloca el robot sobre la mesa, con la barrera que lleva los dos faros apuntando lejos de ti. Ese será el **frente**. En tu hoja dibuja un rectángulo y marca `frente`, `atrás`, `izquierda` y `derecha`.
 
-1. **Preparar.** Coloca PX-32 estable, identifica HW-005 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con motor DC, campo magnético, par y engranaje. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a observar motor y reductora con PX-32 apagado y girar suavemente una rueda. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: relación visible entre rueda, eje, engranajes y motor sin aplicar energía. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
+2. 🟢 Ilumina la esquina trasera derecha. Reconoce, desde afuera hacia adentro, la rueda Mecanum, el eje/acople blanco, la caja amarilla y el cilindro metálico. No necesitas retirar ninguna pieza.
 
-## 10. Código
+3. 🟢 Dibuja esas cuatro partes en fila y únelas con flechas. Sobre la caja amarilla escribe `reductora`; sobre el cilindro, `motor DC`. Si solo escribes “motor” sobre todo el conjunto, todavía faltan dos funciones diferentes.
 
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
+4. 🟢 Haz girar con un dedo uno de los pequeños rodillos negros de la rueda. Debe rotar alrededor de su propio eje sin hacer girar toda la rueda. Esta libertad será importante para el movimiento lateral.
 
-## 11. Qué deberías observar
+5. 🟡 Con el adulto observando, intenta mover la rueda completa apenas unos grados, muy despacio y desde el borde. La reductora puede ofrecer bastante resistencia. **No la fuerces**: si no cede con una presión suave, detente. La resistencia también es una observación válida.
 
-El resultado normal es **relación visible entre rueda, eje, engranajes y motor sin aplicar energía**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+6. 🟢 Señala la ruta que seguiría la energía, sin afirmar que puedes verla: electricidad en las bobinas, campo magnético, par en el rotor, engranajes, eje y rueda. Después señala la ruta contraria de tu prueba manual. Mover la rueda desde afuera intenta hacer trabajar la reductora “al revés”, por eso puede sentirse difícil.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+7. 🟢 Compara visualmente las otras tres esquinas. Debes encontrar cuatro conjuntos equivalentes, uno por rueda. Busca un cable roto, un acople salido o una rueda floja, pero no tires de los cables ni aprietes tornillos.
 
-## 12. Si no funciona
+8. 🟢 Completa esta frase con tus propias palabras: “La rueda toca el suelo, la reductora cambia ___ por ___ y el motor convierte energía eléctrica en ___”. La respuesta debe distinguir movimiento, velocidad y par.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+La misión está completa cuando puedes apuntar a motor, reductora, eje y rueda en cualquier esquina y explicar qué transmite cada unión.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** corte lateral ilustrado del motor con reductora.
+> - **Objetivo:** mostrar cómo un campo magnético termina produciendo el giro lento y con mayor par de la rueda.
+> - **Descripción:** vista en capas del cilindro metálico, rotor y estator, piñón pequeño, tren de engranajes dentro de la carcasa amarilla, eje blanco y rueda; dos flechas separan el recorrido de energía del recorrido mecánico.
+> - **Elementos que deben señalarse:** bobina, imanes, rotor, estator, par, engranaje conductor, engranajes de reducción, eje y rueda.
+> - **Fuente técnica:** Arduino Engineering Kit, sección “3.1 DC Motors”, https://aek.arduino.cc/chapter/concepts; manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 4 a 7.
+> - **Texto alternativo sugerido:** “Corte de un motor DC unido a una reductora amarilla que transmite el giro a la rueda de PX-32”.
 
-## 13. Desafío
+## Si algo no coincide
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+| Observación | Qué significa | Qué hacer |
+|---|---|---|
+| Un rodillo pequeño no gira libremente | Puede estar trabado o rozando | No lo fuerces; el adulto inspecciona suciedad o montaje |
+| La rueda completa no cede a una presión suave | La reducción puede impedir que se mueva fácilmente desde la salida | Registra “no se dejó mover” y continúa sin forzar |
+| El eje blanco gira dentro de la rueda | El acople o la fijación puede estar flojo | No energices el robot; el adulto revisa la unión |
+| Falta una pieza o hay un cable pellizcado | La cadena no coincide con el montaje esperado | Compara con las páginas 4 a 7 del manual y detén el bloque activo |
+| Aparece calor, olor o una celda instalada | No es una inspección sin energía | Aléjate y deja que el adulto aísle la fuente |
 
-## 14. Lecturas y videos para explorar
+## Una predicción para la próxima clase
+
+La Mega 2560 puede ordenar `HIGH` y `LOW`, pero un motor necesita una ruta de potencia. Dibuja dónde colocarías una pieza intermediaria entre la placa y el motor. En la siguiente lección comprobarás si tu dibujo coincide con el Model Y.
+
+## Lecturas y videos para explorar
 
 - [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
 - [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Vuelve a mirar una esquina del robot después de explorar los recursos: ahora cada carcasa debería representar una función, no solo una forma.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **motor DC** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Conceptos del Arduino Engineering Kit](https://aek.arduino.cc/chapter/concepts), sección 3.1 sobre motores DC, rotor, estator, par, inversión y driver.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 4 a 7 y 19 a 21, montaje de motores y ruedas.
+- [Ficha HW-005](../../docs/hardware/HW-005-motores-dc.md), hechos confirmados y especificaciones aún desconocidas de los motores del kit.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Señala una esquina real de PX-32 y explícale el viaje desde la bobina hasta el suelo. Luego responde: ¿por qué una reductora que entrega más par no está creando energía? Si la rueda no se dejó mover, cuenta por qué detenerte fue mejor evidencia que forzarla.
 
-Hoy aprendiste a **explicar cómo un motor convierte energía eléctrica en movimiento** y lo conectaste con **motor DC, campo magnético, par y engranaje**. Pudiste observar relación visible entre rueda, eje, engranajes y motor sin aplicar energía. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 13: Por qué existe el driver Model Y](13-por-que-existe-el-driver-model-y.md).
+La [Lección 13](13-por-que-existe-el-driver-model-y.md) presenta la pieza que recibe una orden pequeña y gobierna la energía de esos cuatro motores.

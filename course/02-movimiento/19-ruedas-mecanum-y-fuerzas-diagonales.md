@@ -1,140 +1,100 @@
 # Lección 19 — Ruedas Mecanum y fuerzas diagonales
 
-## 1. Tu misión de hoy
+## Una rueda que no empuja solo hacia adelante
 
-Hoy vas a **predecir hacia dónde empuja cada rueda Mecanum**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Una rueda común rueda en la dirección en que apunta. Una rueda Mecanum añade pequeños rodillos inclinados alrededor de su borde. Cada rodillo puede girar libremente, de modo que la fuerza en el contacto con el piso se orienta en diagonal.
 
-## 2. Tiempo estimado
+Una sola rueda produciría componentes en dos direcciones: una **longitudinal**, hacia el frente o atrás del chasis, y otra **lateral**, hacia un costado. Una componente es la parte de una fuerza que analizamos sobre un eje elegido. En el robot completo, algunas componentes se suman y otras se cancelan.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
-
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
-
-## 3. Lo que necesitas saber antes de empezar
-
-[Lección 18: Cuatro motores, cuatro identidades](18-cuatro-motores-cuatro-identidades.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
-
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
-
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **rodillo, fuerza, componente y cancelación**. En lenguaje cotidiano, buscamos una forma fiable de predecir hacia dónde empuja cada rueda Mecanum. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-Mover un robot exige coordinar lógica y potencia. La Mega produce señales pequeñas; el Model Y dirige energía hacia los motores; los engranajes cambian velocidad por par; y las ruedas Mecanum convierten giros en fuerzas oblicuas. Esta separación protege la placa y ayuda a depurar: primero se comprueba la orden, luego el canal de potencia y por último el resultado mecánico.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **rodillo, fuerza, componente y cancelación**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para dibujar flechas sobre una foto y comparar orientación física de las cuatro ruedas. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Rodillo:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-006, HW-017.
+La orientación importa tanto como el giro. OSOYOO especifica dos tipos de rueda: vistas desde arriba, las cuatro deben formar un patrón en X. En el diagrama del manual, las posiciones son:
 
 ```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
+           FRENTE
+       1           2
+
+       3           4
+            ATRÁS
 ```
 
-La cadena exacta de hoy se concentra en **rodillo, fuerza, componente y cancelación**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+La posición 1 es frontal izquierda; 2, frontal derecha; 3, trasera izquierda; 4, trasera derecha. Las ruedas 1 y 4 comparten una inclinación, y 2 y 3 la inclinación opuesta.
 
-## 7. Seguridad y participación del adulto
+## Prepara un laboratorio de flechas
 
-- 🟢 El estudiante predice, lee el código y registra observaciones.
-- 🟡 Un adulto permanece presente durante USB, calibración o cualquier prueba física.
-- 🔴 El adulto manipula baterías 18650, interruptores de potencia, driver y cables. Toda conexión se revisa sin USB y con alimentación apagada.
+- PX-32 totalmente apagado, sin USB y sin celdas.
+- Manual OSOYOO abierto en la página 21.
+- Hoja, lápiz, regla y dos colores.
+- Cuatro flechas de papel que puedas girar sobre la mesa.
+- Una linterna para ver la inclinación de los rodillos.
+- Un adulto para confirmar el estado seguro; no hace falta computador ni código.
 
-Para movimiento: primero ruedas levantadas sobre una base estable, velocidad baja, área despejada y el interruptor accesible. Cabello, mangas y dedos lejos de ruedas. Si hay calor, olor, humo, chispa, zumbido fuerte o movimiento inesperado, el adulto corta energía; no se intenta frenar con la mano.
+Debes conservar el mapa de posiciones de la [Lección 18](18-cuatro-motores-cuatro-identidades.md). Aquí los números del dibujo de OSOYOO y los conectores se relacionan así:
 
-## 8. Predice antes de probar
+| Posición OSOYOO | Esquina | Conector |
+|---:|---|---|
+| 1 | frontal izquierda | BK3 |
+| 2 | frontal derecha | BK1 |
+| 3 | trasera izquierda | AK3 |
+| 4 | trasera derecha | AK1 |
 
-1. ¿Qué esperas observar cuando logres predecir hacia dónde empuja cada rueda Mecanum y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
+🔴 El adulto retira fuentes y comprueba que no haya una carga activa de los sketches anteriores. Esta actividad no necesita energizar ni hacer girar motores.
 
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
+## Comprueba la X antes de dibujar fuerzas
 
-## 9. Actividad o experimento guiado
+1. 🟢 Colócate detrás de PX-32 y marca el frente en tu hoja. Copia las cuatro posiciones sin girar el robot durante la actividad.
 
-1. **Preparar.** Coloca PX-32 estable, identifica HW-006, HW-017 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con rodillo, fuerza, componente y cancelación. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a dibujar flechas sobre una foto y comparar orientación física de las cuatro ruedas. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: patrón en X compatible con la página 21 del manual. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
+2. 🟢 Mira la banda central de los rodillos en la rueda 1. Traza en tu dibujo una línea con la misma inclinación. Repite con las ruedas 2, 3 y 4.
 
-## 10. Código
+3. 🟢 Compara tu dibujo con la fotografía y el esquema de la página 21. Las inclinaciones opuestas deben formar una X imaginaria hacia el centro. No basta con que las cuatro ruedas “se vean parecidas”.
 
-Abre [19-ruedas-mecanum-y-fuerzas-diagonales.ino](../../code/educational/19-ruedas-mecanum-y-fuerzas-diagonales/19-ruedas-mecanum-y-fuerzas-diagonales.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **rodillo**. Lee el programa de arriba abajo y predice su salida.
+4. 🟢 Haz girar suavemente **un rodillo pequeño**, no la rueda completa, para comprobar que su eje está inclinado y que puede rodar. Si está trabado, no lo fuerces.
 
-```cpp
-// Curso PX-32 — programa mínimo de la lección 19
-// Cargar solo después de leer la sección de seguridad.
-void setup(){ Serial.begin(9600); Serial.println("Dibuja las cuatro fuerzas; no hace falta energizar motores"); }
-void loop(){}
-```
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía cenital anotada y ampliaciones de rodillo.
+> - **Objetivo:** comprobar el patrón X y distinguir giro de rueda, giro de rodillo y dirección de fuerza.
+> - **Descripción:** vista superior de PX-32 con posiciones 1 a 4; ampliación de una rueda de cada orientación, línea sobre el eje del rodillo y flechas descompuestas en componente longitudinal y lateral.
+> - **Elementos que deben señalarse:** frente, posiciones 1-4, BK3/BK1/AK3/AK1, patrón X, eje de rodillo, fuerza diagonal y sus dos componentes.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, página 21.
+> - **Texto alternativo sugerido:** “Cuatro ruedas Mecanum vistas desde arriba forman una X y una fuerza diagonal se separa en componentes frontal y lateral”.
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+## Suma fuerzas sin mover el robot
 
-## 11. Qué deberías observar
+5. 🟢 En el esquema de OSOYOO identifica las flechas diagonales de las cuatro ruedas para avance. Cópialas con el primer color. No deduzcas su punta solo por la inclinación del rodillo: también depende del sentido de giro.
 
-El resultado normal es **patrón en X compatible con la página 21 del manual**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+6. 🟢 Con el segundo color separa cada flecha diagonal en una parte hacia adelante y otra hacia un lado. Esto es una **descomposición**: dos flechas perpendiculares representan juntas el mismo efecto diagonal.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+7. 🟢 Junta tus cuatro flechas de papel como si todos los motores avanzaran. Las componentes laterales de izquierda y derecha apuntan en sentidos opuestos y se cancelan aproximadamente; las cuatro longitudinales apuntan hacia adelante y se suman.
 
-## 12. Si no funciona
+8. 🟢 Representa ahora un desplazamiento a la derecha siguiendo la tabla de la página 21: ruedas 1 y 4 hacia adelante; 2 y 3 hacia atrás. Las componentes longitudinales se oponen y las laterales se suman hacia la derecha.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+9. 🟢 Explica por qué “rueda hacia adelante” y “robot hacia adelante” no son sinónimos. En un desplazamiento lateral, dos ruedas reciben avance y dos retroceso, pero el chasis completo no debe rotar ni avanzar de forma dominante.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+10. 🟢 La misión termina cuando puedes reconstruir con flechas un avance y un lateral, y cuando la orientación física de las cuatro ruedas coincide con el patrón X. Si no coincide, la siguiente lección activa queda suspendida.
 
-## 13. Desafío
+## Lo que puede engañar a tus ojos
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+- **Mirar desde el frente:** invierte tu percepción de derecha e izquierda. Vuelve detrás del robot.
+- **Seguir el dibujo de la banda de goma:** observa el eje del rodillo completo, no una mancha o reflejo.
+- **Confundir rodillo con rueda:** el rodillo gira sobre un eje diagonal; la rueda completa gira sobre el eje del motor.
+- **Asignar una fuerza solo por inclinación:** el sentido de giro también determina hacia dónde apunta.
+- **Esperar cancelación perfecta:** diferencias entre motores, peso, fricción y piso pueden dejar una desviación real.
 
-## 14. Lecturas y videos para explorar
+Esta lección no necesita un `.ino`. Cargar un programa que solo imprimiera una frase no ayudaría a comprender la geometría; el experimento central está en el robot apagado y en las flechas.
+
+## Lecturas y videos para explorar
 
 - [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
 - [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Vuelve especialmente a la página 21: separa lo que muestra la fotografía sobre montaje de lo que explica el esquema sobre fuerzas.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **rodillo** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 19 a 21, tipos de rueda, patrón X y tabla de actuación.
+- [Ficha HW-006](../../docs/hardware/HW-006-ruedas-mecanum.md), orientación confirmada de las ruedas del kit.
+- [Manual limpio del proyecto](../../reference/osoyoo-manual.md#ruedas-mecanum-pp-19-22), síntesis verificable y recorte visual seleccionado.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Con cuatro flechas de papel, demuestra primero avance y luego desplazamiento lateral. Dile cuáles componentes se suman y cuáles se cancelan, y señala una causa real por la que la cancelación podría no ser perfecta.
 
-Hoy aprendiste a **predecir hacia dónde empuja cada rueda Mecanum** y lo conectaste con **rodillo, fuerza, componente y cancelación**. Pudiste observar patrón en X compatible con la página 21 del manual. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 20: Vectores para mover PX-32](20-vectores-para-mover-px-32.md).
+En la [Lección 20](20-vectores-para-mover-px-32.md) esos patrones de flechas se convertirán en funciones que coordinan los cuatro motores y vuelven siempre a STOP.

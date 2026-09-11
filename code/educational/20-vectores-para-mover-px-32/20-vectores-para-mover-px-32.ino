@@ -1,26 +1,145 @@
-// Curso PX-32 — programa mínimo de la lección 20
-// Cargar solo después de leer la sección de seguridad.
-const byte EN[4]={9,10,11,12};
-const byte P1[4]={22,26,5,7};
-const byte P2[4]={24,28,6,8};
-// Orden: frontal derecha, frontal izquierda, trasera derecha, trasera izquierda.
-void rueda(byte i,int sentido,byte pwm){
-  digitalWrite(P1[i],sentido>0?HIGH:LOW);
-  digitalWrite(P2[i],sentido<0?HIGH:LOW);
-  analogWrite(EN[i],sentido==0?0:pwm);
+// Curso PX-32 - Leccion 20: seis movimientos Mecanum.
+// El sketch queda detenido hasta cambiar EJECUTAR_PRUEBA a true.
+const bool EJECUTAR_PRUEBA = false;
+
+// false: prueba los seis patrones con las ruedas elevadas.
+// true: prueba solo avance y lateral derecho sobre piso despejado.
+const bool PRUEBA_EN_SUELO = false;
+
+const byte POTENCIA_PWM = 100;
+
+// Orden: frontal derecho, frontal izquierdo, trasero derecho,
+// trasero izquierdo.
+const byte PWM_BK1 = 9;   // Frontal derecho
+const byte BK1_IN1 = 22;
+const byte BK1_IN2 = 24;
+const byte PWM_BK3 = 10;  // Frontal izquierdo
+const byte BK3_IN3 = 26;
+const byte BK3_IN4 = 28;
+const byte PWM_AK1 = 11;  // Trasero derecho
+const byte AK1_IN1 = 5;
+const byte AK1_IN2 = 6;
+const byte PWM_AK3 = 12;  // Trasero izquierdo
+const byte AK3_IN3 = 7;
+const byte AK3_IN4 = 8;
+
+void controlarMotor(
+  byte pinPwm,
+  byte pin1,
+  byte pin2,
+  int sentido,
+  byte potenciaPwm
+) {
+  if (sentido > 0) {
+    digitalWrite(pin1, HIGH);
+    digitalWrite(pin2, LOW);
+    analogWrite(pinPwm, potenciaPwm);
+  } else if (sentido < 0) {
+    digitalWrite(pin1, LOW);
+    digitalWrite(pin2, HIGH);
+    analogWrite(pinPwm, potenciaPwm);
+  } else {
+    analogWrite(pinPwm, 0);
+    digitalWrite(pin1, LOW);
+    digitalWrite(pin2, LOW);
+  }
 }
-void parar(){ for(byte i=0;i<4;i++) rueda(i,0,0); }
-void mover(int fd,int fi,int td,int ti,byte pwm){
-  int s[4]={fd,fi,td,ti}; for(byte i=0;i<4;i++) rueda(i,s[i],pwm);
+
+void mover(
+  int frontalDerecho,
+  int frontalIzquierdo,
+  int traseroDerecho,
+  int traseroIzquierdo
+) {
+  controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, frontalDerecho, POTENCIA_PWM);
+  controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, frontalIzquierdo, POTENCIA_PWM);
+  controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, traseroDerecho, POTENCIA_PWM);
+  controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4, traseroIzquierdo, POTENCIA_PWM);
 }
-void prepararMotores(){ for(byte i=0;i<4;i++){ pinMode(EN[i],OUTPUT); pinMode(P1[i],OUTPUT); pinMode(P2[i],OUTPUT); } parar(); }
-void paso(const char* nombre,int fd,int fi,int td,int ti){
-  Serial.println(nombre); mover(fd,fi,td,ti,70); delay(500); parar(); delay(1000);
+
+void detenerTodos() {
+  mover(0, 0, 0, 0);
 }
-void setup(){ Serial.begin(9600); prepararMotores(); delay(3000);
-  // +1/-1 son sentidos lógicos. Confirma en L18 cuál corresponde al avance físico.
-  paso("PATRON 1",+1,+1,+1,+1); paso("PATRON 2",-1,-1,-1,-1);
-  paso("PATRON 3",+1,-1,-1,+1); paso("PATRON 4",-1,+1,+1,-1);
-  paso("PATRON 5",-1,+1,-1,+1); paso("PATRON 6",+1,-1,+1,-1);
+
+void avanzar() {
+  mover(+1, +1, +1, +1);
 }
-void loop(){ parar(); }
+
+void retroceder() {
+  mover(-1, -1, -1, -1);
+}
+
+void desplazarDerecha() {
+  mover(-1, +1, +1, -1);
+}
+
+void desplazarIzquierda() {
+  mover(+1, -1, -1, +1);
+}
+
+void girarHorario() {
+  mover(-1, +1, -1, +1);
+}
+
+void girarAntihorario() {
+  mover(+1, -1, +1, -1);
+}
+
+void esperarYDetener() {
+  delay(500);
+  detenerTodos();
+  delay(1200);
+}
+
+void prepararMotores() {
+  pinMode(PWM_BK1, OUTPUT);
+  pinMode(PWM_BK3, OUTPUT);
+  pinMode(PWM_AK1, OUTPUT);
+  pinMode(PWM_AK3, OUTPUT);
+  pinMode(BK1_IN1, OUTPUT);
+  pinMode(BK1_IN2, OUTPUT);
+  pinMode(BK3_IN3, OUTPUT);
+  pinMode(BK3_IN4, OUTPUT);
+  pinMode(AK1_IN1, OUTPUT);
+  pinMode(AK1_IN2, OUTPUT);
+  pinMode(AK3_IN3, OUTPUT);
+  pinMode(AK3_IN4, OUTPUT);
+  detenerTodos();
+}
+
+void setup() {
+  prepararMotores();
+
+  if (!EJECUTAR_PRUEBA) {
+    return;
+  }
+
+  // Da tiempo para retirar el USB y, despues, energizar desde baterias.
+  delay(15000);
+
+  if (PRUEBA_EN_SUELO) {
+    avanzar();
+    esperarYDetener();
+    desplazarDerecha();
+    esperarYDetener();
+  } else {
+    avanzar();
+    esperarYDetener();
+    retroceder();
+    esperarYDetener();
+    desplazarDerecha();
+    esperarYDetener();
+    desplazarIzquierda();
+    esperarYDetener();
+    girarHorario();
+    esperarYDetener();
+    girarAntihorario();
+    esperarYDetener();
+  }
+
+  detenerTodos();
+}
+
+void loop() {
+  detenerTodos();
+}

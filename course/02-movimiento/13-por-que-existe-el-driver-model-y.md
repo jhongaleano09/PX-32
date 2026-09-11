@@ -1,131 +1,102 @@
 # Lección 13 — Por qué existe el driver Model Y
 
-## 1. Tu misión de hoy
+## Dos caminos llegan al mismo motor
 
-Hoy vas a **trazar por separado la ruta de orden y la ruta de energía**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Imagina que la Mega dice “gira”, pero no hay energía capaz de mover la rueda. La orden existe y el movimiento no. Ahora imagina lo contrario: hay baterías, pero ninguna señal decide hacia dónde debe circular la corriente. Hay energía y tampoco hay control.
 
-## 2. Tiempo estimado
+PX-32 resuelve ese encuentro con la placa azul **OSOYOO Model Y V2.0**. Es un **driver de motores**: recibe señales lógicas desde la Mega y conmuta una ruta de potencia hacia los motores. La Mega decide; el Model Y entrega y dirige la energía que necesita el actuador.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Esto es una **separación funcional**, no un aislamiento eléctrico. Las dos partes del sistema comparten conexiones y referencia; el driver no es una pared mágica. Además, OSOYOO aclara que `VOUT` está conectado directamente a `VIN`, sin un regulador entre ambos. Por eso nunca debes suponer que `VOUT` “reduce” el voltaje.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+La placa Model Y ofrece cuatro canales independientes usados por PX-32:
 
-## 3. Lo que necesitas saber antes de empezar
+| Canal | Motor del robot | Habilitación/PWM | Dirección |
+|---|---|---:|---|
+| BK1 | Frontal derecho | D9 | D22 y D24 |
+| BK3 | Frontal izquierdo | D10 | D26 y D28 |
+| AK1 | Trasero derecho | D11 | D5 y D6 |
+| AK3 | Trasero izquierdo | D12 | D7 y D8 |
 
-[Lección 12: Del electrón al giro: motor DC](12-del-electron-al-giro-motor-dc.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+Las salidas con número `K2` o `K4` que aparecen en la placa repiten el canal vecino; el kit conecta sus cuatro motores a `BK1`, `BK3`, `AK1` y `AK3`.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+## Materiales para seguir las rutas
 
-## 4. Lectura principal
+- PX-32 ensamblado, sin USB y sin baterías.
+- El manual OSOYOO abierto en las páginas 13 y 15.
+- Dos hilos, cintas o lápices de colores distintos: uno para **orden** y otro para **energía**.
+- Una hoja para copiar solamente nombres y flechas, no el dibujo completo.
+- Una linterna para leer las serigrafías `M_A`, `M_B`, `VIN` y `VOUT`.
+- Un adulto para confirmar el estado sin energía; no se desconectará ningún cable.
 
-### La idea intuitiva
+Debes poder localizar motor, reductora y rueda como en la [Lección 12](12-del-electron-al-giro-motor-dc.md).
 
-El tema de hoy es **driver, señal lógica, potencia y aislamiento funcional**. En lenguaje cotidiano, buscamos una forma fiable de trazar por separado la ruta de orden y la ruta de energía. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+🔴 Tu padre retira las celdas y el USB, apaga los interruptores y comprueba que no haya herramientas metálicas sobre las placas. Esta clase es una investigación visual: no energices nada.
 
-Mover un robot exige coordinar lógica y potencia. La Mega produce señales pequeñas; el Model Y dirige energía hacia los motores; los engranajes cambian velocidad por par; y las ruedas Mecanum convierten giros en fuerzas oblicuas. Esta separación protege la placa y ayuda a depurar: primero se comprueba la orden, luego el canal de potencia y por último el resultado mecánico.
+## Rastrea una orden
 
-### De la intuición al concepto técnico
+1. 🟢 Orienta el frente del robot hacia adelante usando la barrera de los faros. Busca la Mega 2560 en el nivel superior y el Model Y azul en el nivel inferior, entre los motores.
 
-Los términos centrales son **driver, señal lógica, potencia y aislamiento funcional**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+2. 🟢 En la página 13 del manual encuentra el grupo `M_A`. Sigue con el primer color `D11 -> M_A ENA`, `D5 -> IN1` y `D6 -> IN2`. Esas tres señales controlan el canal `AK1`.
 
-En PX-32, esta idea se usa para seguir en el diagrama Mega → Model Y → motor y portabaterías → Model Y → motor. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+3. 🟢 Localiza visualmente el cable de seis posiciones de la zona `M_A`. No lo retires. Sigue su recorrido desde el shield superior hasta la cabecera del Model Y. El color de un hilo ayuda a seguirlo, pero la prueba es la etiqueta de cada extremo.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Driver:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-004, HW-005.
+4. 🟢 Desde `M_A` continúa hasta el conector `AK1`, que según el manual pertenece al motor trasero derecho. Acabas de recorrer la ruta de una orden:
 
 ```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
+programa -> pines D11, D5 y D6 -> Model Y, canal AK1 -> motor trasero derecho
 ```
 
-La cadena exacta de hoy se concentra en **driver, señal lógica, potencia y aislamiento funcional**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+## Rastrea la energía sin confundirla con la señal
 
-## 7. Seguridad y participación del adulto
+5. 🟢 Cambia al segundo color. En la página 15 encuentra `battery box -> VIN` del Model Y. Después sigue desde la placa hacia el motor conectado a `AK1`.
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
+6. 🟢 Observa también `VOUT -> VIN` del UART WiFi Shield. Esta rama alimenta otra parte del robot, pero no reemplaza los tres pines de control. Copia en tu hoja:
 
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
+```text
+portabaterías -> VIN del Model Y -> etapa de potencia -> AK1 -> motor
+                         |
+                         +-> VOUT -> VIN del shield
+```
 
-## 8. Predice antes de probar
+7. 🟢 Coloca los dos colores junto al Model Y. Ambos caminos llegan a la misma placa por lugares diferentes: uno lleva información; el otro, energía. Explica qué pasaría si faltara cada uno.
 
-1. ¿Qué esperas observar cuando logres trazar por separado la ruta de orden y la ruta de energía y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
+8. 🟢 Repite el rastreo de señales para `BK1`: D9, D22 y D24. No necesitas seguir todas las rutas físicamente; la meta es demostrar que sabes leer el mapa sin adivinar por colores.
 
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
+9. 🟢 Busca en la placa las letras `AOUT`, `BOUT`, `VIN` y `VOUT`. Si la serigrafía queda oculta por el chasis o los cables, usa la fotografía del manual; no dobles un cable para “ver mejor”.
 
-## 9. Actividad o experimento guiado
+La actividad termina cuando tu hoja contiene dos rutas completas, cada una con origen, paso por el Model Y y destino, y puedes explicar por qué una señal de la Mega no alimenta directamente el motor.
 
-1. **Preparar.** Coloca PX-32 estable, identifica HW-004, HW-005 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con driver, señal lógica, potencia y aislamiento funcional. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a seguir en el diagrama Mega → Model Y → motor y portabaterías → Model Y → motor. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: dos rutas distintas que se encuentran en el driver. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía anotada en dos colores.
+> - **Objetivo:** diferenciar físicamente el camino de control y el camino de potencia en PX-32.
+> - **Descripción:** vista superior con el chasis abierto como en el manual; flechas azules parten de D11, D5 y D6 hacia `M_A`, y flechas naranjas parten del portabaterías hacia `VIN`, cruzan el Model Y y terminan en `AK1`.
+> - **Elementos que deben señalarse:** Mega 2560, UART WiFi Shield, cable de seis posiciones `M_A`, `ENA`, `IN1`, `IN2`, `VIN`, `VOUT`, `AK1` y motor trasero derecho.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, páginas 13 y 15; descripción oficial del Model Y, https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/.
+> - **Texto alternativo sugerido:** “Dos rutas de distinto color llegan al Model Y: una lleva órdenes desde la Mega y otra lleva energía desde las baterías”.
 
-## 10. Código
+## Dudas que esta placa suele provocar
 
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
+- **“¿M_A significa motor izquierdo?”** No. Es el nombre de una zona del driver; en este montaje controla `AK1` y `AK3`, los dos motores traseros.
+- **“¿ENA es energía?”** No. Es la entrada de habilitación y PWM del primer canal de cada zona.
+- **“¿VOUT es una salida regulada?”** OSOYOO dice que está unida directamente a `VIN`; no la trates como una salida de voltaje reducido.
+- **“¿Los K2 y K4 son otros motores independientes?”** En Model Y V2.0 están sincronizados con K1 y K3 del mismo par. PX-32 usa los cuatro conectores K1/K3 documentados.
+- **“¿Puedo comprobar un cable tirando de él?”** No. OSOYOO advierte sujetar la carcasa plástica del conector, y cualquier retiro corresponde al adulto con toda fuente desconectada.
 
-## 11. Qué deberías observar
-
-El resultado normal es **dos rutas distintas que se encuentran en el driver**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
 - [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Mientras exploras, usa los dos colores: cada flecha debería responder “¿esto representa una orden o transporta potencia?”.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **driver** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [OSOYOO Model Y H-Bridge 4-Channel Motor Driver](https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/), canales, entradas, PWM y conexión directa entre `VIN` y `VOUT`.
+- [Manual oficial de OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), páginas 13 y 15, cableado de control y alimentación.
+- [Pinout oficial de Arduino Mega 2560](https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf), pines PWM y límite de corriente de los GPIO de la placa oficial.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Usa tus dos colores para narrar qué viaja por cada ruta. Luego pregúntale: si el motor no gira, ¿qué observación separaría un problema de señal de uno de potencia? No hace falta resolver una avería; basta con formular una prueba segura.
 
-Hoy aprendiste a **trazar por separado la ruta de orden y la ruta de energía** y lo conectaste con **driver, señal lógica, potencia y aislamiento funcional**. Pudiste observar dos rutas distintas que se encuentran en el driver. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 14: Puente H: cambiar la polaridad](14-puente-h-cambiar-la-polaridad.md).
+En la [Lección 14](14-puente-h-cambiar-la-polaridad.md) abrirás conceptualmente el Model Y para descubrir cómo dos entradas deciden el sentido del giro.

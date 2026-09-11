@@ -1,142 +1,176 @@
 # Lección 17 — PWM: regular energía en el tiempo
 
-## 1. Tu misión de hoy
+## Encendido y apagado demasiado rápidos para contarlos
 
-Hoy vas a **comparar tres niveles de mando sin afirmar una velocidad exacta**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Un pin digital solo tiene dos estados eléctricos, pero `analogWrite()` puede producir **PWM**: pulsos que alternan rápidamente entre encendido y apagado. La fracción de cada ciclo que permanece encendido se llama **ciclo de trabajo**.
 
-## 2. Tiempo estimado
+En la Mega 2560, `analogWrite(pin, valor)` usa valores de 0 a 255. En esta prueba:
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+| Valor | Fracción aproximada encendida | Lo que no significa |
+|---:|---:|---|
+| 100 | 39 % | 39 % de la velocidad máxima |
+| 160 | 63 % | 160 revoluciones por minuto |
+| 220 | 86 % | una velocidad garantizada |
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+El motor y la reductora responden a la energía recibida a lo largo del tiempo. Lo normal es observar una tendencia de giro mayor al aumentar PWM, pero el resultado no es lineal: existe rozamiento, la batería cambia, las ruedas tienen carga y un valor bajo puede no superar el **umbral de arranque**.
 
-## 3. Lo que necesitas saber antes de empezar
+## Diseña la comparación
 
-[Lección 16: Invertir el sentido por software](16-invertir-el-sentido-por-software.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+Prepara:
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+- PX-32 sobre los dos soportes rígidos ya comprobados.
+- Computador, Arduino IDE 2 y cable USB de datos.
+- [17-pwm-regular-energia-en-el-tiempo.ino](../../code/educational/17-pwm-regular-energia-en-el-tiempo/17-pwm-regular-energia-en-el-tiempo.ino).
+- Tres tarjetas grandes: `100`, `160` y `220`.
+- Una tabla en papel con columnas `valor`, `¿arrancó?`, `comparación visual/sonora` y `anomalía`.
+- Baterías verificadas y adulto responsable de la potencia.
 
-## 4. Lectura principal
+La dirección de AK1 permanecerá fija en D5 `HIGH` y D6 `LOW`. La única variable deliberada será el valor enviado a D11.
 
-### La idea intuitiva
+🔴 El adulto retira celdas y USB, apaga interruptores y revisa que la rueda AK1 gire libre de cables. Nadie toca una rueda durante la prueba.
 
-El tema de hoy es **PWM, ciclo de trabajo, frecuencia y velocidad media**. En lenguaje cotidiano, buscamos una forma fiable de comparar tres niveles de mando sin afirmar una velocidad exacta. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+## El experimento está escrito en una función
 
-Mover un robot exige coordinar lógica y potencia. La Mega produce señales pequeñas; el Model Y dirige energía hacia los motores; los engranajes cambian velocidad por par; y las ruedas Mecanum convierten giros en fuerzas oblicuas. Esta separación protege la placa y ayuda a depurar: primero se comprueba la orden, luego el canal de potencia y por último el resultado mecánico.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **PWM, ciclo de trabajo, frecuencia y velocidad media**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para aplicar 80, 140 y 200 en un pin PWM con pausas. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Pwm:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-004, HW-005.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **PWM, ciclo de trabajo, frecuencia y velocidad media**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante predice, lee el código y registra observaciones.
-- 🟡 Un adulto permanece presente durante USB, calibración o cualquier prueba física.
-- 🔴 El adulto manipula baterías 18650, interruptores de potencia, driver y cables. Toda conexión se revisa sin USB y con alimentación apagada.
-
-Para movimiento: primero ruedas levantadas sobre una base estable, velocidad baja, área despejada y el interruptor accesible. Cabello, mangas y dedos lejos de ruedas. Si hay calor, olor, humo, chispa, zumbido fuerte o movimiento inesperado, el adulto corta energía; no se intenta frenar con la mano.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres comparar tres niveles de mando sin afirmar una velocidad exacta y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-004, HW-005 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con PWM, ciclo de trabajo, frecuencia y velocidad media. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a aplicar 80, 140 y 200 en un pin PWM con pausas. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: tendencia de velocidad creciente, admitiendo umbral de arranque y variaciones mecánicas. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [17-pwm-regular-energia-en-el-tiempo.ino](../../code/educational/17-pwm-regular-energia-en-el-tiempo/17-pwm-regular-energia-en-el-tiempo.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **PWM**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el archivo y compáralo con el bloque completo:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 17
-// Cargar solo después de leer la sección de seguridad.
-const byte ENA=11, IN1=5, IN2=6;
-void parar(){ analogWrite(ENA,0); digitalWrite(IN1,LOW); digitalWrite(IN2,LOW); }
-void setup(){ pinMode(ENA,OUTPUT); pinMode(IN1,OUTPUT); pinMode(IN2,OUTPUT); parar(); delay(2000); digitalWrite(IN1,HIGH); digitalWrite(IN2,LOW); analogWrite(ENA,80); delay(600); parar(); }
-void loop(){ parar(); }
+// Curso PX-32 - Leccion 17: comparar tres niveles PWM en AK1.
+// El sketch queda detenido hasta cambiar EJECUTAR_PRUEBA a true.
+const bool EJECUTAR_PRUEBA = false;
+
+const byte PWM_BK1 = 9;
+const byte BK1_IN1 = 22;
+const byte BK1_IN2 = 24;
+const byte PWM_BK3 = 10;
+const byte BK3_IN3 = 26;
+const byte BK3_IN4 = 28;
+const byte PWM_AK1 = 11;
+const byte AK1_IN1 = 5;
+const byte AK1_IN2 = 6;
+const byte PWM_AK3 = 12;
+const byte AK3_IN3 = 7;
+const byte AK3_IN4 = 8;
+
+void detenerTodos() {
+  analogWrite(PWM_BK1, 0);
+  analogWrite(PWM_BK3, 0);
+  analogWrite(PWM_AK1, 0);
+  analogWrite(PWM_AK3, 0);
+
+  digitalWrite(BK1_IN1, LOW);
+  digitalWrite(BK1_IN2, LOW);
+  digitalWrite(BK3_IN3, LOW);
+  digitalWrite(BK3_IN4, LOW);
+  digitalWrite(AK1_IN1, LOW);
+  digitalWrite(AK1_IN2, LOW);
+  digitalWrite(AK3_IN3, LOW);
+  digitalWrite(AK3_IN4, LOW);
+}
+
+void prepararMotores() {
+  pinMode(PWM_BK1, OUTPUT);
+  pinMode(PWM_BK3, OUTPUT);
+  pinMode(PWM_AK1, OUTPUT);
+  pinMode(PWM_AK3, OUTPUT);
+  pinMode(BK1_IN1, OUTPUT);
+  pinMode(BK1_IN2, OUTPUT);
+  pinMode(BK3_IN3, OUTPUT);
+  pinMode(BK3_IN4, OUTPUT);
+  pinMode(AK1_IN1, OUTPUT);
+  pinMode(AK1_IN2, OUTPUT);
+  pinMode(AK3_IN3, OUTPUT);
+  pinMode(AK3_IN4, OUTPUT);
+  detenerTodos();
+}
+
+void probarNivel(byte potenciaPwm) {
+  digitalWrite(AK1_IN1, HIGH);
+  digitalWrite(AK1_IN2, LOW);
+  analogWrite(PWM_AK1, potenciaPwm);
+  delay(700);
+  detenerTodos();
+  delay(1200);
+}
+
+void setup() {
+  prepararMotores();
+
+  if (!EJECUTAR_PRUEBA) {
+    return;
+  }
+
+  // Da tiempo para retirar el USB y, despues, energizar desde baterias.
+  delay(15000);
+  probarNivel(100);
+  probarNivel(160);
+  probarNivel(220);
+  detenerTodos();
+}
+
+void loop() {
+  detenerTodos();
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 Lee `probarNivel(byte potenciaPwm)`. El **parámetro** recibe un valor diferente en cada llamada, pero el sentido y los tiempos permanecen iguales. Esta es la comparación justa que preparaste en la Lección 11.
 
-## 11. Qué deberías observar
+3. 🟢 Calcula aproximadamente cada ciclo de trabajo: divide 100, 160 y 220 entre 255. No necesitas contar pulsos; el cálculo representa la proporción de tiempo encendido.
 
-El resultado normal es **tendencia de velocidad creciente, admitiendo umbral de arranque y variaciones mecánicas**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+4. 🟢 Predice un orden, no tres velocidades exactas. Escribe, por ejemplo: “Espero que 220 produzca más giro observable que 160 y 100, salvo que 100 quede bajo el umbral de arranque”.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama temporal comparativo.
+> - **Objetivo:** ver que PWM cambia la proporción encendido/apagado sin convertir el pin en una salida analógica continua.
+> - **Descripción:** tres líneas con ciclos del mismo ancho; áreas HIGH sombreadas para 100/255, 160/255 y 220/255, alineadas con tres ruedas que muestran aumento de giro esperado, no una escala exacta de rpm.
+> - **Elementos que deben señalarse:** HIGH, LOW, período, ciclo de trabajo, 100, 160, 220, energía media y advertencia “no equivale directamente a velocidad”.
+> - **Fuente técnica:** referencia `analogWrite()` de Arduino, https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/; conceptos Arduino Engineering Kit, https://aek.arduino.cc/chapter/concepts, sección PWM.
+> - **Texto alternativo sugerido:** “Tres señales PWM muestran porciones encendidas cada vez mayores dentro de ciclos iguales”.
 
-## 12. Si no funciona
+## Observa tres pulsos comparables
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+5. 🟢 Cambia solamente `EJECUTAR_PRUEBA` a `true`.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+6. 🟡 Con baterías fuera, conecta USB, confirma Mega y puerto, verifica y sube. Retira el USB después del mensaje de carga completada.
 
-## 13. Desafío
+7. 🟢 Ensaya sin energía: el adulto señala una tarjeta cada 700 ms y deja 1200 ms sin tarjeta. Debes poder anticipar `100 -> pausa -> 160 -> pausa -> 220 -> pausa`.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+8. 🔴 El adulto instala las celdas, confirma que PX-32 sigue estable y enciende. Después de quince segundos comienza el primer nivel. Mantén manos, tarjetas y rostro fuera del volumen de las ruedas.
 
-## 14. Lecturas y videos para explorar
+9. 🟢 Levanta la tarjeta correspondiente al escuchar o ver cada pulso y llena la tabla. Compara desenfoque visual, sonido y capacidad de arrancar; no toques la rueda y no inventes rpm.
+
+10. 🔴 Si un nivel produce zumbido continuo sin giro, una rueda trabada, vibración que mueve el soporte, calor, olor o reinicio, el adulto apaga de inmediato. Un motor detenido puede exigir mucha corriente; no esperes al nivel siguiente “a ver si mejora”.
+
+11. 🟢 Si los tres niveles completan la secuencia, busca una **tendencia**, no una igualdad perfecta. `220` debería parecer mayor que `100`; pequeñas diferencias o un primer nivel que apenas arranca son datos sobre el sistema real.
+
+12. 🔴 El adulto apaga y retira las baterías. Con USB como única fuente, restaura `EJECUTAR_PRUEBA = false`, verifica y carga la versión neutral.
+
+La actividad está completa cuando puedes explicar por qué aumentó la proporción HIGH, qué observaste realmente y por qué eso no permite afirmar una velocidad exacta.
+
+## Interpreta antes de corregir
+
+| Resultado | Interpretación razonable | Próximo paso seguro |
+|---|---|---|
+| 100 no arranca; 160 y 220 sí | 100 puede estar bajo el umbral de arranque en estas condiciones | Registra el umbral aproximado; no declares el motor defectuoso |
+| Los tres parecen iguales | La observación visual puede no tener resolución suficiente o el driver puede estar saturando la respuesta | Repite solo otro día con una marca visual segura diseñada por el adulto; no alargues pulsos ahora |
+| El orden parece invertido | Batería, roce o observación pueden haber cambiado | Revisa que las llamadas sean 100, 160 y 220 y que nada toque AK1 |
+| Una pausa desaparece | Falta `detenerTodos()` o `delay(1200)` dentro de `probarNivel()` | No energices de nuevo hasta restaurar ambas líneas |
+| Otra rueda gira | La parada de todos los canales o el sketch cargado no coincide | Apaga, compara el archivo y revisa pines sin energía |
+
+## Lecturas y videos para explorar
 
 - [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
 - [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Al explorar, separa siempre tres datos: valor PWM ordenado, movimiento observado y condiciones físicas de la prueba.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **PWM** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Referencia `analogWrite()` de Arduino](https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/), uso de valores PWM.
+- [Arduino Mega 2560 Rev3](https://docs.arduino.cc/hardware/mega-2560/), 15 salidas PWM; el pinout oficial identifica D9 a D12 como PWM.
+- [Guía oficial del Model Y](https://osoyoo.com/2022/02/25/osoyoo-model-y-4-channel-motor-driver/), pines de velocidad y rango de ejemplo 0 a 255.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Muéstrale tu tabla y evita la frase “fue al 63 % de velocidad”. Di qué porcentaje del ciclo representa 160, qué cambió en la observación y qué factores impiden convertirlo directamente en rpm.
 
-Hoy aprendiste a **comparar tres niveles de mando sin afirmar una velocidad exacta** y lo conectaste con **PWM, ciclo de trabajo, frecuencia y velocidad media**. Pudiste observar tendencia de velocidad creciente, admitiendo umbral de arranque y variaciones mecánicas. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 18: Cuatro motores, cuatro identidades](18-cuatro-motores-cuatro-identidades.md).
+En la [Lección 18](18-cuatro-motores-cuatro-identidades.md) conservarás una sola potencia y usarás pulsos breves para comprobar la identidad de las cuatro esquinas.

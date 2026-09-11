@@ -14,7 +14,6 @@ Cada sketch vive en una carpeta del mismo nombre que su archivo `.ino`, como req
 | 16 | [16-invertir-el-sentido-por-software/16-invertir-el-sentido-por-software.ino](16-invertir-el-sentido-por-software/16-invertir-el-sentido-por-software.ino) | dirección, inversión lógica e invariante de seguridad |
 | 17 | [17-pwm-regular-energia-en-el-tiempo/17-pwm-regular-energia-en-el-tiempo.ino](17-pwm-regular-energia-en-el-tiempo/17-pwm-regular-energia-en-el-tiempo.ino) | PWM, ciclo de trabajo, frecuencia y velocidad media |
 | 18 | [18-cuatro-motores-cuatro-identidades/18-cuatro-motores-cuatro-identidades.ino](18-cuatro-motores-cuatro-identidades/18-cuatro-motores-cuatro-identidades.ino) | motor frontal/trasero, izquierdo/derecho y prueba aislada |
-| 19 | [19-ruedas-mecanum-y-fuerzas-diagonales/19-ruedas-mecanum-y-fuerzas-diagonales.ino](19-ruedas-mecanum-y-fuerzas-diagonales/19-ruedas-mecanum-y-fuerzas-diagonales.ino) | rodillo, fuerza, componente y cancelación |
 | 20 | [20-vectores-para-mover-px-32/20-vectores-para-mover-px-32.ino](20-vectores-para-mover-px-32/20-vectores-para-mover-px-32.ino) | vector, suma, traslación, rotación y STOP |
 | 28 | [28-leer-un-sensor-ir-por-un-pin-digital/28-leer-un-sensor-ir-por-un-pin-digital.ino](28-leer-un-sensor-ir-por-un-pin-digital/28-leer-un-sensor-ir-por-un-pin-digital.ino) | INPUT, digitalRead, HIGH y LOW |
 | 29 | [29-dos-sensores-cuatro-situaciones/29-dos-sensores-cuatro-situaciones.ino](29-dos-sensores-cuatro-situaciones/29-dos-sensores-cuatro-situaciones.ino) | AND, OR, tabla de verdad y combinación |
