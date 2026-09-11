@@ -124,10 +124,16 @@ No es necesario memorizar códigos `HW-xxx`. Sí debes poder volver a encontrar 
 
 ## Lecturas y videos para explorar
 
-- [Arduino: introducción y placa Mega](https://docs.arduino.cc/hardware/mega-2560/) — Inglés; lectura oficial; 10 min. Aprenderás arduino: introducción y placa mega. Esencial.
-- [Qué es la electricidad, lectura interna](../../docs/readings/que-es-electricidad.md) — Español; lectura; 8 min. Aprenderás qué es la electricidad, lectura interna. Opcional.
+- [An Introduction To Robotics (Sense-Plan-Act)](https://www.youtube.com/watch?v=HvMQONnCXbE) — Inglés sencillo; video; 30 min (puedes verlo por partes).
+**Por qué este recurso:** profundiza tu inventario con un recorrido completo por las familias de piezas de un robot: sensores de varios tipos, cámaras, computadoras de a bordo y motores, con ejemplos de robots verdaderos.
 
-Después del inventario, estas lecturas ayudan a pasar de “sé cómo se llama” a “comprendo qué ocurre dentro”.
+- [Radar de componentes: fichas del hardware de PX-32](../../docs/hardware/README.md) — Español; lectura interna; 10 min.
+**Por qué este recurso:** confirma tu clasificación al darte la ficha de cada componente del robot, con su trabajo, sus pistas visibles y las cosas que aún nadie ha comprobado.
+
+- [Electrical Circuits](https://www.youtube.com/watch?v=HOFp8bHTN30) — Inglés sencillo, con animaciones; video; 5 min.
+**Por qué este recurso:** estimula tu siguiente lección mostrando cómo un circuito lleva energía por todo un circuito cerrado, la misma idea que late bajo cada cable que inventariaste hoy.
+
+Explóralos con una pregunta en mente: ¿qué pieza de tu inventario haría cada trabajo que muestran estos recursos?
 
 ## Referencias técnicas de la clase
 

@@ -106,10 +106,16 @@ La ubicación ayuda a reconocer una pieza, pero no prueba su función. La prueba
 
 ## Lecturas y videos para explorar
 
-- [Arduino: introducción y placa Mega](https://docs.arduino.cc/hardware/mega-2560/) — Inglés; lectura oficial; 10 min. Aprenderás arduino: introducción y placa mega. Esencial.
-- [Qué es la electricidad, lectura interna](../../docs/readings/que-es-electricidad.md) — Español; lectura; 8 min. Aprenderás qué es la electricidad, lectura interna. Opcional.
+- [Máquinas y robots para niños: ¿qué son y en qué se diferencian?](https://www.youtube.com/watch?v=Qoyb3eOZmtk) — Español; video; 4 min.
+**Por qué este recurso:** confirma lo visto al comparar máquinas que obedecen una orden fija con robots que perciben y deciden, con ejemplos reales y un ritmo pensado para tu edad.
 
-Estas lecturas abren dos preguntas para más adelante: ¿qué ocurre dentro de la Mega cuando ejecuta instrucciones y cómo llega energía a cada pieza?
+- [How do robots experience the world?](https://www.youtube.com/watch?v=FeRxP2Z27C4) — Inglés sencillo, hablado despacio; video; 8 min.
+**Por qué este recurso:** profundiza la idea de percibir-procesar-actuar mostrando cómo los sensores son como los sentidos de un robot, tal como vas a clasificar las piezas de PX-32 hoy.
+
+- [Los Rovers del Marte](https://spaceplace.nasa.gov/mars-rovers/sp/) — Español; lectura; 10 min.
+**Por qué este recurso:** estimula la curiosidad contando cómo los rovers de la NASA perciben Marte con sensores, procesan con su computadora y actúan con sus ruedas y brazos, igual que PX-32 pero en otro planeta.
+
+Cuando las explores, piensa: ¿cuál es la pieza que percibe, la que decide y la que actúa en cada robot que viste?
 
 ## Referencias técnicas de la clase
 

@@ -132,10 +132,16 @@ Imagina que el archivo contiene una palabra mal escrita. El compilador podría d
 
 ## Lecturas y videos para explorar
 
-- [Arduino: introducción y placa Mega](https://docs.arduino.cc/hardware/mega-2560/) — Inglés; lectura oficial; 10 min. Aprenderás arduino: introducción y placa mega. Esencial.
-- [Qué es la electricidad, lectura interna](../../docs/readings/que-es-electricidad.md) — Español; lectura; 8 min. Aprenderás qué es la electricidad, lectura interna. Opcional.
+- [How Computers Work: CPU, Memory, Input & Output](https://www.youtube.com/watch?v=DKGZlaPlVLY) — Inglés sencillo, con subtítulos; video; 5 min.
+**Por qué este recurso:** confirma tu mapa al mostrar que toda computadora, hasta la Mega, vive de lo mismo: recibir entradas, procesar con su procesador y producir salidas.
 
-Al explorar, intenta separar cada afirmación sobre la placa oficial de lo que todavía debe comprobarse en la revisión OSOYOO.
+- [Cómo funciona un Arduino (explicado fácil y con simulación real)](https://www.youtube.com/watch?v=lLIJL7x4HjA) — Español; video; 6 min.
+**Por qué este recurso:** profundiza lo visto abriendo una placa parecida a la tuya para mostrar dónde vive el programa y cómo los pines conectan el programa con el mundo real.
+
+- [Introduction to Arduino (cómic oficial)](https://content.arduino.cc/assets/arduino_comic_ESPA%C3%91OL.pdf) — Español; cómic de lectura; 15 min.
+**Por qué este recurso:** estimula tu paso al IDE contando en un cómic divertido qué es Arduino, para qué sirve cada parte de la placa y por qué gente de todo el mundo crea con ella.
+
+Al explorarlos, une las dos ideas: ¿qué parte de la placa oficial cumple el papel de la flash, cuál el de la SRAM y cuál el de los pines de tu mapa?
 
 ## Referencias técnicas de la clase
 
