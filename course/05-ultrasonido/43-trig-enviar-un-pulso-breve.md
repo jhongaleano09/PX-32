@@ -1,141 +1,131 @@
 # Lección 43 — TRIG: enviar un pulso breve
 
-## 1. Tu misión de hoy
+## Cómo se le habla a un sensor que no tiene botones
 
-Hoy vas a **generar un pulso de 10 µs en D30**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+El módulo ultrasónico de PX-32 no tiene botones, pantalla ni teclado. Es una placa con dos cilindros y cuatro pines. ¿Cómo se le ordena "grita ahora"?
 
-## 2. Tiempo estimado
+La respuesta ya la conoces de la Lección 17, aunque no lo sepas: **hablándole con voltaje**. A Blink le ordenabas encender con `digitalWrite(13, HIGH)`. A este sensor se le ordena gritar subiendo un pin a 5 V durante un tiempo muy preciso: **10 microsegundos** de HIGH. No un segundo, no un milisegundo: diez microsegundos, la cuarta parte de un ciclo del grito de 40 kHz que calculaste en la Lección 40. Ese voltaje brevísimo es la orden completa; el módulo la recibe, y por su cuenta emite su ráfaga de ultrasonido y se queda esperando que le registres el regreso.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Hay un problema práctico, y es honesto reconocerlo: **tú no puedes ver un pulso de 10 µs**. Ni el ojo ni el oído lo captan. ¿Cómo sabes entonces que la orden salió? Hoy el truco será hacer que el programa **narre en el monitor serie cada paso que da**, como un relator de fútbol que cuenta la jugada milisegundo a milisegundo. El monitor no puede mostrarte el pulso; pero puede mostrarte la secuencia de órdenes, y con eso más lo que ya sabes del sensor, la evidencia es suficiente.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Un aviso de vocabulario antes de empezar: a esa subida breve de voltaje se le llama **pulso**. Lo usarás sin parar de aquí en adelante.
 
-## 3. Lo que necesitas saber antes de empezar
+## Lo que necesitas
 
-[Lección 06: Primer programa: Blink](../01-programacion/06-primer-programa-blink.md), [Lección 42: Eco y tiempo de vuelo](42-eco-y-tiempo-de-vuelo.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+- PX-32 ensamblado, sobre la mesa, **con los motores sin energía** (sin baterías: hoy el único alimento es el USB).
+- El módulo ultrasónico conectado (lo verificamos en el paso 1).
+- Computador con Arduino IDE 2 y el cable USB.
+- El sketch [43-trig-enviar-un-pulso-breve.ino](../../code/educational/43-trig-enviar-un-pulso-breve/43-trig-enviar-un-pulso-breve.ino).
+- Tu cuaderno.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+🟢 Programar, cargar y observar es tuyo. 🟡 Tu padre verifica el estado del robot antes de conectar el USB y presencia toda la sesión. 🔴 Si hay que tocar un cable del sensor o de potencia, lo hace él: siempre con USB fuera y todo apagado.
 
-## 4. Lectura principal
+## Antes de cargar: verifica las cuatro líneas de vida del sensor
 
-### La idea intuitiva
+1. 🟡 Con PX-32 apagado y sin USB, mira con tu padre los **cuatro cables** que llegan al módulo ultrasónico desde el UART WiFi Shield (la placa sobre la Mega). El mapa canónico del robot dice exactamente qué debe haber:
 
-El tema de hoy es **pulso, microsegundo, OUTPUT y digitalWrite**. En lenguaje cotidiano, buscamos una forma fiable de generar un pulso de 10 µs en D30. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+   | Pin del módulo | Llega a | Para qué |
+   |---|---|---|
+   | VCC | 5V | alimentación |
+   | Trig | **D30** | la orden de gritar (hoy) |
+   | Echo | **D31** | el regreso del eco (mañana) |
+   | GND | GND | referencia |
 
-El módulo ultrasónico estima distancia midiendo tiempo, no extendiendo una regla invisible. Envía una onda, espera un eco y usa la velocidad aproximada del sonido. El servo añade dirección y convierte una medición puntual en un pequeño mapa. Toda estimación tiene límites: objetos blandos, inclinados, muy cercanos o estrechos pueden devolver ecos débiles.
+   En el manual del fabricante estos cables se muestran rojo (VCC), morado (Trig), verde (Echo) y negro (GND), pero **no confíes solo en el color**: los colores pueden cambiar entre unidades. Confía en el destino de cada cable, pin por pin, contra el [mapa de conexiones](../../docs/reference/mapa-conexiones-robot.md).
 
-### De la intuición al concepto técnico
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía anotada de las conexiones del módulo en el robot real.
+> - **Objetivo:** que el niño verifique los cuatro cables contra el mapa sin adivinar.
+> - **Descripción:** vista del frente del robot con el módulo ultrasónico y sus cuatro cables siguiéndose hasta el UART WiFi Shield; cada cable resaltado y rotulado con su pin de origen (VCC, Trig, Echo, GND) y su destino (5V, D30, D31, GND).
+> - **Elementos que deben señalarse:** los cuatro cables uno a uno, los rótulos del shield, el módulo ultrasónico al otro extremo.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, página 29 (imagen local: [página 29](../../assets/osoyoo-manual/pagina-29-conexion-ultrasonico.png)) y [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md).
+> - **Texto alternativo sugerido:** "Cuatro cables del módulo ultrasónico seguidos hasta el shield, rotulados VCC-5V, Trig-D30, Echo-D31 y GND-GND".
 
-Los términos centrales son **pulso, microsegundo, OUTPUT y digitalWrite**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+2. 🔴 Si falta algún cable o no coinciden los pines, no lo conectes tú: el adulto lo corrige con todo apagado. Volver a intentar con un cable mal puesto puede dañar el módulo.
 
-En PX-32, esta idea se usa para examinar y cargar el pulso con el robot inmóvil. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+## El programa, línea por línea
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Pulso:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-001, HW-009.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **pulso, microsegundo, OUTPUT y digitalWrite**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante prepara la predicción, el programa y la tabla de datos.
-- 🟡 Un adulto revisa el montaje antes de conectar USB o alimentar sensores.
-- 🔴 El adulto corrige cualquier cable, ruta de Serial1 o conexión de potencia. Se cablea únicamente con USB retirado y alimentación apagada.
-
-La actividad comienza sin movimiento. Si una lectura es extraña, no se cambian varios cables a la vez: se apaga, se compara con el mapa canónico y se modifica una sola variable.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres generar un pulso de 10 µs en D30 y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-001, HW-009 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con pulso, microsegundo, OUTPUT y digitalWrite. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a examinar y cargar el pulso con el robot inmóvil. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: secuencia LOW-HIGH-LOW correcta; la medición aún no se interpreta. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [43-trig-enviar-un-pulso-breve.ino](../../code/educational/43-trig-enviar-un-pulso-breve/43-trig-enviar-un-pulso-breve.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **pulso**. Lee el programa de arriba abajo y predice su salida.
+3. 🟢 Con el USB conectado (por el adulto 🟡), abre el `.ino` en Arduino IDE y comprueba que el sketch del archivo es **idéntico** a este bloque:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 43
-// Cargar solo después de leer la sección de seguridad.
-const byte TRIG=30,ECHO=31;
-void setup(){ pinMode(TRIG,OUTPUT); pinMode(ECHO,INPUT); Serial.begin(9600); }
-void loop(){ digitalWrite(TRIG,LOW); delayMicroseconds(2); digitalWrite(TRIG,HIGH); delayMicroseconds(10); digitalWrite(TRIG,LOW); unsigned long us=pulseIn(ECHO,HIGH,30000UL); if(us==0) Serial.println("SIN_ECO"); else { float cm=us*0.0343/2.0; Serial.println(cm); } delay(100); }
+// Curso PX-32 - Leccion 43: enviar el pulso TRIG.
+// Hoy solo aprendemos a dar la orden: todavia no medimos el eco.
+
+const byte TRIG = 30;  // orden: cable desde D30 al pin Trig del modulo
+const byte ECHO = 31;  // respuesta: cable desde el pin Echo a D31 (manana)
+
+void setup() {
+  pinMode(TRIG, OUTPUT);    // TRIG lo maneja la Mega
+  digitalWrite(TRIG, LOW);  // empezar en reposo
+  pinMode(ECHO, INPUT);     // ECHO lo maneja el modulo
+  Serial.begin(9600);
+  Serial.println("Leccion 43: solo TRIG.");
+  Serial.println("El eco se mide en la Leccion 44.");
+}
+
+void loop() {
+  Serial.println("--- nuevo pulso ---");
+
+  Serial.println("1) TRIG en LOW  durante 2 us (reposo)");
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+
+  Serial.println("2) TRIG en HIGH durante 10 us (la orden)");
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+
+  Serial.println("3) TRIG vuelve a LOW (fin de la orden)");
+  digitalWrite(TRIG, LOW);
+
+  Serial.println("El modulo acaba de emitir su rafaga silenciosa.");
+  delay(1000);  // pausa humana: un pulso por segundo
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+4. 🟢 **Lo conocido, primero.** `setup()`, `loop()`, `pinMode`, `digitalWrite`, `Serial` y `const`: todo viene de las lecciones 05 a 11. Hoy solo hay **dos palabras nuevas**, y una es familiar:
 
-## 11. Qué deberías observar
+   - `delayMicroseconds(10)` es la hermana microscópica del `delay()` de Blink. `delay(1000)` espera 1000 **mili**segundos; `delayMicroseconds(10)` espera 10 **micro**segundos, cien mil veces menos. Es la primera vez que manejas tiempos más pequeños que el milisegundo: los conociste como unidad en la Lección 40 y ahora como herramienta.
+   - `const byte ECHO = 31` prepara el pin D31 como `INPUT`, pero **nadie lo lee todavía**. Está declarado hoy para que el montaje quede completo desde el primer sketch; el eco llega en la Lección 44.
 
-El resultado normal es **secuencia LOW-HIGH-LOW correcta; la medición aún no se interpreta**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+5. 🟢 **La secuencia LOW–HIGH–LOW, leída como música.** Fíjate en el orden exacto y en por qué es así: `LOW` 2 µs (asegurarnos de que el pin arranca limpio y bajo), `HIGH` 10 µs (la orden), `LOW` (bajar para que la próxima orden sea una subida nueva). Es como llamar a una puerta: tocar, esperar, retirar la mano. Los módulos tipo HC-SR04 piden exactamente este ritual; su hoja de datos lo describe: un pulso de al menos 10 µs en Trig dispara la ráfaga de 8 ciclos a 40 kHz.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+6. 🟢 **Predice antes de cargar.** Escribe en el cuaderno qué cinco líneas crees que aparecerán en el monitor cada segundo, y en qué orden. Piensa también: ¿se moverá algo en el robot? ¿Oirás algo? (Respuestas: nada se moverá —no hay órdenes a motores—, y nada oirás —40 kHz están fuera de tu oído, Lección 41—. Si "oyes" un clic, es el servo o algo suelto: detente y revisa con tu padre.)
 
-## 12. Si no funciona
+7. 🟡 Tu padre comprueba la selección de placa (Mega 2560) y puerto, sube el sketch y abre el monitor serie a **9600 baudios** (Lección 08). Si el IDE marca error de compilación, revisa la tabla de abajo antes de tocar nada más.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+8. 🟢 **Observa al relator trabajar.** Deben aparecer, una vez por segundo, las cinco líneas de tu predicción: la secuencia completa y el anuncio de la ráfaga. Verifica línea por línea contra tu cuaderno. Ese "rafaga silenciosa" no es adorno: en ese instante el cilindro T del sensor **realmente emitió** un chillido de 40 kHz que rebotó en la pared de tu cuarto y regresó al cilindro R. Está pasando de verdad, a un palmo de tu cara, y ni tú ni nadie en la habitación lo percibe. Solo la Mega podría contarlo… y aprenderá mañana.
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+9. 🟢 **Cambia una sola cosa.** Modifica únicamente el `delay(1000)` final a `delay(3000)` y vuelve a subir. El relator ahora habla cada tres segundos: la orden es la misma; solo cambia el ritmo humano. Déjalo en 1000 al terminar, para que el archivo quede como el original.
 
-## 13. Desafío
+10. 🟢 **Cierre seguro.** Cierra el monitor, desconecta el USB (lo hace el adulto si prefieres) y anota en el cuaderno la evidencia del día: "la orden de gritar es un pulso de 10 µs en D30; secuencia LOW–HIGH–LOW; no hay nada que oír ni ver, la evidencia es la narración del monitor".
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+## Si no funciona
 
-## 14. Lecturas y videos para explorar
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| El monitor no muestra nada | ¿9600 baudios? ¿El puerto correcto? | Revisa con la prueba de desconexión de la Lección 05: el puerto desaparece al retirar el USB |
+| Las líneas salen con símbolos raros | ¿Otra velocidad en el monitor? | Baja el selector del monitor a 9600 |
+| Error de compilación | ¿Copiaste una línea incompleta o borraste un `;`? | Compara con el bloque de arriba carácter por carácter; el IDE subraya la línea sospechosa |
+| Todo sale pero no pasa nada más | ¿Esperabas oír o ver el grito? | Es correcto así: 40 kHz son inaudibles y no hay motores conectados a este sketch |
+| El monitor repite más rápido de lo esperado | ¿Cambiaste `delay(1000)` y lo dejaste así? | Devuélvelo a 1000: un pulso por segundo es el ritmo pensado para leer con calma |
+
+## Desafío: el pulso más largo del mundo
+
+¿Qué pasaría si en vez de 10 µs dejaras TRIG en HIGH durante un segundo entero? Piénsalo antes de probarlo, y escríbelo: la hoja de datos dice que el módulo necesita *al menos* 10 µs para **iniciar** la ráfaga; después de eso, mantener el pulso más tiempo no grita más fuerte ni más largo — la orden es un disparo, no un volumen. Si quieres comprobarlo en el monitor, cambia solo `delayMicroseconds(10)` por `delayMicroseconds(50)`: la narración no cambia en nada perceptible. Cinco veces más de orden… y el mismo grito de siempre. No todas las magnitudes de un programa funcionan como perillas.
+
+## Lecturas y videos para explorar
 
 - [Velocidad, frecuencia y longitud de onda del sonido](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength) — Inglés; libro abierto; 12 min. Aprenderás velocidad, frecuencia y longitud de onda del sonido. Esencial.
 - [Biblioteca Servo](https://docs.arduino.cc/libraries/servo/) — Inglés; referencia oficial Arduino; 10 min. Aprenderás biblioteca servo. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+## Referencias técnicas de la clase
 
-## 15. Cuéntale a papá
+- [Hoja de datos del módulo HC-SR04 (SparkFun)](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf): disparo con pulso de 10 µs en Trig y ráfaga de 8 ciclos a 40 kHz.
+- [`delayMicroseconds()` en la referencia de Arduino](https://docs.arduino.cc/language-reference/en/functions/time/delaymicroseconds/): pausas en microsegundos.
+- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md): Trig → D30, Echo → D31, según manual OSOYOO p. 29.
 
-- Cuéntale con tus palabras qué significa **pulso** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+## Cuéntale a papá
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+Muéstrale el monitor en acción y explícale por qué no se oye ni se ve nada, aunque el sensor esté gritando frente a ustedes en ese mismo instante: 10 µs de orden, 40 kHz de grito, 25 µs por ciclo. Pregúntale si puede aplaudir durante 10 microsegundos (pista: no, y tú tampoco — la Lección 40 ya lo demostró). Marca la casilla 43 en [PROGRESS.md](../../PROGRESS.md).
 
-## 16. Resumen de la jornada
-
-Hoy aprendiste a **generar un pulso de 10 µs en D30** y lo conectaste con **pulso, microsegundo, OUTPUT y digitalWrite**. Pudiste observar secuencia LOW-HIGH-LOW correcta; la medición aún no se interpreta. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 44: ECHO: medir una duración](44-echo-medir-una-duracion.md).
+La orden ya sale. Falta el cronómetro que mida el regreso: en la [Lección 44](44-echo-medir-una-duracion.md) la Mega aprende a esperar el eco.

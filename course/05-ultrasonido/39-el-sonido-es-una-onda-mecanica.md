@@ -1,131 +1,75 @@
 # Lección 39 — El sonido es una onda mecánica
 
-## 1. Tu misión de hoy
+## La explosión más ruidosa del cine es mentira
 
-Hoy vas a **explicar por qué el sonido necesita materia para propagarse**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+En las películas de espacio, los planetas explotan con un estruendo ensordecedor. Es mentira. En el espacio real, la explosión más gigantesca del universo se vería… y se oiría **nada**. Un silencio total.
 
-## 2. Tiempo estimado
+¿Por qué? Porque en el espacio casi no hay aire, y el sonido **necesita materia** para viajar. Cuando hablas, no sales pedacitos de voz de tu boca hacia el oído de tu padre. Lo que ocurre es más curioso: tu garganta empuja el aire que tienes delante, ese aire empuja al siguiente, ese al siguiente… y el empujón llega hasta un tímpano. Sin aire que empujar, no hay empujón que viaje. Por eso el espacio es el lugar más silencioso que existe.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Ese "empujón que viaja" tiene nombre científico: **onda mecánica**. *Mecánica* porque necesita materia que empujar (aire, agua, metal, madera). Y en este bloque va a ser la herramienta con la que PX-32 medirá distancias sin tocar nada: su sensor ultrasónico **grita** un empujón de aire, espera a que rebote en un objeto y regrese, y con el tiempo que tardó calcula qué tan lejos está. Pero antes de usar ese superpoder hay que entenderlo bien, y hoy no hay código ni pantallas: hoy el laboratorio son tus manos.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Lo que necesitas
 
-## 3. Lo que necesitas saber antes de empezar
+- Un **resorte largo y flojo** (un Slinky de juguete es perfecto). Si no tienes, una fila de **10 a 15 monedas o canicas iguales** sobre una regla con canal, o dentro del riel de una puerta, o en cualquier surco que las mantenga en línea recta.
+- Una superficie de mesa lisa y seca.
+- PX-32 apagado, **sin baterías y sin USB**, solo para observarlo al final.
+- Tu cuaderno y lápiz.
 
-[Lección 03: Electricidad sin misterios](../00-fundamentos/03-electricidad-sin-misterios.md), [Lección 38: Hito: seguir una línea](../04-line-tracking/38-hito-seguir-una-linea.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+🟢 Toda la actividad de hoy la puedes hacer tú solo: no hay electricidad de ningún tipo.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+## El experimento: un empujón que viaja solo
 
-## 4. Lectura principal
+1. 🟢 **Estira el resorte** sobre la mesa, en línea recta y flojo (no tenso). Si usas monedas, alínalas pegadas una contra otra en el canal, sin apretar. Dibuja en tu cuaderno cómo se ve la fila *antes* de hacer nada.
 
-### La idea intuitiva
+2. 🟢 **Predice antes de tocar.** Escribe: "si empujo el extremo de la fila, ¿qué va a pasar?" Tu primera idea probablemente sea "todas se mueven juntas". Guárdala: el experimento la va a juzgar.
 
-El tema de hoy es **vibración, medio, compresión y onda**. En lenguaje cotidiano, buscamos una forma fiable de explicar por qué el sonido necesita materia para propagarse. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+3. 🟢 **Da un empujón corto y firme** al primer eslabón (o a la primera moneda), en dirección a lo largo de la fila, y **mira lo que pasa despacio**. En el resorte verás un bulto de eslabones juntos —una **compresión**— que corre hacia el otro extremo. En las monedas, verás el movimiento saltar de una a la siguiente hasta tirar la última.
 
-El módulo ultrasónico estima distancia midiendo tiempo, no extendiendo una regla invisible. Envía una onda, espera un eco y usa la velocidad aproximada del sonido. El servo añade dirección y convierte una medición puntual en un pequeño mapa. Toda estimación tiene límites: objetos blandos, inclinados, muy cercanos o estrechos pueden devolver ecos débiles.
+4. 🟢 **La observación clave de hoy.** Mira cualquier eslabón o moneda del medio, no el bulto. ¿Viajó hasta el otro extremo? **No.** Cada uno solo se movió un poquito de su lugar y volvió, o golpeó al vecino y se quedó. Lo que viajó fue el *empujón*, no las cosas. Esa es exactamente la diferencia entre el sonido (el empujón que viaja) y el viento (aire que de verdad se traslada).
 
-### De la intuición al concepto técnico
+5. 🟢 **Repite y dibuja tres momentos** en el cuaderno: la fila en reposo, el bulto a la mitad del camino, y la fila después. Marca con una flecha qué viajó, y con otra flecha qué solo vibró en su sitio.
 
-Los términos centrales son **vibración, medio, compresión y onda**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+6. 🟢 **La prueba del vacío.** Ahora separa dos eslabones del medio (o quita una moneda y deja un hueco) y vuelve a empujar. El empujón **no cruza el hueco**. Acabas de fabricar, en miniatura, el silencio del espacio: sin materia que recibir y reenviar el empujón, el sonido se detiene. Ese hueco es lo que le pasa al sonido en el vacío.
 
-En PX-32, esta idea se usa para modelar un pulso y su propagación con una fila de objetos o personas. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+7. 🟢 **Conecta con la Lección 22.** ¿Te acuerdas de la luz infrarroja del bloque anterior? Ella cruzaba el espacio del Sol hasta la Tierra sin problema. La luz no necesita aire; el sonido sí. Son dos familias distintas de ondas, y PX-32 ya usó una de cada: infrarroja para seguir líneas, y ahora sonidos para medir distancias.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+8. 🟢 **Busca la "boca" de PX-32.** Con el robot apagado y en la mesa, mira el frente superior: sobre el servo hay una placa pequeña con **dos cilindros metálicos** como dos latas en fila. Ese es el módulo ultrasónico (HW-009). Uno de los cilindros empujará el aire (la voz) y el otro escuchará el regreso (el oído). Hoy no hacen nada; solo confírmalos con tus ojos y anota en el cuaderno: "dos cilindros, uno emisor y uno receptor, frente al robot".
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** ilustración conceptual en secuencia.
+> - **Objetivo:** mostrar que en una onda mecánica el empujón viaja pero cada elemento solo oscila en su posición.
+> - **Descripción:** tres viñetas de una fila de esferas en línea: (1) en reposo, (2) un bulto de esferas juntas —compresión— a la mitad del camino con flecha de avance, (3) fila de nuevo en reposo; en cada viñeta una esfera del medio marcada con color para evidenciar que no se desplazó.
+> - **Elementos que deben señalarse:** flecha del empujón inicial, zona de compresión con flecha de viaje, esfera marcada inmóvil en su sitio, rótulo "vibra, no viaja".
+> - **Fuente técnica:** OpenStax Physics 17.1-17.2, https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength, sección de ondas de sonido en un medio.
+> - **Texto alternativo sugerido:** "Tres momentos de una fila de esferas donde un empujón viaja como bulto de compresión mientras cada esfera solo vibra en su lugar".
 
-## 5. Palabras nuevas
+## Desafío: el medio importa
 
-- **Vibración:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+Prueba el mismo empujón en un medio distinto: estira el resorte sobre un paño o alfombra, o empuja la fila de monedas apretando más fuerte la primera. ¿Llega más lejos? ¿Más rápido? Cambia **una sola cosa** y anota qué cambia. Los materiales que transmiten mejor el empujón hacen llegar el sonido más lejos: por eso puedes oír a alguien golpeando un riel de tren desde muchísimo más lejos que gritando por el aire.
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+## Si no funciona
 
-## 6. Así aparece en PX-32
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Las monedas se disparan en todas direcciones | ¿El canal las contiene? ¿El empujón fue lateral en vez de a lo largo? | Usa un riel más profundo y empuja en la dirección de la fila, no hacia abajo |
+| El bulto del resorte no avanza | ¿Resorte demasiado tenso o enredado? | Estira menos: flojo transmite, tenso rebota |
+| No veo nada raro, todo se mueve junto | ¿Empujaste demasiado lento? | El empujón debe ser corto y seco, como un golpe, no un arrastre |
+| No encuentro los dos cilindros en PX-32 | ¿Estás mirando el frente superior? | Busca el soporte que gira sobre el servo; si no está instalado, márcalo como duda y revisa con tu padre el inventario de la Lección 02 |
 
-**Hardware:** HW-009.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **vibración, medio, compresión y onda**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres explicar por qué el sonido necesita materia para propagarse y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-009 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con vibración, medio, compresión y onda. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a modelar un pulso y su propagación con una fila de objetos o personas. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: el patrón viaja mientras cada elemento oscila alrededor de su posición. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
-
-## 11. Qué deberías observar
-
-El resultado normal es **el patrón viaja mientras cada elemento oscila alrededor de su posición**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [Velocidad, frecuencia y longitud de onda del sonido](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength) — Inglés; libro abierto; 12 min. Aprenderás velocidad, frecuencia y longitud de onda del sonido. Esencial.
 - [Biblioteca Servo](https://docs.arduino.cc/libraries/servo/) — Inglés; referencia oficial Arduino; 10 min. Aprenderás biblioteca servo. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Si el inglés se te atraganta, pide a tu padre que traduzca los párrafos clave: las imágenes y fórmulas de OpenStax se entienden casi solas.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **vibración** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [OpenStax Physics, sección 14.1](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength): el sonido como onda mecánica que requiere un medio.
+- [HW-009 en el diccionario de hardware](../../docs/hardware/HW-009-ultrasonico.md): identificación del módulo ultrasónico de PX-32.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Explícale por qué las explosiones espaciales del cine son mentira, usando la fila de monedas o el resorte como demostración. Pregúntale qué le pasa a la campana que en las películas suena en el vacío. Y cuéntale el plan del bloque: PX-32 va a medir distancias gritando empujones de aire y escuchando el rebote. Marca la casilla 39 en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **explicar por qué el sonido necesita materia para propagarse** y lo conectaste con **vibración, medio, compresión y onda**. Pudiste observar el patrón viaja mientras cada elemento oscila alrededor de su posición. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 40: Frecuencia y período](40-frecuencia-y-periodo.md).
+En la [Lección 40](40-frecuencia-y-periodo.md) pondremos número a esos empujones: ¿cuántos por segundo produce un sonido, y cuánto dura cada uno?

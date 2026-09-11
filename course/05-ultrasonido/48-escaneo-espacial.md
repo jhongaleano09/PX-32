@@ -1,143 +1,155 @@
 # Lección 48 — Escaneo espacial
 
-## 1. Tu misión de hoy
+## El faro que barre la noche con un cuaderno en la mano
 
-Hoy vas a **medir derecha, centro e izquierda con servo y ultrasonido**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Los faros de los puertos no se encienden y ya: **giran**, y su haz barre el mar en círculos. El capitán de un barco, en la oscuridad, no ve el haz directamente — ve el **destello** cuando pasa por su rumbo, y con su cronómetro y la carta de la costa deduce dónde está. Un faro giratorio es un solo foco convertido en un mapa completo de la noche.
 
-## 2. Tiempo estimado
+Hoy PX-32 se convierte en faro, y tú en el capitán que dibuja la carta. Todo lo del bloque se une en una sola rutina de cuatro tiempos: **mover** la cabeza a un ángulo, **esperar** a que la mecánica se asiente, **medir** la distancia con el ultrasonido, **anotar** el par ángulo-distancia. Mover, esperar, medir, anotar. Tres veces: izquierda, centro, derecha. Al final, el monitor entrega una tabla — y esa tabla, dibujada en tu cuaderno, es un pequeño **mapa polar**: un mapa donde cada punto queda definido no por "cuánto al este y cuánto al norte", sino por **ángulo y distancia** desde quien mira. Es exactamente cómo un radar organiza el mundo, y hoy tu cuaderno va a oler a radar.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+La palabra del día es **barrido** ("sweep" en inglés, y verás ese nombre en mil proyectos de robotics): recorrer una serie de direcciones tomando una muestra en cada una.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Lo que necesitas
 
-## 3. Lo que necesitas saber antes de empezar
+- PX-32 ensamblado, servo alineado en 90° frente al chasis (Lección 47) y sensor verificado (Lecciones 43–46).
+- Tu cuaderno abierto en la página del dato del ángulo 45° ("45 apunta hacia mi ___").
+- Computador, Arduino IDE 2, USB… y baterías 18650 a cargo del adulto para la fase completa (el servo necesita su energía, como aprendiste ayer).
+- El sketch [48-escaneo-espacial.ino](../../code/educational/48-escaneo-espacial/48-escaneo-espacial.ino).
+- Dos obstáculos de prueba: dos libros parados o cajas, que puedas poner a los costados del robot.
+- Un despeje de medio metro al frente del robot: la mesa desocupada o el piso con área libre.
 
-[Lección 46: Medir objetos conocidos](46-medir-objetos-conocidos.md), [Lección 47: Un servo apunta el sensor](47-un-servo-apunta-el-sensor.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+🟢 Programar, observar y dibujar el mapa es tuyo. 🟡 El adulto presencia USB y fase de batería. 🔴 Baterías e interruptor, siempre el adulto.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+## El programa: mover, esperar, medir, anotar
 
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **barrido, muestra, ángulo y mapa polar**. En lenguaje cotidiano, buscamos una forma fiable de medir derecha, centro e izquierda con servo y ultrasonido. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-El módulo ultrasónico estima distancia midiendo tiempo, no extendiendo una regla invisible. Envía una onda, espera un eco y usa la velocidad aproximada del sonido. El servo añade dirección y convierte una medición puntual en un pequeño mapa. Toda estimación tiene límites: objetos blandos, inclinados, muy cercanos o estrechos pueden devolver ecos débiles.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **barrido, muestra, ángulo y mapa polar**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para mover, esperar asentamiento, medir y guardar tres pares ángulo-distancia. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Barrido:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-009, HW-010.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **barrido, muestra, ángulo y mapa polar**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante prepara la predicción, el programa y la tabla de datos.
-- 🟡 Un adulto revisa el montaje antes de conectar USB o alimentar sensores.
-- 🔴 El adulto corrige cualquier cable, ruta de Serial1 o conexión de potencia. Se cablea únicamente con USB retirado y alimentación apagada.
-
-La actividad comienza sin movimiento. Si una lectura es extraña, no se cambian varios cables a la vez: se apaga, se compara con el mapa canónico y se modifica una sola variable.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres medir derecha, centro e izquierda con servo y ultrasonido y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-009, HW-010 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con barrido, muestra, ángulo y mapa polar. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a mover, esperar asentamiento, medir y guardar tres pares ángulo-distancia. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: tabla consistente y retorno del sensor al centro. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [48-escaneo-espacial.ino](../../code/educational/48-escaneo-espacial/48-escaneo-espacial.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **barrido**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y verifica que coincida con este bloque:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 48
-// Cargar solo después de leer la sección de seguridad.
+// Curso PX-32 - Leccion 48: escaneo espacial.
+// Mover, esperar el asentamiento, medir, informar: tres direcciones.
+
 #include <Servo.h>
-Servo cabeza; const byte TRIG=30,ECHO=31,PIN_SERVO=13;
-float distancia(){ digitalWrite(TRIG,LOW); delayMicroseconds(2); digitalWrite(TRIG,HIGH); delayMicroseconds(10); digitalWrite(TRIG,LOW); unsigned long us=pulseIn(ECHO,HIGH,30000UL); return us?us*0.0343/2.0:-1; }
-void setup(){ Serial.begin(9600); pinMode(TRIG,OUTPUT); pinMode(ECHO,INPUT); cabeza.attach(PIN_SERVO); }
-void loop(){ for(int a=45;a<=135;a+=45){ cabeza.write(a); delay(500); Serial.print(a); Serial.print(','); Serial.println(distancia()); } cabeza.write(90); delay(1500); }
+
+const byte TRIG = 30;
+const byte ECHO = 31;
+const byte PIN_SERVO = 13;
+const unsigned long TIMEOUT_US = 30000UL;
+const float SONIDO_CM_POR_US = 0.0343;
+
+Servo cabeza;
+
+// Los tres angulos del barrido (array como en la Leccion 35).
+const int ANGULOS[3] = { 45, 90, 135 };
+
+float medirDistanciaCm() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  unsigned long us = pulseIn(ECHO, HIGH, TIMEOUT_US);
+
+  if (us == 0 || us > 23200UL) {
+    return -1.0;  // -1 = lectura no fiable (convenio de esta leccion)
+  }
+
+  return us * SONIDO_CM_POR_US / 2.0;
+}
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  digitalWrite(TRIG, LOW);
+  pinMode(ECHO, INPUT);
+  Serial.begin(9600);
+  cabeza.attach(PIN_SERVO);
+  cabeza.write(90);  // empezar mirando al frente
+  delay(1000);
+  Serial.println("Leccion 48: escaneo 45 / 90 / 135.");
+}
+
+void loop() {
+  for (byte i = 0; i < 3; i++) {
+    cabeza.write(ANGULOS[i]);
+    delay(500);  // asentamiento: la mecanica necesita su tiempo
+
+    float cm = medirDistanciaCm();
+
+    Serial.print("angulo ");
+    Serial.print(ANGULOS[i]);
+    Serial.print(": ");
+
+    if (cm < 0) {
+      Serial.println("sin eco fiable");
+    } else {
+      Serial.print(cm, 1);
+      Serial.println(" cm");
+    }
+  }
+
+  Serial.println("--- barrido completo: vuelta al frente ---");
+  cabeza.write(90);
+  delay(1500);
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 **Todo lo que hay adentro ya es tuyo.** Repasa la lista de proveniencia — es el resumen más bonito del bloque: `ANGULOS[3]` es un array (Lección 35) que guarda los tres ángulos; el `for` con `byte i` los recorre uno a uno (Lección 10); `medirDistanciaCm()` es la fusión de las Lecciones 44 y 45 — gritar, cronometrar, convertir, y declarar `-1` cuando el eco no es fiable; `cabeza.write()` es el cuello de ayer; el `delay(500)` tras cada movimiento es la paciencia mecánica. Lo único verdaderamente nuevo es un **convenio**: usar `-1.0` como respuesta para "esto no es una distancia válida". Como ninguna distancia real puede ser negativa, `-1` queda libre para significar "no fiable" sin confundirse con una medición.
 
-## 11. Qué deberías observar
+3. 🟢 **Por qué 500 ms de espera.** El servo es rápido pero no instantáneo, y mientras vibra tras llegar, sus cilindros se mueven con él: medir en plena vibración es fotografiar a alguien corriendo. El `delay(500)` es el "quédate quieto un momento" del fotógrafo. Pruébalo mentalmente: ¿qué pasaría con 50 ms? (El servo apenas va llegando: lecturas con el sensor a medio camino — un barrido de mentira.)
 
-El resultado normal es **tabla consistente y retorno del sensor al centro**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+4. 🟢 **Predice el barrido con obstáculos.** Antes de cargar, monta la escena: un libro parado a unos 25 cm del costado donde apunta 45°, otro a unos 25 cm del lado de 135°, y el frente (90°) despejado hacia el espacio más abierto que tengas (una pared lejana o el borde libre de la mesa). Escribe tu predicción: "ángulo 45: ___ cm, ángulo 90: ___ o sin eco fiable, ángulo 135: ___ cm". Usa tu cuaderno de la Lección 47 para saber cuál libro queda en cuál ángulo.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+5. 🟡 **Fase USB.** El adulto conecta, sube el sketch, monitor a 9600. Igual que ayer, es posible que el servo no se mueva sin baterías; en tu robot puede que sí. La fase de verdad es la siguiente.
 
-## 12. Si no funciona
+6. 🔴 **Fase batería.** El adulto instala las celdas y enciende, robot apoyado y manos lejos del soporte. Al arrancar, cabeza al frente 1 s, y luego el ciclo: 45… pausa… "angulo 45: 24,9 cm"… 90… 135… y vuelta al frente. Cada barrido completo tarda ~3 s, y el monitor va dictando la tabla.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+## El experimento: el capitán dibuja su carta
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+7. 🟢 **Primera carta.** Copia en el cuaderno la tabla completa de un barrido con los dos libros montados. Deben verse las tres direcciones, cada una con su número (o su "sin eco fiable"). Compara contra tu predicción del paso 4 y explica cualquier diferencia (¿el libro estaba a la distancia que creías? ¿más inclinado?).
 
-## 13. Desafío
+8. 🟢 **Dibuja el mapa polar.** En el cuaderno: un punto central (PX-32), tres flechas — la del centro al frente, una a cada costado según TU dato de la Lección 47 (45 hacia tu izquierda o derecha, tal como lo anotaste) — y sobre cada flecha, una rayita cruzada con la distancia medida escrita al lado. Ponle objetos dibujados donde están los libros. **Ese dibujo es un mapa del mundo construido por tu robot.** Nadie te lo dio: PX-32 lo midió.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** ilustración de mapa polar paso a paso.
+> - **Objetivo:** enseñar a traducir la tabla ángulo-distancia del monitor a un dibujo tipo radar.
+> - **Descripción:** panel izquierdo con la tabla "angulo 45: 24,9 cm / angulo 90: sin eco / angulo 135: 25,2 cm"; panel derecho con el robot como punto central, tres flechas a 45, 90 y 135 grados, ticks de distancia sobre cada flecha y los dos libros dibujados en sus posiciones.
+> - **Elementos que deben señalarse:** punto central rotulado PX-32, las tres flechas con su ángulo, ticks con centímetros, rótulo "sin eco fiable" en la flecha central, libros-objetivo.
+> - **Fuente técnica:** elaboración propia del curso sobre el barrido del manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, pp. 31–33 (demo de evasión del fabricante con lecturas a 45/90/135).
+> - **Texto alternativo sugerido:** "Tabla de barrido al lado de un mapa polar con tres flechas y las distancias medidas marcadas sobre cada una".
 
-## 14. Lecturas y videos para explorar
+9. 🟢 **Cambia una sola cosa: mueve un libro.** Corre el libro del lado 45 unos 10 cm más lejos y deja el otro quieto. Pulsa RESET y copia el nuevo barrido: solo la dirección 45 debió cambiar. Esa es la firma de un buen instrumento: responde a lo que cambió y no a lo que no.
+
+10. 🟢 **El caso del pasillo vacío.** Quita los dos libros y apunta el frente hacia el espacio más abierto disponible. El barrido mostrará los tres como "sin eco fiable" o números grandes y desparejos, según tu módulo (Lección 44, tu anotación). En el mapa polar esto se dibuja… con nada: un mundo sin obstáculos a la vista. Anótalo así — "la ausencia de eco también es información: no hay nada a mi alcance".
+
+11. 🟢 **Cierre.** El adulto apaga y retira las celdas 🔴. Tu cuaderno debe quedar con: la tabla del primer barrido, el mapa polar, y la constancia de que al mover un solo objeto solo cambió una sola dirección.
+
+## Si no funciona
+
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Las distancias no corresponden al lado correcto | ¿Tu dato de la Lección 47 está bien anotado? | Verifica de nuevo desde atrás del robot: 45 y 135 se intercambian si te paras enfrente en vez de detrás |
+| El ángulo 90 marca 4 cm siempre | ¿Hay algo frente al robot que olvidaste? | La mesa, un borde, tu propia mano apoyada: mira qué hay a 4 cm al frente de los cilindros |
+| Las lecturas salen a medias de camino | ¿La espera de asentamiento es corta? | No bajes `delay(500)` a menos que veas al servo firmemente detenido antes de 500 ms |
+| El servo no gira pero el monitor avanza | ¿Fase USB sin baterías? | Recuerda la Lección 47: el músculo del servo vive del lado de las baterías; pasa a fase batería 🔴 |
+| "sin eco fiable" en todas partes | ¿Obstáculos blandos, inclinados o lejos? | Repite con libros duros a 25 cm: la configuración robusta de la Lección 46 |
+| Los números cambian entre barridos sin tocar nada | ¿El robot se mueve, la mesa vibra, hay alguien hablando cerca? | Sujeta el robot, apoya los codos: el sonar de 25 cm no perdona temblores |
+
+## Desafío: el barrido de cinco puntos
+
+¿Puedes ampliar el mapa sin ampliar los riesgos? Modifica solo el array: `const int ANGULOS[5] = { 45, 70, 90, 110, 135 };` y el `for` para recorrer 5 (`i < 5`). Carga (fase batería con el adulto 🔴) y copia el barrido de cinco puntos: ¿apareció algún obstáculo entre 45 y 90 que el barrido de tres no veía? Esa es la diferencia entre **resolución** de mapas: más muestras, más detalle, más tiempo por barrido. Nada es gratis. Al terminar, devuelve el archivo a la versión de tres puntos.
+
+## Lecturas y videos para explorar
 
 - [Velocidad, frecuencia y longitud de onda del sonido](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength) — Inglés; libro abierto; 12 min. Aprenderás velocidad, frecuencia y longitud de onda del sonido. Esencial.
 - [Biblioteca Servo](https://docs.arduino.cc/libraries/servo/) — Inglés; referencia oficial Arduino; 10 min. Aprenderás biblioteca servo. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+## Referencias técnicas de la clase
 
-## 15. Cuéntale a papá
+- [Biblioteca Servo de Arduino](https://docs.arduino.cc/libraries/servo/): `write()` y `attach()` en producción.
+- [`pulseIn()` en la referencia de Arduino](https://docs.arduino.cc/language-reference/en/functions/advanced-io/pulseIn/): temporización y timeout dentro de `medirDistanciaCm()`.
+- [Manual OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), pp. 31–33: demo del fabricante que gira el sensor para comparar los lados antes de decidir.
 
-- Cuéntale con tus palabras qué significa **barrido** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+## Cuéntale a papá
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+Muéstrale el mapa polar de tu cuaderno y cuéntale que su hijo lo dibujó con datos que midió el robot solo: tres direcciones, tres distancias, dos libros localizados sin tocarlos. Explícale el convenio del `-1` ("cuando el eco no es fiable, el número dice que no es un número") y por qué el robot siempre regresa la cabeza al frente antes de repetir. Marca la casilla 48 en [PROGRESS.md](../../PROGRESS.md).
 
-## 16. Resumen de la jornada
-
-Hoy aprendiste a **medir derecha, centro e izquierda con servo y ultrasonido** y lo conectaste con **barrido, muestra, ángulo y mapa polar**. Pudiste observar tabla consistente y retorno del sensor al centro. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 49: Evitar obstáculos](49-evitar-obstaculos.md).
+El mapa existe. Falta la decisión: en la [Lección 49](49-evitar-obstaculos.md), el hito del bloque — PX-32 usará este barrido para **esquivar obstáculos conduciendo solo**.

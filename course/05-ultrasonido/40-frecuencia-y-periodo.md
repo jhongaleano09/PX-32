@@ -1,131 +1,87 @@
 # Lección 40 — Frecuencia y período
 
-## 1. Tu misión de hoy
+## Tu cuerpo ya mide frecuencias sin saberlo
 
-Hoy vas a **relacionar ciclos por segundo con duración de cada ciclo**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Ponte la mano en el pecho y siente tu corazón. Un latido… otro… otro. Si eres como la mayoría de la gente, late más o menos **una vez por segundo** cuando estás tranquilo. En la clase de gimnasia, después de correr, sube a dos o tres por segundo. Acabas de hacer, sin saberlo, una medición de **frecuencia**: cuántas veces por segundo se repite algo.
 
-## 2. Tiempo estimado
+Los sonidos también son repeticiones, y muy rápidas. Ayer viste que el sonido es un empujón que viaja por el aire. Pero un empujón solo no es una voz ni un silbido: una voz es una **sucesión de empujones**, uno tras otro, como aplausos encadenados. La frecuencia de esa sucesión es lo que tus oídos traducen como "grave" (pocos empujones por segundo) o "agudo" (muchísimos).
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Hoy vas a medir frecuencias con tu cuerpo, con un reloj y con la calculadora, y vas a llegar hasta una frecuencia que ningún humano ha aplaudido jamás: la del grito secreto del sensor de PX-32.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Dos palabras que son la misma idea al revés
 
-## 3. Lo que necesitas saber antes de empezar
+- **Frecuencia (f):** cuántas repeticiones ocurren **en un segundo**. Se mide en **hertz (Hz)**, en honor a Heinrich Hertz, el físico que demostró la existencia de las ondas de radio (lo volverás a encontrar en el bloque de Bluetooth). 4 Hz significa "cuatro veces por segundo".
+- **Período (T):** cuánto **dura una sola repetición**. Se mide en segundos (o en fracciones). Es la misma información mirada al revés: si aplaudes 4 veces por segundo, cada aplauso dura un cuarto de segundo.
 
-[Lección 39: El sonido es una onda mecánica](39-el-sonido-es-una-onda-mecanica.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
-
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
-
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **frecuencia, hertz, período y ciclo**. En lenguaje cotidiano, buscamos una forma fiable de relacionar ciclos por segundo con duración de cada ciclo. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-El módulo ultrasónico estima distancia midiendo tiempo, no extendiendo una regla invisible. Envía una onda, espera un eco y usa la velocidad aproximada del sonido. El servo añade dirección y convierte una medición puntual en un pequeño mapa. Toda estimación tiene límites: objetos blandos, inclinados, muy cercanos o estrechos pueden devolver ecos débiles.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **frecuencia, hertz, período y ciclo**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para calcular períodos sencillos para 1, 2, 10 y 40 000 Hz. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Frecuencia:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-009.
+Y ahí está la fórmula más importante de hoy, tan simple que casi parece trampa:
 
 ```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
+período = 1 / frecuencia
+frecuencia = 1 / período
 ```
 
-La cadena exacta de hoy se concentra en **frecuencia, hertz, período y ciclo**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+Si algo se repite 2 veces por segundo, cada repetición dura medio segundo. Si se repite 10 veces por segundo, dura un décimo. Cuanto más frecuencia, menos período. Son inversos, como "cuántos pasos das" y "qué tan largos son tus pasos" para recorrer la misma distancia.
 
-## 7. Seguridad y participación del adulto
+## Lo que necesitas
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
+- Un reloj con segundero, cronómetro o el que tenga tu padre en el teléfono (que él lo sostenga).
+- Calculadora (la del computador sirve).
+- Tu cuaderno para la tabla.
+- Tus manos. Hoy PX-32 descansa: no se usa el robot.
 
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
+🟢 Todo lo haces tú; solo necesitas a tu padre como árbitro de tiempo.
 
-## 8. Predice antes de probar
+## El experimento: hasta dónde llega tu cuerpo
 
-1. ¿Qué esperas observar cuando logres relacionar ciclos por segundo con duración de cada ciclo y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
+1. 🟢 **Aplausos de 1 Hz.** Con tu padre cronometrando 10 segundos, aplaude **una vez por segundo** (él te marca el ritmo con el dedo al principio, luego te suelta). Deben contar unos 10 aplausos en 10 segundos. Anota en el cuaderno: `1 Hz -> período 1 segundo`.
 
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
+2. 🟢 **Sube a 2 Hz.** Ahora dos aplausos por segundo durante 10 segundos (unos 20 en total). Calcula con la fórmula: `período = 1/2 = 0,5 segundos`. Compruébalo con el cronómetro si quieres: entre un aplauso y el siguiente pasan dos mitades de segundo.
 
-## 9. Actividad o experimento guiado
+3. 🟢 **Ahora 4 Hz y luego 8 Hz.** Duplica el ritmo. Llega un punto —entre 6 y 10 aplausos por segundo— donde el aplauso deja de ser aplauso y se vuelve un tractor. Ese es el **límite de tus manos**. Los músculos no dan para más. Anota tu récord personal: "mis manos llegan a ___ Hz".
 
-1. **Preparar.** Coloca PX-32 estable, identifica HW-009 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con frecuencia, hertz, período y ciclo. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a calcular períodos sencillos para 1, 2, 10 y 40 000 Hz. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: productos frecuencia×período coherentes y unidades correctas. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
+4. 🟢 **La tabla de la calculadora.** Copia esta tabla y complétala con `período = 1 / frecuencia`:
 
-## 10. Código
+   | Frecuencia | Cálculo | Período |
+   |---|---|---|
+   | 1 Hz | 1/1 | 1 s |
+   | 2 Hz | 1/2 | 0,5 s |
+   | 10 Hz | 1/10 | ___ |
+   | 20 000 Hz (lo más agudo que oyes) | 1/20000 | ___ |
+   | 40 000 Hz (el grito de PX-32) | 1/40000 | ___ |
 
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
+5. 🟢 **Los microsegundos entran en escena.** Completa las dos últimas filas y mira lo que obtienes: 1/20 000 s = 0,00005 s, y 1/40 000 s = 0,000025 s. Escribir tantos ceros cansa y confunde, así que los científicos usan una unidad más cómoda: el **microsegundo (µs)**, que es la millonésima parte de un segundo. Entonces: 0,000025 s = 25 µs. **El grito de PX-32 tiene un período de 25 µs.** Graba ese número: en la Lección 43 vas a escribir código que manda órdenes de 10 µs, ¡más cortas aún que un ciclo del grito!
 
-## 11. Qué deberías observar
+6. 🟢 **Verifica que lo entendiste** respondiendo en el cuaderno: si un zumbido tiene una frecuencia de 100 Hz, ¿cuánto dura cada ciclo? (Respuesta para comprobar: 0,01 s, es decir 10 000 µs). ¿Y uno de 2 000 Hz? (0,5 ms = 500 µs).
 
-El resultado normal es **productos frecuencia×período coherentes y unidades correctas**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+Fíjate en algo honesto: "lo más agudo que oyes" (20 000 Hz) es un valor típico del oído humano joven; el límite exacto de cada persona varía y baja con la edad. Los 40 000 Hz del módulo no son un capricho: el fabricante de este tipo de sensores los eligió justo **por encima** de lo que cualquier persona oye, para que el robot grite sin molestar a nadie. Mañana veremos ese límite con lupa.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+## Desafío: el metrónomo humano
 
-## 12. Si no funciona
+Pide a tu padre que aplauda a un ritmo constante sin decirte la frecuencia. Tú cronometras 10 segundos, cuentas sus aplausos y calculas la frecuencia y el período. Luego intercambien papeles. El que calcule el período más exacto sin calculadora (de cabeza, con fracciones) gana un punto. Cinco rondas.
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+## Si no funciona
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| No logro mantener el ritmo | ¿Intentas mirar el cronómetro mientras aplaudes? | Que tu padre cuente los segundos en voz alta; tú solo aplaudes |
+| Me pierdo con tantos ceros | ¿Estás escribiendo 0,000025 en lugar de pensar en µs? | Usa microsegundos desde la fila de 10 Hz: 1/10 s = 100 000 µs, y baja dividiendo |
+| La calculadora me da notación rara (2,5e-5) | ¿Usas la calculadora del computador en modo científico? | Pídele a tu padre que te explique: 2,5e-5 significa 2,5 × 0,00001, o sea 25 µs |
+| No sé si mi corazón late 1 Hz de verdad | ¿Cronometraste 15 segundos y contaste latidos? | Cuenta los latidos de 15 s y divide entre 15: esa es tu frecuencia cardíaca en Hz |
 
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [Velocidad, frecuencia y longitud de onda del sonido](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength) — Inglés; libro abierto; 12 min. Aprenderás velocidad, frecuencia y longitud de onda del sonido. Esencial.
 - [Biblioteca Servo](https://docs.arduino.cc/libraries/servo/) — Inglés; referencia oficial Arduino; 10 min. Aprenderás biblioteca servo. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+La sección de frecuencia y período de OpenStax tiene exactamente la fórmula de hoy con ejemplos resueltos.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **frecuencia** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [OpenStax Physics, sección 14.1](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength): definición de frecuencia, período y su relación inversa.
+- [Referencia del lenguaje Arduino, `delayMicroseconds()`](https://docs.arduino.cc/language-reference/en/functions/time/delaymicroseconds/): la unidad µs tal como la usa la Mega (aparecerá en la Lección 43).
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Rétalo a un duelo de ritmos: quién aplaude más parejo a 2 Hz. Luego explícale con tus palabras por qué frecuencia y período son la misma idea al revés, y cuéntale el dato del día: el sensor de PX-32 trabaja a 40 000 Hz, con ciclos de solo 25 µs. Marca la casilla 40 en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **relacionar ciclos por segundo con duración de cada ciclo** y lo conectaste con **frecuencia, hertz, período y ciclo**. Pudiste observar productos frecuencia×período coherentes y unidades correctas. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 41: Ultrasonido: más allá del oído](41-ultrasonido-mas-alla-del-oido.md).
+¿Qué hay más allá de los 20 000 Hz que tus oídos alcanzan a oír? En la [Lección 41](41-ultrasonido-mas-alla-del-oido.md) conocemos a los animales que viven ahí, y el grito silencioso de PX-32.

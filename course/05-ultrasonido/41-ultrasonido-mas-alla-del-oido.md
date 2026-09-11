@@ -1,131 +1,93 @@
 # Lección 41 — Ultrasonido: más allá del oído
 
-## 1. Tu misión de hoy
+## El cazador que ve con los oídos
 
-Hoy vas a **clasificar frecuencias y explicar por qué PX-32 usa ultrasonido**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Cierra los ojos y trata de atrapar una mosca volando. Imposible. Ahora mira a un murciélago: vuela en una cueva completamente a oscuras, a toda velocidad, entre cientos de paredes y estalactitas… y no choca nunca. Tampoco la mosca escapa.
 
-## 2. Tiempo estimado
+El truco del murciélago lo descubrió un científico italiano, Lazzaro Spallanzani, tapando los oídos de murciélagos con cera: chocaban contra todo. No era magia ni vista de rayos: **cazaban con el oído**. Gritan gritos agudísimos, muchísimo más agudos que cualquier sonido que tú puedas oír, y leen los ecos que rebotan de las polillas y las paredes. Con puro sonido construyen un mapa del mundo. A esa técnica los humanos la llamamos **ecolocación**, y hoy PX-32 va a empezar a aprenderla.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Ese territorio de sonidos demasiado agudos para nosotros tiene nombre: **ultrasonido**. Todo lo que vibra por encima de unos 20 000 Hz vive ahí. Tu oído termina ahí; el mundo del ultrasonido sigue mucho más allá, y está lleno de vecinos.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## Los vecinos del ultrasonido
 
-## 3. Lo que necesitas saber antes de empezar
+- **Los perros** oyen bastante más arriba que las personas. Por eso el silbato para perros parece no sonar: tú oyes un soplo de aire y el perro, a veinte metros, levanta las orejas. El silbato está emitiendo en su zona ultrasónica.
+- **Los murciélagos** gritan entre decenas y cientos de miles de hertz, según la especie.
+- **Los delfines** ecolocan bajo el agua con clics ultrasonoros para encontrar peces en agua turbia.
+- **El módulo de PX-32** (el tipo de sensor HC-SR04 que monta el robot) grita a **40 000 Hz**, el doble de lo más agudo que el oído humano joven puede captar. Cuando PX-32 "grita", tú oyes exactamente lo mismo que cuando calla: nada.
 
-[Lección 40: Frecuencia y período](40-frecuencia-y-periodo.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+Una aclaración importante antes de seguir: **"no lo oigo" no significa "no existe" y tampoco significa "es inofensivo en cualquier cantidad"**. El silbato para perros es inofensivo, pero los sonidos —audibles o no— son energía que viaja; un ultrasonido potente, como el que usan las máquinas de limpieza industrial, puede hacer cosas muy reales. La regla de respetar el volumen vale para todo lo que vibra, lo oigas o no.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+Y la palabra del día sale del murciélago y del robot a la vez: un **transductor** es cualquier pieza que transforma un tipo de energía en otra. En el sensor de PX-32 hay dos: uno convierte electricidad en empujones de aire (la voz) y el otro convierte los empujones que regresan en electricidad otra vez (el oído). El micrófono y el parlante de tu casa son transductores; los dos cilindros del sensor también.
 
-## 4. Lectura principal
+## Lo que necesitas
 
-### La idea intuitiva
+- PX-32 en la mesa, apagado, **sin baterías y sin USB**.
+- Buena luz para leer letras pequeñas en el frente del sensor.
+- Tu cuaderno: hoy se arma una tabla para clasificar sonidos.
+- Calculadora para convertir frecuencias a períodos (fórmula de la Lección 40).
 
-El tema de hoy es **audible, ultrasonido, transductor y 40 kHz**. En lenguaje cotidiano, buscamos una forma fiable de clasificar frecuencias y explicar por qué PX-32 usa ultrasonido. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
+🟢 Todo es observación y pizarra: no hay energía hoy.
 
-El módulo ultrasónico estima distancia midiendo tiempo, no extendiendo una regla invisible. Envía una onda, espera un eco y usa la velocidad aproximada del sonido. El servo añade dirección y convierte una medición puntual en un pequeño mapa. Toda estimación tiene límites: objetos blandos, inclinados, muy cercanos o estrechos pueden devolver ecos débiles.
+## La actividad: el mapa del ultrasonido y el rostro de PX-32
 
-### De la intuición al concepto técnico
+1. 🟢 **Copia y completa la tabla** en el cuaderno. La primera fila va de ejemplo:
 
-Los términos centrales son **audible, ultrasonido, transductor y 40 kHz**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
+   | Sonido | Frecuencia aproximada | ¿Lo oyes? | ¿Es ultrasonido? |
+   |---|---|---|---|
+   | Trueno lejano | decenas de Hz | sí | no |
+   | Tu voz hablando | entre unos 100 y 300 Hz | ___ | ___ |
+   | Tecla más aguda de un piano | unos 4 000 Hz | ___ | ___ |
+   | Tu límite auditivo | unos 20 000 Hz | apenas | ___ |
+   | Silbato para perros | más de 20 000 Hz | ___ | ___ |
+   | Grito del sensor de PX-32 | 40 000 Hz | ___ | ___ |
+   | Grito de muchos murciélagos | hasta unos 200 000 Hz | ___ | ___ |
 
-En PX-32, esta idea se usa para ubicar 40 kHz respecto al rango auditivo humano aproximado. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
+   La frontera del ultrasonido no es un muro exacto: cada oído tiene su propio límite y el de los adultos está más abajo que el de los niños. Por eso escribimos "aproximada": la física del sonido no cambia con tu oído, pero tu oído sí decide qué parte escuchas.
 
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
+2. 🟢 **Calcula dos períodos** con `período = 1 / frecuencia`, en microsegundos: el de la tecla aguda del piano (4 000 Hz → 250 µs) y el del sensor (40 000 Hz → 25 µs; ya lo conoces de ayer). Fíjate: el doble de frecuencia, la mitad de período.
 
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
+3. 🟢 **Encuentra los dos transductores.** Acércate al frente de PX-32 y mira la placa del sensor: son los **dos cilindros metálicos** que ubicaste en la Lección 39, montados sobre el soporte que gira. Busca junto a ellos (en la placa, en letra pequeña) las marcas **T** y **R**: **T** viene de *transmisor* (grita) y **R** de *receptor* (escucha). Cuidado con un parecido de nombres que confunde: el pin **Trig** de la fila de conexión (el que va a D30) es el cable de la orden, no un cilindro. Si tu módulo no tiene las letras visibles, no importa: los dos cilindros son idénticos a la vista, y su diferencia es a qué circuito están conectados por dentro. Anota: "el cilindro T grita, el cilindro R escucha, y Trig es un pin, no una pieza".
 
-## 5. Palabras nuevas
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** fotografía anotada del módulo ultrasónico montado en PX-32.
+> - **Objetivo:** que el niño identifique los dos transductores y los cuatro pines antes de programar el sensor.
+> - **Descripción:** vista frontal del módulo con los dos cilindros metálicos resaltados y etiquetados T (grita) y R (escucha), y una segunda vista con los cuatro pines de conexión señalados: VCC, Trig, Echo y GND.
+> - **Elementos que deben señalarse:** cilindro T, cilindro R, letras de serigrafía si son visibles, fila de 4 pines con sus nombres, soporte del servo detrás.
+> - **Fuente técnica:** manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, página 29, esquema de conexión del módulo ultrasónico (imagen local: [página 29](../../assets/osoyoo-manual/pagina-29-conexion-ultrasonico.png)).
+> - **Texto alternativo sugerido:** "Módulo ultrasónico con dos cilindros T y R señalados y sus cuatro pines de conexión etiquetados".
 
-- **Audible:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
+4. 🟢 **Comprueba el silencio del robot.** Pon tu oreja a un palmo del sensor (el robot sigue apagado; es para fijar la escena). Cuando PX-32 grite en unas lecciones más, desde este mismo lugar no oirás absolutamente nada: 40 000 Hz están 20 000 por encima de tu límite. Tu perro, si tienes, sí podría molestarse; por eso los sensores domésticos de este tipo se eligen para pasar desapercibidos.
 
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
+5. 🟢 **La pregunta puente.** Anota tu predicción en el cuaderno: el sensor grita, el sonido viaja hasta una pared y regresa al cilindro R. ¿Qué cree el robot que necesita **medir** para saber a qué distancia está la pared: el volumen del grito, el color de la pared o el **tiempo** que tardó el viaje? Si respondiste "el tiempo", acabas de anticipar las próximas tres lecciones.
 
-## 6. Así aparece en PX-32
+## Desafío: el traductor de murciélagos
 
-**Hardware:** HW-009.
+Busca con tu padre un video de ecolocación de murciélagos (en la sección de lecturas hay material para empezar). Muchos videos "traducen" el grito bajándolo de frecuencia para que los humanos lo oigamos. Explica en tu cuaderno: si el grito real es de 80 000 Hz y el traductor lo convierte a 500 Hz para que lo oigas, ¿qué le pasó al período? (Pista: 1/80000 s = 12,5 µs reales; 1/500 s = 2 ms en la traducción. La traducción estira el tiempo 160 veces para que quepa en tu oído.)
 
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
+## Si no funciona
 
-La cadena exacta de hoy se concentra en **audible, ultrasonido, transductor y 40 kHz**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| No encuentro las letras T y R | ¿Miras la placa del sensor con buena luz? | Algunas versiones del módulo casi no las marcan; identifícalo por función (los dos cilindros idénticos) y sigue |
+| La tabla me confunde | ¿Estás mezclando "frecuencia" con "volumen"? | Frecuencia es *cuántas veces por segundo* (agudo/grave); volumen es *qué tan fuerte* — dos cosas independientes |
+| Dudo del dato de 40 000 Hz del módulo | ¿Consultaste el diccionario de hardware? | El manual de OSOYOO nombra el módulo genéricamente; los módulos tipo HC-SR04 trabajan a 40 kHz según su hoja de datos — cita ambas cosas en tu cuaderno, como hace el curso |
+| El sensor de mi robot no está sobre un soporte giratorio | ¿Está montado directo sin servo? | Revisa el inventario de la Lección 02 con tu padre y anota la diferencia; el servo aparece en la Lección 47 |
 
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
-
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres clasificar frecuencias y explicar por qué PX-32 usa ultrasonido y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-009 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con audible, ultrasonido, transductor y 40 kHz. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a ubicar 40 kHz respecto al rango auditivo humano aproximado. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: clasificación correcta sin afirmar que inaudible significa inofensivo en todo contexto. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
-
-## 11. Qué deberías observar
-
-El resultado normal es **clasificación correcta sin afirmar que inaudible significa inofensivo en todo contexto**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
-
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
-
-## 12. Si no funciona
-
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
-
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
-
-## 13. Desafío
-
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [Velocidad, frecuencia y longitud de onda del sonido](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength) — Inglés; libro abierto; 12 min. Aprenderás velocidad, frecuencia y longitud de onda del sonido. Esencial.
 - [Biblioteca Servo](https://docs.arduino.cc/libraries/servo/) — Inglés; referencia oficial Arduino; 10 min. Aprenderás biblioteca servo. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+Pide a tu padre buscar "bat echolocation slowed down": escuchar un grito de murciélago estirado en el tiempo vale más que mil descripciones.
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **audible** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [Hoja de datos del módulo HC-SR04 (SparkFun)](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf): frecuencia de trabajo de 40 kHz y protocolo Trig/Echo. El manual de OSOYOO nombra el módulo genéricamente como "Ultrasonic module" (ver [errata y estado de verificación](../../docs/hardware/HW-009-ultrasonico.md)).
+- [HW-009 en el diccionario de hardware](../../docs/hardware/HW-009-ultrasonico.md): pines VCC/Trig/Echo/GND y estado de verificación.
+- [OpenStax Physics, sección 14.1](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength): rango auditivo humano y ultrasonido.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Cuéntale la historia de Spallanzani y los murciélagos con cera en los oídos, y muéstrale en PX-32 los dos cilindros que gritan y escuchan. Pregúntale si sabía que el silbato del perro de su infancia era ultrasonido. Y déjale una inquietud a propósito: si el robot mide distancias con tiempo de viaje, ¿de dónde sacará el sonido la velocidad para convertir tiempo en centímetros? Marca la casilla 41 en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **clasificar frecuencias y explicar por qué PX-32 usa ultrasonido** y lo conectaste con **audible, ultrasonido, transductor y 40 kHz**. Pudiste observar clasificación correcta sin afirmar que inaudible significa inofensivo en todo contexto. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 42: Eco y tiempo de vuelo](42-eco-y-tiempo-de-vuelo.md).
+La respuesta es una velocidad con la que convives todos los días sin verla: en la [Lección 42](42-eco-y-tiempo-de-vuelo.md) la cacemos con un trueno.

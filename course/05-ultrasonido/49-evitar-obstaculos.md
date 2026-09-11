@@ -1,156 +1,344 @@
 # Lección 49 — Evitar obstáculos
 
-## 1. Tu misión de hoy
+## El hito: PX-32 conduce, frena y decide solo
 
-Hoy vas a **detenerse, observar y escoger un lado libre antes de avanzar**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+Todo el bloque ha sido un entrenamiento en cámara lenta para esta sesión. La física del sonido (39–42), el grito y el cronómetro (43–44), los centímetros (45), la desconfianza estadística (46), el cuello (47) y el mapa (48). Hoy se une todo en el comportamiento más espectacular del curso hasta ahora: **PX-32 avanza solo, detecta un obstáculo, se detiene, mira a ambos lados y esquiva hacia donde hay espacio.** Es el hito 49, y el manual del fabricante trae exactamente esta demo como su "Lección 2" — nosotros la construiremos con la política de seguridad de este curso, que es más estricta que la del fabricante.
 
-## 2. Tiempo estimado
+Porque un robot que decide no es un robot que improvisa. El de hoy sigue una **política** — un puñado de reglas pensadas antes de encender nada, exactamente como la tabla de siete patrones de la Lección 37. Las reglas son estas:
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+1. **STOP primero.** ¿Frente bloqueado, lectura no fiable (-1), o los dos lados bloqueados? La única respuesta válida es ruedas detenidas. Ninguna lectura ausente autoriza avanzar: para un robot, "no sé qué hay adelante" se trata igual que "hay algo adelante".
+2. **Después mirar.** Con el robot ya detenido, la cabeza barre 45 y 135 (la rutina exacta de la Lección 48).
+3. **Girar solo con evidencia.** Se gira hacia el lado con más espacio, y únicamente si ese lado supera la distancia segura. Si ambos lados están bloqueados o sus lecturas no son fiables… se queda en STOP y espera a que un humano decida.
+4. **Nunca correr.** Potencia 60 de 255, giros breves de 350 ms, y siempre re-medir después de cada maniobra.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+Fíjate en la regla 1, porque es la que separa un juguete de un robot: el fabricante advierte en su solución de problemas que su demo puede comportarse raro si el sensor está mal conectado. Nuestra respuesta a eso no es "ojalá no pase", sino una política que convierte cualquier lectura sospechosa en **freno**. Un sensor flojo, un cable suelto, un eco que se pierde: todo termina en el mismo lugar seguro — parado.
 
-## 3. Lo que necesitas saber antes de empezar
+## Lo que necesitas
 
-[Lección 20: Vectores para mover PX-32](../02-movimiento/20-vectores-para-mover-px-32.md), [Lección 48: Escaneo espacial](48-escaneo-espacial.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
+- PX-32 ensamblado, servo alineado al frente en 90° (Lección 47), sensor verificado (Lecciones 43–46).
+- Tu cuaderno con el dato del ángulo 45° ("45 apunta hacia mi ___"): hoy ese apunte se convierte en una constante del programa.
+- Computador con Arduino IDE 2, cable USB y **baterías 18650 con carga** (adulto).
+- El sketch [49-evitar-obstaculos.ino](../../code/educational/49-evitar-obstaculos/49-evitar-obstaculos.ino).
+- Los dos soportes rígidos de la Lección 20 (fase B).
+- Un obstáculo grande y blando para la pista: una caja de cartón, una almohada firme o similar, de al menos 30 cm de frente. **Nada de sillas, mesas ni nada que pueda voltearse.**
+- Un piso despejado de al menos 2 m al frente del robot, sin escalones, mascotas, cables ni cosas frágiles.
 
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
+🟢 Programar, predecir y observar es tuyo. 🟡 El adulto presencia el USB y la calibración de constantes. 🔴 Baterías, interruptor, arranque en piso y corte de emergencia: el adulto, con la mano cerca del interruptor siempre.
 
-## 4. Lectura principal
+## El programa: la política hecha código
 
-### La idea intuitiva
-
-El tema de hoy es **umbral de seguridad, elección y maniobra**. En lenguaje cotidiano, buscamos una forma fiable de detenerse, observar y escoger un lado libre antes de avanzar. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-El módulo ultrasónico estima distancia midiendo tiempo, no extendiendo una regla invisible. Envía una onda, espera un eco y usa la velocidad aproximada del sonido. El servo añade dirección y convierte una medición puntual en un pequeño mapa. Toda estimación tiene límites: objetos blandos, inclinados, muy cercanos o estrechos pueden devolver ecos débiles.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **umbral de seguridad, elección y maniobra**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para simular decisiones por Serial y luego probar a baja velocidad. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Umbral de seguridad:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-004 a HW-006, HW-009, HW-010.
-
-```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
-```
-
-La cadena exacta de hoy se concentra en **umbral de seguridad, elección y maniobra**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
-
-## 7. Seguridad y participación del adulto
-
-- 🟢 El estudiante predice, lee el código y registra observaciones.
-- 🟡 Un adulto permanece presente durante USB, calibración o cualquier prueba física.
-- 🔴 El adulto manipula baterías 18650, interruptores de potencia, driver y cables. Toda conexión se revisa sin USB y con alimentación apagada.
-
-Para movimiento: primero ruedas levantadas sobre una base estable, velocidad baja, área despejada y el interruptor accesible. Cabello, mangas y dedos lejos de ruedas. Si hay calor, olor, humo, chispa, zumbido fuerte o movimiento inesperado, el adulto corta energía; no se intenta frenar con la mano.
-
-## 8. Predice antes de probar
-
-1. ¿Qué esperas observar cuando logres detenerse, observar y escoger un lado libre antes de avanzar y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
-
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
-
-## 9. Actividad o experimento guiado
-
-1. **Preparar.** Coloca PX-32 estable, identifica HW-004 a HW-006, HW-009, HW-010 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con umbral de seguridad, elección y maniobra. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a simular decisiones por Serial y luego probar a baja velocidad. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: STOP antecede al giro y ninguna lectura ausente autoriza avance. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
-
-## 10. Código
-
-Abre [49-evitar-obstaculos.ino](../../code/educational/49-evitar-obstaculos/49-evitar-obstaculos.ino). Antes de cargarlo, localiza `setup()`, `loop()` y la línea que representa **umbral de seguridad**. Lee el programa de arriba abajo y predice su salida.
+1. 🟢 Abre el `.ino` y verifica que coincida con este bloque:
 
 ```cpp
-// Curso PX-32 — programa mínimo de la lección 49
-// Cargar solo después de leer la sección de seguridad.
-const byte EN[4]={9,10,11,12};
-const byte P1[4]={22,26,5,7};
-const byte P2[4]={24,28,6,8};
-// Orden: frontal derecha, frontal izquierda, trasera derecha, trasera izquierda.
-void rueda(byte i,int sentido,byte pwm){
-  digitalWrite(P1[i],sentido>0?HIGH:LOW);
-  digitalWrite(P2[i],sentido<0?HIGH:LOW);
-  analogWrite(EN[i],sentido==0?0:pwm);
-}
-void parar(){ for(byte i=0;i<4;i++) rueda(i,0,0); }
-void mover(int fd,int fi,int td,int ti,byte pwm){
-  int s[4]={fd,fi,td,ti}; for(byte i=0;i<4;i++) rueda(i,s[i],pwm);
-}
-void prepararMotores(){ for(byte i=0;i<4;i++){ pinMode(EN[i],OUTPUT); pinMode(P1[i],OUTPUT); pinMode(P2[i],OUTPUT); } parar(); }
+// Curso PX-32 - Leccion 49: evitar obstaculos (hito del bloque).
+// Politica: STOP primero, mirar los dos lados y girar solo
+// con evidencia. Ninguna lectura no fiable autoriza avanzar.
+
 #include <Servo.h>
-Servo cabeza; const byte TRIG=30,ECHO=31; float cm(){ digitalWrite(TRIG,LOW); delayMicroseconds(2); digitalWrite(TRIG,HIGH); delayMicroseconds(10); digitalWrite(TRIG,LOW); unsigned long us=pulseIn(ECHO,HIGH,30000UL); return us?us*0.0343/2.0:-1; }
-void setup(){ prepararMotores(); pinMode(TRIG,OUTPUT); pinMode(ECHO,INPUT); cabeza.attach(13); cabeza.write(90); delay(3000); }
-void loop(){ float frente=cm(); if(frente<0||frente<25){ parar(); cabeza.write(45); delay(500); float izq=cm(); cabeza.write(135); delay(500); float der=cm(); cabeza.write(90); if(izq<0||der<0) parar(); else if(izq>der) mover(-1,+1,-1,+1,60); else mover(+1,-1,+1,-1,60); delay(350); parar(); } else mover(+1,+1,+1,+1,60); delay(40); }
+
+// FASE A: false -> solo imprime las decisiones.
+// FASE B y C: true -> las ejecuta con los motores.
+const bool MOTOR_ACTIVO = false;
+
+// Tu evidencia de la Leccion 48: con el sensor mirando al frente,
+// el angulo 45 apunta hacia TU izquierda? (true o false)
+const bool GRADOS_45_MIRA_A_TU_IZQUIERDA = true;
+
+const float DISTANCIA_SEGURA_CM = 25.0;
+const byte POTENCIA_AVANCE = 60;
+const byte POTENCIA_GIRO = 55;
+
+// Orden de los motores: frontal derecho, frontal izquierdo,
+// trasero derecho, trasero izquierdo (Lecciones 20 y 38).
+const byte PWM_BK1 = 9;   // Frontal derecho
+const byte BK1_IN1 = 22;
+const byte BK1_IN2 = 24;
+const byte PWM_BK3 = 10;  // Frontal izquierdo
+const byte BK3_IN3 = 26;
+const byte BK3_IN4 = 28;
+const byte PWM_AK1 = 11;  // Trasero derecho
+const byte AK1_IN1 = 5;
+const byte AK1_IN2 = 6;
+const byte PWM_AK3 = 12;  // Trasero izquierdo
+const byte AK3_IN3 = 7;
+const byte AK3_IN4 = 8;
+
+const byte TRIG = 30;
+const byte ECHO = 31;
+const byte PIN_SERVO = 13;
+const unsigned long TIMEOUT_US = 30000UL;
+const float SONIDO_CM_POR_US = 0.0343;
+
+Servo cabeza;
+
+void controlarMotor(
+  byte pinPwm,
+  byte pin1,
+  byte pin2,
+  int sentido,
+  byte potenciaPwm
+) {
+  if (sentido > 0) {
+    digitalWrite(pin1, HIGH);
+    digitalWrite(pin2, LOW);
+    analogWrite(pinPwm, potenciaPwm);
+  } else if (sentido < 0) {
+    digitalWrite(pin1, LOW);
+    digitalWrite(pin2, HIGH);
+    analogWrite(pinPwm, potenciaPwm);
+  } else {
+    analogWrite(pinPwm, 0);
+    digitalWrite(pin1, LOW);
+    digitalWrite(pin2, LOW);
+  }
+}
+
+void moverConPotencia(
+  int frontalDerecho,
+  int frontalIzquierdo,
+  int traseroDerecho,
+  int traseroIzquierdo,
+  byte potenciaPwm
+) {
+  controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, frontalDerecho, potenciaPwm);
+  controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, frontalIzquierdo, potenciaPwm);
+  controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, traseroDerecho, potenciaPwm);
+  controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4, traseroIzquierdo, potenciaPwm);
+}
+
+void detenerTodos() {
+  moverConPotencia(0, 0, 0, 0, 0);
+}
+
+void prepararMotores() {
+  pinMode(PWM_BK1, OUTPUT);
+  pinMode(PWM_BK3, OUTPUT);
+  pinMode(PWM_AK1, OUTPUT);
+  pinMode(PWM_AK3, OUTPUT);
+  pinMode(BK1_IN1, OUTPUT);
+  pinMode(BK1_IN2, OUTPUT);
+  pinMode(BK3_IN3, OUTPUT);
+  pinMode(BK3_IN4, OUTPUT);
+  pinMode(AK1_IN1, OUTPUT);
+  pinMode(AK1_IN2, OUTPUT);
+  pinMode(AK3_IN3, OUTPUT);
+  pinMode(AK3_IN4, OUTPUT);
+  detenerTodos();
+}
+
+void avanzar() {
+  moverConPotencia(+1, +1, +1, +1, POTENCIA_AVANCE);
+}
+
+void girarHaciaLaIzquierda() {
+  moverConPotencia(+1, -1, +1, -1, POTENCIA_GIRO);
+}
+
+void girarHaciaLaDerecha() {
+  moverConPotencia(-1, +1, -1, +1, POTENCIA_GIRO);
+}
+
+void girarHaciaElLadoDe45() {
+  if (GRADOS_45_MIRA_A_TU_IZQUIERDA) {
+    girarHaciaLaIzquierda();
+  } else {
+    girarHaciaLaDerecha();
+  }
+}
+
+void girarHaciaElLadoDe135() {
+  if (GRADOS_45_MIRA_A_TU_IZQUIERDA) {
+    girarHaciaLaDerecha();
+  } else {
+    girarHaciaLaIzquierda();
+  }
+}
+
+float medirDistanciaCm() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  unsigned long us = pulseIn(ECHO, HIGH, TIMEOUT_US);
+
+  if (us == 0 || us > 23200UL) {
+    return -1.0;  // lectura no fiable: se trata como riesgo
+  }
+
+  return us * SONIDO_CM_POR_US / 2.0;
+}
+
+void setup() {
+  prepararMotores();
+  pinMode(TRIG, OUTPUT);
+  digitalWrite(TRIG, LOW);
+  pinMode(ECHO, INPUT);
+  Serial.begin(9600);
+  cabeza.attach(PIN_SERVO);
+  cabeza.write(90);  // alineacion: sensor mirando al frente
+  delay(1000);
+
+  if (MOTOR_ACTIVO) {
+    Serial.println("MODO: EVASION ACTIVA");
+  } else {
+    Serial.println("MODO: SOLO IMPRIMIR");
+  }
+
+  if (GRADOS_45_MIRA_A_TU_IZQUIERDA) {
+    Serial.println("angulo 45 mira a la IZQUIERDA (segun tu cuaderno)");
+  } else {
+    Serial.println("angulo 45 mira a la DERECHA (segun tu cuaderno)");
+  }
+
+  delay(3000);  // tres segundos de calma antes de empezar
+}
+
+void loop() {
+  float frente = medirDistanciaCm();
+
+  if (frente < 0 || frente < DISTANCIA_SEGURA_CM) {
+    // 1) STOP: siempre antes que cualquier maniobra.
+    detenerTodos();
+    Serial.println("STOP: obstaculo o lectura no fiable");
+
+    // 2) Mirar los dos lados con la cabeza.
+    cabeza.write(45);
+    delay(500);
+    float lado45 = medirDistanciaCm();
+
+    cabeza.write(135);
+    delay(500);
+    float lado135 = medirDistanciaCm();
+
+    cabeza.write(90);
+    delay(300);
+
+    Serial.print("angulo 45: ");
+    if (lado45 < 0) {
+      Serial.println("no fiable");
+    } else {
+      Serial.print(lado45, 1);
+      Serial.println(" cm");
+    }
+
+    Serial.print("angulo 135: ");
+    if (lado135 < 0) {
+      Serial.println("no fiable");
+    } else {
+      Serial.print(lado135, 1);
+      Serial.println(" cm");
+    }
+
+    // 3) Elegir con evidencia: lado libre y fiable, o nada.
+    bool libre45 = (lado45 >= DISTANCIA_SEGURA_CM);
+    bool libre135 = (lado135 >= DISTANCIA_SEGURA_CM);
+
+    if (!libre45 && !libre135) {
+      Serial.println("AMBOS LADOS BLOQUEADOS: me quedo en STOP");
+    } else if (libre45 && (!libre135 || lado45 >= lado135)) {
+      Serial.println("GIRO hacia el lado del angulo 45");
+      if (MOTOR_ACTIVO) {
+        girarHaciaElLadoDe45();
+        delay(350);
+        detenerTodos();
+      }
+    } else {
+      Serial.println("GIRO hacia el lado del angulo 135");
+      if (MOTOR_ACTIVO) {
+        girarHaciaElLadoDe135();
+        delay(350);
+        detenerTodos();
+      }
+    }
+  } else {
+    Serial.println("LIBRE: avanzar");
+    if (MOTOR_ACTIVO) {
+      avanzar();
+    }
+  }
+
+  delay(40);
+}
 ```
 
-La sintaxis —llaves, paréntesis y punto y coma— permite que el compilador separe instrucciones. El comportamiento es lo que ocurre al ejecutarlas. El propósito de este sketch es aislar la idea de hoy; todavía no es el programa final del robot. No añadas una segunda mejora hasta comprobar la primera.
+2. 🟢 **Lo conocido, todo.** El bloque de motores (pines, `controlarMotor`, `moverConPotencia`, `detenerTodos`, `prepararMotores`, `avanzar`, giros) es **literalmente el de las Lecciones 20 y 38**: no hay una sola línea nueva. `medirDistanciaCm()` es la de la Lección 48. El corazón nuevo cabe en una frase: el `loop()` es la **política de los cuatro pasos** convertida en `if`.
 
-## 11. Qué deberías observar
+3. 🟢 **Tu cuaderno, codificado (otra vez).** Busca `GRADOS_45_MIRA_A_TU_IZQUIERDA`: es tu observación de la Lección 47 convertida en decisión. Gracias a ella, "girar hacia el lado del 45" sabe si eso significa ruedas a la izquierda o a la derecha. Como `IR1_DEL_LADO_IZQUIERDO` en la Lección 38: el robot obedece a tu evidencia, no a la suerte de fábrica. Si tu cuaderno dice que 45 mira a tu **derecha**, cámbiala a `false` antes de cargar nada.
 
-El resultado normal es **STOP antecede al giro y ninguna lectura ausente autoriza avance**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+4. 🟢 **La bandera de permiso.** `MOTOR_ACTIVO` funciona igual que en las Lecciones 30 y 38: en `false`, el programa **piensa en voz alta** —imprime cada decisión— pero la única orden que llega a los motores es `detenerTodos()`. Las dos primeras líneas del monitor te dicen el modo y el lado asumido del 45: léelas **siempre** antes de dar por buena una carga.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+5. 🟢 **Sigue la lógica de elección.** `libre45` y `libre135` son `bool` (Lección 09): solo pueden ser `true` o `false`. Para ser "libre" hay que ser fiable **y** superar 25 cm — compara con `>=`: una pared a exactamente 25,0 cm cuenta como libre. La línea clave de la elección es `libre45 && (!libre135 || lado45 >= lado135)`: "el 45 está libre, y además el 135 no lo está o el 45 tiene tanto espacio como él". Con paréntesis, una condición larga se lee como tú hablas. Y en la fase de giro: `delay(350)` y **STOP de nuevo** — el giro es un mordisco corto, no una maniobra a ciegas; después de cada mordisco el bucle vuelve a medir.
 
-## 12. Si no funciona
+6. 🟢 **Predice el ensayo completo.** Antes de la fase A, escribe qué imprimirá el programa (y qué harán las ruedas en B y C) en estos cuatro escenarios: (a) frente despejado, (b) obstáculo a 20 cm y espacio a un solo lado, (c) obstáculo y **ambos** lados con libros a 20 cm, (d) sensor tapado con la mano (lectura no fiable… o 4 cm de mano: ambas respuestas frenan, ¿por qué?).
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+## Fase A: el robot solo piensa (USB)
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+7. 🟡 El adulto conecta el USB. Verifica juntas: `MOTOR_ACTIVO` en `false`, la constante del lado del 45 según el cuaderno. Sube el sketch, monitor a 9600. Deben aparecer "MODO: SOLO IMPRIMIR" y el lado del 45: tu comprobante.
 
-## 13. Desafío
+8. 🟢 **Interroga la política sin riesgo.** Pon tu mano a 10 cm del sensor: el monitor debe dictar `STOP`, las dos lecturas laterales, y su decisión (`GIRO…` o `AMBOS LADOS BLOQUEADOS`). Coloca libros a los costados según los escenarios (b) y (c) de tu predicción y verifica cada respuesta. Ninguna rueda debe girar. Si alguna decisión sale al revés, **corrígela aquí**, en la pantalla, donde los errores son gratis — igual que en las lecciones 30 y 38.
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
+## Fase B: ruedas levantadas
 
-## 14. Lecturas y videos para explorar
+9. 🟡 Apagado y sin baterías, cambien únicamente `MOTOR_ACTIVO = false` por `true`. Solo USB, sube, verifica las dos líneas del monitor. Cierra el monitor: la evidencia ahora son las ruedas y la cabeza.
+
+10. 🔴 El adulto retira el USB, instala las celdas y enciende el robot **sobre los dos soportes**, mano junto al interruptor. Respeta los tres segundos de calma.
+
+11. 🟢 **Verifica la coreografía completa en el aire.** Mano a 10 cm frente al sensor: STOP inmediato (regla 1), la cabeza barre ambos lados, y las ruedas giran en el sentido de la decisión **solo 350 ms** y vuelven a frenar. Retira la mano: avance continuo y tranquilo (la cabeza al frente). Tapa el sensor con la palma: STOP y barrido — la mano a centímetros es "no fiable" por la zona ciega de la Lección 45 o una lectura cortísima; ambas cosas frenan. Practica el freno tres veces: es tu actuación estrella de seguridad.
+
+12. 🔴 Ante una rueda inesperada, ausencia de STOP, zumbido, calor u olor: el adulto corta energía y la fase de piso queda cancelada hasta revisar.
+
+## Fase C: en el piso
+
+13. 🔴 Solo si la fase B fue limpia: el adulto apaga, baja el robot y lo coloca a al menos 1,5 m del obstáculo, sensor al frente, área despejada, nadie delante. Enciende, respeta los tres segundos, y aléjense del frente del robot.
+
+14. 🟢 **Observa el hito con calma.** El robot avanza despacio hacia la caja; al llegar al umbral (25 cm) se detiene, **mira** izquierda y derecha, y esquiva hacia el lado con espacio con un giro corto; después vuelve a medir y sigue. Camina junto a él (nunca delante) y narra lo que hace en voz alta: "mide… frena… escanea… decide". Ese relato ES el bucle del programa.
+
+15. 🟢 **El caso honrado.** Si el robot queda encerrado o ambos lados dan lecturas no fiables, debe quedarse en STOP sin luchar. No es un fracaso: es la regla 3 funcionando — un robot que sabe quedarse quieto es mejor robot que uno que improvisa.
+
+16. 🔴 Al terminar, el adulto apaga y retira las celdas. Ustedes devuelven `MOTOR_ACTIVO = false`, conectan solo USB, suben la versión neutral y comprueban "MODO: SOLO IMPRIMIR". Un PX-32 guardado no debería poder moverse aunque se encienda por accidente.
+
+El hito está completo cuando viviste las tres fases en orden, el robot esquivó al menos una vez hacia el lado correcto, se detuvo ante la caja y ante la falta de eco fiable, y puedes explicar el bucle completo — medir, frenar, escanea, decidir — señalando cada parte del sketch.
+
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama de flujo de la política de decisión.
+> - **Objetivo:** que el niño vea la política de los cuatro pasos como un mapa de caminos con una sola salida peligrosa controlada: STOP.
+> - **Descripción:** diagrama de flujo vertical: "medir frente" → rombo "¿fiable y >= 25 cm?" → sí: "AVANZAR (vuelve a medir)"; no: "STOP" → "escanear 45 y 135" → rombo "¿algún lado libre y fiable?" → sí: "giro corto 350 ms hacia ese lado → vuelve a medir"; no: "me quedo en STOP".
+> - **Elementos que deben señalarse:** las dos salidas hacia STOP (frente no seguro y lados no seguros), la flecha de retorno a "medir" tras cada acción, los rótulos de fase (A: solo imprime, B/C: ejecuta).
+> - **Fuente técnica:** política del curso sobre la demo de evasión del manual OSOYOO, https://osoyoo.com/manual/2021006600-2026.pdf, pp. 26–33.
+> - **Texto alternativo sugerido:** "Diagrama de flujo de la evasión de obstáculos: medir, frenar, escanear ambos lados, girar solo con evidencia o quedarse en STOP".
+
+## Desafío: el probador de políticas
+
+De pizarra, con el robot ya guardado: tu hermano o tu padre te dicta un escenario ("frente a 40 cm, izquierda a 10, derecha a 80") y tú respondes como el robot ("LIBRE avanzo… no: frente bloqueado… STOP… escano… giro hacia la derecha") señalando la rama del `if` en el sketch que se ejecuta. Cinco rondas. Si quieres la versión con código, sube `DISTANCIA_SEGURA_CM` a 40 en fase A y descubre cuánto antes empieza a frenar el robot — un número, todo un carácter.
+
+## Si no funciona
+
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| No pasa de "MODO: SOLO IMPRIMIR" a moverse | ¿Olvidaron `MOTOR_ACTIVO = true` para la fase B? | Es la bandera, no el hardware; cámbienla y suban de nuevo |
+| Frena pero gira hacia el lado bloqueado | ¿`GRADOS_45_MIRA_A_TU_IZQUIERDA` coincide con tu cuaderno? | Verifica desde atrás del robot; corrige la constante y vuelve a la fase A, nunca cambies signos de motor a ciegas |
+| Nunca frena: choca contra la caja | ¿Cables Trig/Echo bien en D30/D31? ¿Objeto blando o inclinado? | El manual del fabricante da la misma pista para su demo: revisar la conexión del sensor; prueba con caja grande y plana, de frente |
+| Se detiene aunque el frente está despejado | ¿Suelo, zócalo o sombra delante? ¿Lectura no fiable repetida? | Sube el sensor de dudas: apunta el frente al aire libre; si sigue en STOP, fase A con el monitor para ver la lectura exacta |
+| Gira sin parar en circulitos | ¿Los lados alternan libre/bloqueado muy rápido? | Normal cerca de esquinas: cada giro es de 350 ms y re-mide; aleja el robot de las paredes o ensancha el espacio |
+| Titubea, reinicia o pierde fuerza | ¿Celdas gastadas o conectores flojos? | 🔴 El adulto corta energía y revisa la ruta de potencia (baterías → portabaterías → VIN del Model Y, según el [mapa de conexiones](../../docs/reference/mapa-conexiones-robot.md)) antes de reintentar |
+| La cabeza no barre al frenar | ¿El servo centrado en 90° al encender? | Repite la alineación de la Lección 47: soporte al frente con todo apagado |
+
+## Lecturas y videos para explorar
 
 - [Velocidad, frecuencia y longitud de onda del sonido](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength) — Inglés; libro abierto; 12 min. Aprenderás velocidad, frecuencia y longitud de onda del sonido. Esencial.
 - [Biblioteca Servo](https://docs.arduino.cc/libraries/servo/) — Inglés; referencia oficial Arduino; 10 min. Aprenderás biblioteca servo. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+## Referencias técnicas de la clase
 
-## 15. Cuéntale a papá
+- [Manual OSOYOO](https://osoyoo.com/manual/2021006600-2026.pdf), pp. 26–33: demo de evasión del fabricante (barrido 45/90/135 antes de decidir), alineación del servo y solución de problemas de conexión del sensor (VCC→5V, TRIG→D30, ECHO→D31, GND→GND).
+- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md): sensor, servo y motores.
+- [Referencia del lenguaje Arduino](https://docs.arduino.cc/language-reference/): `bool`, operadores lógicos `&&`/`||`, `if...else` y `analogWrite()`.
+- [Guía de sensores del curso](../../docs/reference/sensores.md): regla de integración — Serial primero, decisión impresa después, movimiento al final.
 
-- Cuéntale con tus palabras qué significa **umbral de seguridad** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+## Cuéntale a papá
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+Piloteen juntos la fase final y luego explícale la política con tus palabras: frenar primero, mirar después, girar solo con evidencia — y por qué un robot que se queda quieto cuando no entiende es más seguro que uno valiente. Muéstrale en el sketch la constante `GRADOS_45_MIRA_A_TU_IZQUIERDA` y cuéntale que esa línea existe gracias a tu cuaderno, igual que la del lado de IR1 en la Lección 38. Marca el **hito 49** en [PROGRESS.md](../../PROGRESS.md): PX-32 ya ve con sonido, decide y esquiva.
 
-## 16. Resumen de la jornada
-
-Hoy aprendiste a **detenerse, observar y escoger un lado libre antes de avanzar** y lo conectaste con **umbral de seguridad, elección y maniobra**. Pudiste observar STOP antecede al giro y ninguna lectura ausente autoriza avance. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 50: Radio: otra región del espectro](../06-bluetooth/50-radio-otra-region-del-espectro.md).
+Y un cambio de sentido se avecina: el sonido necesitaba aire para viajar (Lección 39), pero en la [Lección 50](../06-bluetooth/50-radio-otra-region-del-espectro.md) PX-32 estrenará ondas que cruzan el vacío sin problema — la radio, prima de la luz que ya usaste para seguir líneas. Bienvenido al bloque de Bluetooth.

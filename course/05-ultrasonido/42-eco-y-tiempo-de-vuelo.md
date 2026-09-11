@@ -1,131 +1,91 @@
 # Lección 42 — Eco y tiempo de vuelo
 
-## 1. Tu misión de hoy
+## El truco de la tormenta
 
-Hoy vas a **deducir por qué la distancia es recorrido total dividido entre dos**. Al terminar podrás demostrarlo con una explicación, un dato o un comportamiento observable; no basta con decir “funcionó”.
+En una tormenta hay un juego que juegan los abuelos del campo: cuando brilla el relámpago, empiezan a contar "uno… dos… tres…" hasta que llega el trueno. Cada tres segundos, un kilómetro de distancia. Relámpago y trueno nacen en el mismo instante y del mismo lugar; el relámpago te llega casi al instante (la luz es rapidísima), pero el sonido viaja a su propio paso. Contando cuánto se demora, mides a qué distancia cayó el rayo **sin moverte de tu silla**.
 
-## 2. Tiempo estimado
+Acabas de ver el corazón entero de este bloque: **una señal que viaja a velocidad conocida + un cronómetro = distancia**. PX-32 no tiene abuelo ni tormenta a mano, pero tiene el equivalente perfecto: grita un ultrasonido (su relámpago), espera el eco que rebota en el obstáculo (su trueno) y mide el tiempo entre ambos. A ese tiempo los ingenieros lo llaman **tiempo de vuelo**.
 
-- Lectura y conversación inicial: 10 minutos.
-- Preparación y predicción: 5 minutos.
-- Actividad o programación: 15 minutos.
-- Desafío y depuración: 5 minutos.
-- Cuéntale a papá y resumen: 5 minutos.
+Falta solo una pieza de geometría, y es la pieza que más confunde a todo el mundo.
 
-**Total: 40 minutos.** Si aparece una duda de cableado o la actividad necesita más intentos, detente al terminar la preparación y continúa otro día; la seguridad no se comprime para cumplir el reloj.
+## El detalle del viaje de ida y vuelta
 
-## 3. Lo que necesitas saber antes de empezar
+Cuando el grito del sensor rebotó en la pared y volvió, ¿cuánto camino recorrió? Piénsalo con calma: fue **hasta la pared y de regreso**. Si la pared está a 30 cm, el sonido recorrió 30 cm… y luego otros 30 cm de vuelta: **60 cm en total**.
 
-[Lección 41: Ultrasonido: más allá del oído](41-ultrasonido-mas-alla-del-oido.md). Debes poder explicar su idea central y repetir su prueba segura antes de continuar.
-
-También necesitas distinguir tres capas de PX-32: la **energía** permite que algo ocurra, la **señal** representa información u órdenes y el **programa** decide qué hacer con ellas. Cuando algo falle, pregunta primero en cuál capa está la evidencia. Consulta el [glosario general](../../docs/reference/glosario.md) y el [mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) sin modificar el montaje.
-
-## 4. Lectura principal
-
-### La idea intuitiva
-
-El tema de hoy es **eco, velocidad del sonido, ida y vuelta**. En lenguaje cotidiano, buscamos una forma fiable de deducir por qué la distancia es recorrido total dividido entre dos. La palabra “fiable” importa: una sola coincidencia puede ser suerte; una explicación científica conecta una causa, una prueba y un resultado que otra persona podría repetir.
-
-El módulo ultrasónico estima distancia midiendo tiempo, no extendiendo una regla invisible. Envía una onda, espera un eco y usa la velocidad aproximada del sonido. El servo añade dirección y convierte una medición puntual en un pequeño mapa. Toda estimación tiene límites: objetos blandos, inclinados, muy cercanos o estrechos pueden devolver ecos débiles.
-
-### De la intuición al concepto técnico
-
-Los términos centrales son **eco, velocidad del sonido, ida y vuelta**. No son etiquetas decorativas: cada uno nombra una relación que podremos observar. Una analogía útil es pensar en una receta: ingredientes, pasos y resultado ayudan a organizar la acción. Pero la analogía tiene límite; PX-32 no “sabe” qué desea el cocinero y un componente real responde a voltaje, tiempo, geometría y código, no a intenciones.
-
-En PX-32, esta idea se usa para resolver trayectos dibujados de sensor a pared y regreso. Antes de actuar, separa cuatro preguntas: ¿qué cambiaremos?, ¿qué mantendremos igual?, ¿qué mediremos?, ¿qué resultado nos obligaría a detenernos? Ese orden convierte una demostración llamativa en un experimento. Si modificamos dos cosas a la vez, perdemos la posibilidad de saber cuál causó el cambio.
-
-Un error frecuente es confundir el nombre de una pieza con una explicación. Decir “es un sensor” no explica qué magnitud detecta, qué señal entrega ni bajo qué condiciones puede equivocarse. Otro error es atribuir intención al programa: una condición `if` no “comprende” el obstáculo; compara representaciones y ejecuta una rama. Pregunta de reflexión: **¿qué evidencia distinguiría una decisión correcta de una coincidencia?**
-
-La meta no es memorizar todo en una lectura. Primero forma un modelo: entrada → transformación → salida. Después contrástalo con la actividad. Si el resultado no coincide, el modelo gana detalle. Esa revisión es aprendizaje científico, no fracaso.
-
-## 5. Palabras nuevas
-
-- **Eco:** idea principal que podrás reconocer en la actividad.
-- **Evidencia:** observación o medición que apoya o contradice una explicación.
-- **Variable de prueba:** elemento que cambiamos deliberadamente mientras mantenemos los demás lo más estables posible.
-- **Fallo seguro:** estado que reduce el riesgo cuando falta información; en PX-32 suele ser `STOP`.
-
-Puedes consultar definiciones relacionadas en el [glosario general](../../docs/reference/glosario.md).
-
-## 6. Así aparece en PX-32
-
-**Hardware:** HW-009.
+Eso significa que el tiempo que mide el sensor es el tiempo de un viaje doble. Para conocer la distancia hasta la pared hay que dividir el recorrido total entre dos. Es la regla de la que depende todo el cálculo del robot, y vale la pena verla con el cuerpo y no solo con lápiz:
 
 ```text
-fenómeno o comando → sensor/interfaz → pin y programa → decisión → actuador o mensaje
-                         ↑                         |
-                         └──── evidencia Serial ──┘
+distancia hasta el objeto = (velocidad × tiempo medido) / 2
 ```
 
-La cadena exacta de hoy se concentra en **eco, velocidad del sonido, ida y vuelta**. No cambies conexiones basándote solo en este esquema conceptual. Para pines usa el [mapa canónico](../../docs/reference/mapa-conexiones-robot.md); para discrepancias usa la [errata del manual](../../docs/reference/errata-osoyoo.md). Los límites de potencia y la configuración interna del portabaterías siguen `PENDIENTE_DE_VERIFICAR`.
+Y falta la velocidad. En aire a unos 20 °C, el sonido viaja a aproximadamente **343 metros por segundo**. Un dato asombroso si lo piensas: mientras lees esta frase, el sonido pudo dar casi una vuelta a una cancha de fútbol. Y a la vez es tan lento comparado con la luz, que en una tormenta llega con segundos de retraso: ese retraso es exactamente lo que cuentan los abuelos.
 
-## 7. Seguridad y participación del adulto
+## Lo que necesitas
 
-- 🟢 El estudiante puede leer, dibujar, programar y observar el robot apagado.
-- 🟡 Un adulto comprueba el estado de PX-32 antes de conectar USB.
-- 🔴 Solo el adulto manipula baterías 18650, cargador, potencia o cableado dudoso.
+- Un pasillo o un espacio libre de unos 3 a 4 metros en el piso (marcado con cinta si es posible).
+- Cinta métrica o regla larga (para marcar 1, 2 y 3 metros).
+- Cronómetro (el del teléfono de tu padre).
+- Tu cuaderno y calculadora.
+- Un cómplice: tu padre o alguien de la casa que camine parejo.
 
-La mesa debe estar seca y despejada. PX-32 permanece apagado y ensamblado salvo que un paso indique lo contrario. Ante calor, olor, humo, chispa o daño visible, no se toca: el adulto aísla la alimentación.
+🟢 Todo el experimento es caminar y calcular: sin electricidad y sin robot encendido. PX-32 puede quedarse mirando desde la mesa.
 
-## 8. Predice antes de probar
+## El experimento: camina como un sonido
 
-1. ¿Qué esperas observar cuando logres deducir por qué la distancia es recorrido total dividido entre dos y qué mecanismo produciría ese resultado?
-2. ¿Qué observación contraria te haría detenerte o revisar la explicación?
+1. 🟢 **Monta la pista.** En el piso, marca con cinta una línea de salida, y a 1, 2 y 3 metros marcas visibles. La última marca (o una pared a 3 metros) será "el obstáculo".
 
-Respóndelas en voz alta o en tu cuaderno físico. No necesitas un diario digital.
+2. 🟢 **Predice en el cuaderno.** Antes de medir nada, escribe: "si mi cómplice camina parejo y tarda 6 segundos en ir hasta los 3 metros y volver, el viaje completo fue de ___ metros, así que la ida sola fue de ___ metros". (Respuestas para comprobar después: 6 y 3.)
 
-## 9. Actividad o experimento guiado
+3. 🟢 **El viaje de ida y vuelta, cronometrado.** Tu cómplice camina a paso parejo desde la salida hasta la marca de 3 m, toca la marca (¡ese toque es el rebote del eco!) y regresa. Tú cronometras **el viaje completo**. Anota el tiempo total.
 
-1. **Preparar.** Coloca PX-32 estable, identifica HW-009 y confirma con el adulto que la energía está en el estado seguro. Continúa solo si no hay cables sueltos, daño, calor u olor.
-2. **Trazar.** Señala la ruta entrada → proceso → salida relacionada con eco, velocidad del sonido, ida y vuelta. Si no puedes justificar un pin, consulta el mapa; no adivines.
-3. **Predecir.** Elige un resultado concreto y una señal de parada. Di qué variable cambiarás y cuáles permanecerán iguales.
-4. **Probar.** Vas a resolver trayectos dibujados de sensor a pared y regreso. Haz un solo cambio. Observa antes de repetir y mantén accesible la forma de detener la prueba.
-5. **Comprobar.** El resultado que permite continuar es: división entre dos justificada geométricamente. Si no aparece, apaga cuando corresponda y pasa a “Si no funciona”.
-6. **Repetir.** Realiza una segunda prueba cambiando solo un valor, posición o entrada. Compara, no persigas un resultado “bonito”.
-7. **Restaurar.** Detén el programa, apaga la alimentación y devuelve cualquier ajuste temporal a su posición anotada. El adulto confirma que PX-32 conserva su ensamblaje y que ningún cable invade ruedas o engranajes.
+4. 🟢 **Haz las cuentas del robot.** Con la cinta métrica mide el paso real de tu cómplice: cuántos centímetros avanza en una zancada, o mejor, cuánto tarda en recorrer un metro conocido. Calcula su **velocidad** (por ejemplo, 1 metro cada 2 segundos = 0,5 m/s). Ahora aplica la fórmula del robot:
 
-## 10. Código
+   ```text
+   distancia hasta la marca = (velocidad × tiempo total) / 2
+   ```
 
-Hoy no hace falta cargar código nuevo. Si se usa el monitor serie o un sketch anterior, será solo como instrumento de observación. Esta decisión mantiene una sola idea nueva en la sesión y evita confundir un fenómeno físico con un error de sintaxis.
+   Compara con los 3 metros reales de la cinta. ¿Te acercaste? Repite el viaje dos veces más y promedia: una sola medición puede salir suertuda o desastrosa; tres te dan una idea honesta (esto volverá en la Lección 46, con el robot de verdad).
 
-## 11. Qué deberías observar
+5. 🟢 **La prueba del trueno.** Ahora al revés: conoces la velocidad del sonido (343 m/s) y la distancia (3 m). Calcula cuánto tardaría el eco de una palmada en una pared a 3 m: recorrido total 6 m → tiempo = 6 / 343 ≈ **0,0175 segundos**, unos 17,5 ms o 17 500 µs. Ese número es tan corto que ningún humano lo cronometra: por eso necesitas un murciélago… o una Mega 2560, que mide microsegundos sin despeinarse.
 
-El resultado normal es **división entre dos justificada geométricamente**. Puede haber variación por tolerancias, superficie, luz, fricción, carga, eco o tiempos del programa. Una variación pequeña y repetible es información; un salto grande, un reinicio, una lectura imposible o un movimiento inesperado exige STOP.
+6. 🟢 **El examen del ÷2.** Responde en el cuaderno sin mirar atrás: el sensor mide un eco de 5 860 µs. Con 0,0343 cm/µs, ¿qué recorrido total hizo el sonido y a qué distancia está el objeto? (Cálculo: 5860 × 0,0343 ≈ 201 cm de recorrido; ÷ 2 = 100,5 cm hasta el objeto.) Si obtuviste 100,5 cm, la división entre dos ya es tuya para siempre.
 
-No concluyas “está dañado” por un solo dato. Tampoco concluyas “es seguro” porque funcionó una vez. Repite bajo las mismas condiciones y compara. En sensores, conserva una condición conocida; en código, observa Serial; en movimiento, vuelve primero a ruedas levantadas.
+> **[PENDIENTE VISUAL]**
+> - **Tipo:** diagrama de trayectoria.
+> - **Objetivo:** fijar la diferencia entre recorrido total y distancia al objeto.
+> - **Descripción:** vista cenital del robot frente a una pared; flecha de ida desde el sensor a la pared rotulada "30 cm", flecha de retorno rotulada "30 cm", llave que abarca ambas rotulada "recorrido total medido: 60 cm", y corchete simple desde el robot hasta la pared rotulado "distancia real: 60 / 2 = 30 cm".
+> - **Elementos que deben señalarse:** sensor ultrasónico, pared, ambas flechas con sentido, rótulos de recorrido total y de distancia entre dos.
+> - **Fuente técnica:** hoja de datos HC-SR04 (SparkFun), https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf, descripción del tiempo de eco de ida y vuelta.
+> - **Texto alternativo sugerido:** "Diagrama del viaje de ida y vuelta del ultrasonido mostrando que el recorrido medido es el doble de la distancia al objeto".
 
-## 12. Si no funciona
+## Desafío: el juego de la tormenta, con reglas
 
-| Síntoma | Prueba sencilla | Interpretación | Siguiente acción segura |
-|---|---|---|---|
-| No ocurre nada | Comprueba alimentación lógica, placa y programa esperado | Puede faltar energía o haberse elegido placa/puerto incorrectos | Detén, revisa una capa y vuelve a intentar |
-| El dato no cambia | Cambia solo la entrada física prevista | El sensor, pin o lógica puede no coincidir | Imprime la lectura cruda y compárala con el mapa |
-| El resultado es intermitente | Repite sin mover cables y observa el tiempo | Puede haber umbral, ruido o conexión inestable | Apaga; el adulto inspecciona conectores |
-| Hay movimiento inesperado, calor u olor | No hagas otra prueba | Es una condición de riesgo, no un reto de software | El adulto corta energía y revisa antes de continuar |
+Con tu padre, inventa el juego completo: él dice "¡rayo!" en voz baja y aplaude fuerte 3, 6 o 9 segundos después (el trueno). Con la regla de los abuelos (3 segundos ≈ 1 kilómetro), calcula a qué "distancia" cayó cada rayo. Luego invierte el juego: él te da la distancia (2 km) y tú produces el trueno con el retraso correcto. El que menos se equivica en cinco rondas gana. Al final, calcula juntos cuántos microsegundos tardaría el eco de un rayo que cayera a 3 km… y descubre por qué el trueno de un rayo cercano retumba en vez de aplaudir una sola vez (pista: el rayo es largo, y cada punto de él está a una distancia distinta de ti).
 
-El método es siempre **síntoma → prueba pequeña → interpretación → una acción**. Cambiar cinco cosas puede ocultar el problema y crear uno nuevo.
+## Si no funciona
 
-## 13. Desafío
+| Síntoma | Qué revisar | Acción |
+|---|---|---|
+| Mi cálculo da el doble de lo esperado | ¿Olvidaste dividir entre 2? | Es el error clásico: el cronómetro midió ida **y** vuelta; el objeto está a la mitad |
+| El cómplice camina a pasos desparejos | ¿Cambia de ritmo al girar? | Que ensaye el giro tocando la marca sin detenerse, y promedia varias corridas |
+| No me sale 17,5 ms para la pared a 3 m | ¿Dividiste 6/343 o 3/343? | El recorrido es 6 m (ida y vuelta); si usaste 3 m obtendrás la mitad: 8,75 ms |
+| Me pierdo entre ms y µs | ¿Recuerdas la Lección 40? | 1 ms = 1000 µs; 17,5 ms = 17 500 µs. La Mega hablará en µs |
+| La velocidad del sonido, ¿siempre es 343? | ¿Hace frío o calor hoy? | 343 m/s corresponde a unos 20 °C; con aire más frío el sonido va un poco más lento. Anótalo como fuente de error, no lo escondas |
 
-Diseña una variante que cambie una sola condición de la actividad. Antes de ejecutarla, escribe una frase “Si…, entonces…, porque…”. Luego explica si el resultado apoya la predicción. No copies una solución completa: el valor del desafío está en elegir la variable y justificarla.
-
-## 14. Lecturas y videos para explorar
+## Lecturas y videos para explorar
 
 - [Velocidad, frecuencia y longitud de onda del sonido](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength) — Inglés; libro abierto; 12 min. Aprenderás velocidad, frecuencia y longitud de onda del sonido. Esencial.
 - [Biblioteca Servo](https://docs.arduino.cc/libraries/servo/) — Inglés; referencia oficial Arduino; 10 min. Aprenderás biblioteca servo. Opcional.
 
-Comprueba con un adulto antes de abandonar el material del curso. Un recurso externo amplía la explicación; nunca reemplaza el mapa de conexiones ni las reglas de seguridad de PX-32.
+En OpenStax encontrarás la tabla de velocidades del sonido en aire, agua y acero: el mismo grito viaja a velocidades distintas según el medio (¿te acuerdas de la Lección 39?).
 
-## 15. Cuéntale a papá
+## Referencias técnicas de la clase
 
-- Cuéntale con tus palabras qué significa **eco** y dónde aparece en PX-32.
-- Muéstrale la evidencia y explícale qué cambiaste y qué mantuviste igual.
-- Pregúntale qué ejemplo parecido conoce fuera de la robótica.
-- Explícale un error posible y la prueba pequeña que usarías para localizarlo.
-- Dile qué te gustaría probar después y qué regla de seguridad conservarías.
+- [OpenStax Physics, sección 14.1](https://openstax.org/books/physics/pages/14-1-speed-of-sound-frequency-and-wavelength): velocidad del sonido en el aire (343 m/s a 20 °C) y su variación con la temperatura.
+- [Hoja de datos del módulo HC-SR04 (SparkFun)](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf): el eco como tiempo de ida y vuelta.
 
-Esto es una conversación, no un examen. Si una explicación se atasca, vuelvan juntos al diagrama entrada → proceso → salida.
+## Cuéntale a papá
 
-## 16. Resumen de la jornada
+Jueguen el juego de la tormenta del desafío y luego explícale el error del doble: por qué un robot que olvida dividir entre 2 creería que todo está al doble de su distancia real, y qué tan peligroso sería eso al frenar frente a un obstáculo. Muéstrale tu tabla de mediciones del pasillo. Marca la casilla 42 en [PROGRESS.md](../../PROGRESS.md).
 
-Hoy aprendiste a **deducir por qué la distancia es recorrido total dividido entre dos** y lo conectaste con **eco, velocidad del sonido, ida y vuelta**. Pudiste observar división entre dos justificada geométricamente. La regla de seguridad es cambiar conexiones únicamente sin energía y usar `STOP` ante información dudosa. La próxima sesión será la [Lección 43: TRIG: enviar un pulso breve](43-trig-enviar-un-pulso-breve.md).
+Ya tienes la física completa: onda, frecuencia, eco, velocidad y la división entre dos. En la [Lección 43](43-trig-enviar-un-pulso-breve.md) se enciende el computador: PX-32 aprende por fin a **dar la orden de gritar**.
