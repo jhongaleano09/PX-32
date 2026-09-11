@@ -1,0 +1,12 @@
+.DS_Store
+tmp/
+
+# Credenciales locales futuras de Wi-Fi/Bluetooth
+secrets.h
+**/secrets.h
+*.local.h
+
+# Artefactos de compilación Arduino
+build/
+*.hex
+*.elf
