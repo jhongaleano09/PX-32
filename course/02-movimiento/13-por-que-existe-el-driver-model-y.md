@@ -84,10 +84,16 @@ La actividad termina cuando tu hoja contiene dos rutas completas, cada una con o
 
 ## Lecturas y videos para explorar
 
-- [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
-- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
+- [Cómo usar el driver controlador de motores L298N](https://www.youtube.com/watch?v=0bxqxp9EkVI) — Español; video; 17 min (verlo por partes).
+**Por qué este recurso:** profundiza en la idea central de la lección con otro driver distinto al Model Y pero con el mismo trabajo: recibir órdenes de un lado y gobernar la potencia del otro; divídelo en dos partes.
 
-Mientras exploras, usa los dos colores: cada flecha debería responder “¿esto representa una orden o transporta potencia?”.
+- [Motor DC con Arduino y driver L298N o L293D](https://programarfacil.com/electronica/motor-dc/) — Español; lectura; ~12 min.
+**Por qué este recurso:** confirma por qué los pines de la placa no pueden alimentar un motor y por qué existe el intermediario, exactamente la separación entre señal y energía que rastrea esta clase.
+
+- [¿Qué es un motor shield?](https://pasionelectronica.com/que-es-un-motor-shield/) — Español; lectura; ~5 min.
+**Por qué este recurso:** estimula la curiosidad al mostrar placas que se montan sobre Arduino como un sándwich para controlar cuatro motores; te ayuda a imaginar variantes del Model Y.
+
+Mientras exploras, usa tus dos colores: cada flecha de cada recurso debería responder «¿esto lleva una orden o transporta potencia?».
 
 ## Referencias técnicas de la clase
 

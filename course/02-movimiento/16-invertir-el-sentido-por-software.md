@@ -160,10 +160,16 @@ Sin volver a encender, predice qué cambiaría si `delay(1200)` fuera `delay(200
 
 ## Lecturas y videos para explorar
 
-- [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
-- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
+- [CÓMO CAMBIAR EL SENTIDO DE GIRO DE UN MOTOR DC](https://www.youtube.com/watch?v=FCIY09M-KvE) — Español; video; 10 min.
+**Por qué este recurso:** confirma que invertir el giro es invertir la polaridad, primero con cables y luego con electrónica, tal como harás por software hoy.
 
-Busca la diferencia entre una tabla de conexiones —qué pin llega dónde— y una tabla lógica —qué combinación produce cada acción—.
+- [Arduino: módulo Puente H L298N — cambio de giro y control de velocidad](https://www.youtube.com/watch?v=dcECIc56NAM) — Español; video; 9 min.
+**Por qué este recurso:** profundiza mostrando que cambiar HIGH y LOW en el código invierte el motor sin tocar un cable, exactamente el experimento de esta lección.
+
+- [¿Qué es PWM y cómo funciona?](https://www.youtube.com/watch?v=mze9kAw3n4Q) — Español; video; 2 min.
+**Por qué este recurso:** estimula con una introducción rapidísima a los pulsos encendido/apagado, que será el tema completo de la próxima lección.
+
+Antes y después de explorar, repite la secuencia de hoy: sentido 1, STOP, espera y sentido 2; la pausa también es parte del experimento.
 
 ## Referencias técnicas de la clase
 

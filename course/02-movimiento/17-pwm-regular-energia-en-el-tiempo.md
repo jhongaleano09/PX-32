@@ -158,10 +158,16 @@ La actividad está completa cuando puedes explicar por qué aumentó la proporci
 
 ## Lecturas y videos para explorar
 
-- [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
-- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
+- [Señal PWM con Arduino y analogWrite](https://programarfacil.com/blog/arduino-blog/pwm-con-arduino-analogico/) — Español; lectura; ~12 min.
+**Por qué este recurso:** profundiza en `analogWrite()` y el ciclo de trabajo con ejemplos en LED y motor; es la misma función y la misma escala 0–255 que probaste hoy.
 
-Al explorar, separa siempre tres datos: valor PWM ordenado, movimiento observado y condiciones físicas de la prueba.
+- [Modulación por ancho de pulsos PWM](https://cursos.mcielectronics.cl/2019/06/18/modulacion-por-ancho-de-pulsos/) — Español; lectura con gráficas; ~10 min.
+**Por qué este recurso:** confirma con gráficas qué significa la fracción encendida de cada ciclo y por qué el resultado no es una velocidad garantizada.
+
+- [Salida PWM Arduino #018](https://www.youtube.com/watch?v=EZT7dXO9_MA) — Español; video; 14 min (verlo por partes).
+**Por qué este recurso:** estimula porque muestra la señal PWM en un osciloscopio: verás los pulsos que hoy solo imaginaste; como dura 14 min, míralo en dos partes.
+
+Revisa tu tabla con estos recursos a la mano: valor PWM ordenado, proporción encendida y lo que observaste son tres datos distintos.
 
 ## Referencias técnicas de la clase
 

@@ -248,10 +248,16 @@ El hito está completo cuando relacionas al menos un patrón con sus cuatro giro
 
 ## Lecturas y videos para explorar
 
-- [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
-- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
+- [Vectores: introducción — qué es un vector y sus características](https://www.youtube.com/watch?v=IrTeyyzerjI) — Español; video; 12 min.
+**Por qué este recurso:** confirma con ejemplos claros la idea de magnitud y dirección que aplica hoy a cada motor: el signo `+1` o `-1` es la dirección, y el PWM es la magnitud.
 
-Usa la tabla de la página 21 para comprobar cada patrón. La fuente sirve para desafiar tu memoria, no solo para confirmar que acertaste.
+- [Adición de Vectores (PhET)](https://phet.colorado.edu/sims/html/vector-addition/latest/vector-addition_es.html) — Español; simulador interactivo; 10-15 min.
+**Por qué este recurso:** profundiza permitiendo arrastrar flechas y ver cómo se suman sus componentes, igual que las fuerzas diagonales de tus cuatro ruedas.
+
+- [Mecanum TeleOp (Game Manual 0)](https://gm0.org/en/latest/docs/software/tutorials/mecanum-drive.html) — Inglés técnico sencillo; lectura con diagramas; ~15 min.
+**Por qué este recurso:** estimula porque muestra la tabla real que usan los equipos de robótica competitiva para combinar giros de ruedas y obtener cualquier movimiento; el inglés es accesible y muy visual.
+
+Usa la simulación y los diagramas para comprobar cada patrón de signos de `mover()`: la fuente sirve para desafiar tu memoria, no solo para confirmar que acertaste.
 
 ## Referencias técnicas de la clase
 

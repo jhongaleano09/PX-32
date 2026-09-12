@@ -74,10 +74,16 @@ La Mega 2560 puede ordenar `HIGH` y `LOW`, pero un motor necesita una ruta de po
 
 ## Lecturas y videos para explorar
 
-- [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
-- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
+- [How does an Electric Motor work? (DC Motor) — Jared Owen](https://www.youtube.com/watch?v=CWulQ1ZSE3c) — Inglés con doblaje al español en el engranaje del reproductor; video; 10 min.
+**Por qué este recurso:** profundiza en lo que hoy solo viste por fuera: una animación 3D abre el motor para mostrar estator, rotor, escobillas y el campo magnético que produce el giro.
 
-Vuelve a mirar una esquina del robot después de explorar los recursos: ahora cada carcasa debería representar una función, no solo una forma.
+- [Motor DC con reductora: funcionamiento](https://www.youtube.com/watch?v=62Z-K6e1ou8) — Español; video; 14 min (verlo por partes).
+**Por qué este recurso:** confirma la cadena mecánica de PX-32 con un motor real igual al tuyo y explica para qué sirve la caja amarilla de engranajes; como dura 14 min, divídelo en dos partes.
+
+- [Motores eléctricos de corriente continua](https://www.areatecnologia.com/electricidad/motores-corriente-continua.html) — Español; lectura con esquemas y animaciones GIF; ~10 min.
+**Por qué este recurso:** profundiza con diagramas claros del electromagnetismo y las partes del motor; las animaciones permiten ver el giro que hoy solo imaginaste.
+
+Después de explorar, vuelve a una esquina de PX-32: el cilindro y la caja amarilla ya no serán solo formas, sino funciones que puedes nombrar.
 
 ## Referencias técnicas de la clase
 

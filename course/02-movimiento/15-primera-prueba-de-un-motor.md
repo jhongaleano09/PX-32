@@ -159,10 +159,16 @@ La misión termina cuando puedes nombrar AK1, sus tres pines, la duración del p
 
 ## Lecturas y videos para explorar
 
-- [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
-- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
+- [Crea tu PRIMER PROGRAMA con ARDUINO IDE](https://www.youtube.com/watch?v=wsAVDgyDhsQ) — Español; video; 14 min (verlo por partes).
+**Por qué este recurso:** confirma el flujo que harás hoy — seleccionar la placa, elegir el puerto, Verificar y Subir — antes de tocar el robot; divídelo en dos partes si lo prefieres.
 
-En el manual, encuentra el nombre AK1 en la tabla de motores y luego sus tres señales en la tabla de la página 13.
+- [Upload your first code to Arduino Uno](https://www.youtube.com/watch?v=y5znFDmY5V4) — Inglés muy sencillo; video; 5 min.
+**Por qué este recurso:** estimula porque muestra en pantalla real el botón de Subir y la carga terminada; el inglés es elemental y casi todo se entiende viendo.
+
+- [Tutorial de uso del módulo L298N](https://naylampmechatronics.com/blog/11_tutorial-de-uso-del-modulo-l298n.html) — Español; lectura con fotos; ~10 min.
+**Por qué este recurso:** profundiza en un driver de motores real: puente H, bornes de motor y control por ENA/IN, la misma anatomía del Model Y que usarás en la prueba.
+
+Compara cada recurso con el paso que estás a punto de dar: placa, puerto, Verificar, Subir y solo después, baterías.
 
 ## Referencias técnicas de la clase
 

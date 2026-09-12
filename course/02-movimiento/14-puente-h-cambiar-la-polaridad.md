@@ -83,10 +83,16 @@ Prepara:
 
 ## Lecturas y videos para explorar
 
-- [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
-- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
+- [H Bridge Motor Control Basics Explained](https://www.youtube.com/watch?v=YYMsS50x1UY) — Inglés sencillo, con muchos dibujos y poco texto hablado; video; 2 min.
+**Por qué este recurso:** confirma en dos minutos el dibujo de la H con cuatro interruptores que construiste en papel; el inglés es muy accesible porque casi todo se ve, no se escucha.
 
-Busca en esos recursos una evidencia para el pinout y otra para la relación entre entradas y sentido. No uses una fotografía como prueba de un estado lógico que no muestra.
+- [Explicación del Puente H con transistores](https://www.youtube.com/watch?v=OuaLi_bBR9o) — Español; video; 8 min.
+**Por qué este recurso:** profundiza en cómo cuatro interruptores electrónicos invierten la polaridad, igual que tus fichas sobre la H dibujada.
+
+- [Control de motores con Arduino](https://wiki.bricolabs.cc/es/guias/control_de_motores) — Español; lectura con esquemas; ~12 min.
+**Por qué este recurso:** confirma el puente H con diagramas paso a paso y explica por qué `LOW/LOW` deja el motor en espera, como en tu tabla de la lección.
+
+Busca en estos recursos una imagen del puente H y compárala con tu hoja: las dos diagonales y el motor al centro deben coincidir.
 
 ## Referencias técnicas de la clase
 

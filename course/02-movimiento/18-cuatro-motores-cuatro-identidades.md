@@ -155,10 +155,16 @@ void loop() {
 
 ## Lecturas y videos para explorar
 
-- [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
-- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
+- [Carro 4x4 con Arduino](https://www.youtube.com/watch?v=2_2J0B-1PYE) — Español; video; 7 min.
+**Por qué este recurso:** confirma con un carro real de cuatro motores la idea de esta lección: cada esquina es un motor independiente con su propio control.
 
-Prueba a reconstruir la tabla sin mirar y luego corrígela con la fuente. Recordar no sustituye verificar.
+- [Plataforma robótica 4x4 y puente H L298N](https://www.youtube.com/watch?v=GdO3Dt1IaFU) — Español; video; 15 min (verlo por partes).
+**Por qué este recurso:** profundiza en cómo un solo driver gobierna cuatro motores y cómo el programa decide qué esquina se mueve; divídelo en dos partes.
+
+- [Cómo armar y programar un auto robot (Smart Car 4WD) con Arduino](https://www.mechatronicstore.cl/como-armar-y-programar-un-auto-robot-smart-car-4wd-con-arduino/) — Español; lectura con fotos y código; ~12 min.
+**Por qué este recurso:** estimula porque muestra un proyecto completo paso a paso — chasis, driver, pines y programa — con el que puedes comparar la tabla BK1/BK3/AK1/AK3 de PX-32.
+
+Intenta reconstruir la tabla de las cuatro esquinas sin mirar y luego corrígela con estos recursos: recordar no sustituye verificar.
 
 ## Referencias técnicas de la clase
 

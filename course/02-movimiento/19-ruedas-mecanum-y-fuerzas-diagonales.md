@@ -82,10 +82,16 @@ Esta lección no necesita un `.ino`. Cargar un programa que solo imprimiera una 
 
 ## Lecturas y videos para explorar
 
-- [Conexiones verificadas de Model Y y motores](../../reference/original/osoyoo-mecanum-wheel-robotic-car-kit-v2.pdf) — Inglés; manual del fabricante; 5-10 min. Aprenderás conexiones verificadas de model y y motores. Esencial.
-- [Mapa canónico de conexiones](../../docs/reference/mapa-conexiones-robot.md) — Español; referencia interna; 8 min. Aprenderás mapa canónico de conexiones. Opcional.
+- [¡La brillante ingeniería de las ruedas Mecanum!](https://www.youtube.com/watch?v=PYLT2bCU5Ek) — Español; video; 6 min.
+**Por qué este recurso:** confirma el patrón X y las fuerzas diagonales con robots reales desplazándose de lado, el mismo fenómeno que describiste hoy con flechas de papel.
 
-Vuelve especialmente a la página 21: separa lo que muestra la fotografía sobre montaje de lo que explica el esquema sobre fuerzas.
+- [The Mecanum Wheel Is So Weird, It Is Genius. How It Works](https://www.youtube.com/watch?v=AlsCUzCCc-k) — Inglés claro; video; 12 min.
+**Por qué este recurso:** profundiza en el papel de cada rodillo inclinado a 45°; el inglés es pausado y muy visual, adecuado para un preadolescente técnico.
+
+- [Robot con Mecanum Wheel controlado por Arduino](https://www.luisllamas.es/robot-con-mecanum-wheel-controlado-por-arduino/) — Español; lectura con diagramas; ~10 min.
+**Por qué este recurso:** profundiza con diagramas limpios en por qué cada rueda empuja en diagonal y en cómo las componentes se suman o se cancelan, la descomposición que hiciste hoy.
+
+Después de explorar, gira de nuevo los rodillos con el dedo: ahora sabes que esa libertad es la que permite que PX-32 se desplace de lado.
 
 ## Referencias técnicas de la clase
 
