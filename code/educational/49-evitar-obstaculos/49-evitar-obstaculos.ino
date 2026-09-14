@@ -148,22 +148,23 @@ void prepararMotores() {
   detenerTodos();
 }
 
-void probarMotor(byte numeroMotor) {
+void probarMotor(byte numeroMotor, int sentido) {
   sistemaArmado = false;
   detenerTodos();
 
   Serial.print("PRUEBA MOTOR ");
   Serial.print(numeroMotor);
+  Serial.print(sentido > 0 ? " ADELANTE" : " ATRAS");
   Serial.println(": 2 segundos a potencia moderada");
 
   if (numeroMotor == 1) {
-    controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, +1, POTENCIA_PRUEBA_MOTOR);
+    controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, sentido, POTENCIA_PRUEBA_MOTOR);
   } else if (numeroMotor == 2) {
-    controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, +1, POTENCIA_PRUEBA_MOTOR);
+    controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, sentido, POTENCIA_PRUEBA_MOTOR);
   } else if (numeroMotor == 3) {
-    controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, +1, POTENCIA_PRUEBA_MOTOR);
+    controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, sentido, POTENCIA_PRUEBA_MOTOR);
   } else if (numeroMotor == 4) {
-    controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4, +1, POTENCIA_PRUEBA_MOTOR);
+    controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4, sentido, POTENCIA_PRUEBA_MOTOR);
   }
 
   delay(DURACION_PRUEBA_MOTOR_MS);
@@ -296,7 +297,9 @@ void procesarComandosSerial() {
       detenerTodos();
       Serial.println("STOP MANUAL: sistema desarmado");
     } else if (comando >= '1' && comando <= '4') {
-      probarMotor(comando - '0');
+      probarMotor(comando - '0', +1);
+    } else if (comando >= '5' && comando <= '8') {
+      probarMotor(comando - '4', -1);
     } else if (comando == 'I' || comando == 'i') {
       diagnosticarSensoresIr();
     } else if (comando == 'T' || comando == 't') {
@@ -426,7 +429,7 @@ void setup() {
   Serial.println("PX-32: EVASION ACTIVA CON MEDIANA DE 3");
   Serial.println("Seguridad: una lectura no fiable siempre produce STOP");
   Serial.println("Comandos: A = armar motores; S = STOP y desarmar");
-  Serial.println("Pruebas con ruedas levantadas: 1, 2, 3 o 4 = un motor");
+  Serial.println("Motores adelante: 1-4; motores atras: 5-8");
   Serial.println("Prueba sin movimiento: I = sensores IR durante 6 segundos");
   Serial.println("Prueba sin movimiento: T = tracker de linea durante 8 segundos");
   Serial.println("ESTADO INICIAL: DESARMADO");
