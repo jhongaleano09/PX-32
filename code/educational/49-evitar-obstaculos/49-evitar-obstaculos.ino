@@ -174,7 +174,26 @@ void probarMotor(byte numeroMotor, int sentido) {
 
 // ---------------- Medicion ----------------
 
+void activarServo() {
+  if (!cabeza.attached()) {
+    cabeza.attach(PIN_SERVO);
+  }
+  cabeza.write(ANGULO_FRENTE);
+  anguloActualServo = ANGULO_FRENTE;
+  delay(300);
+}
+
+void desactivarServo() {
+  if (cabeza.attached()) {
+    cabeza.detach();
+  }
+}
+
 void apuntarSensor(byte anguloDestino) {
+  if (!cabeza.attached()) {
+    return;
+  }
+
   int desplazamiento = abs((int)anguloDestino - (int)anguloActualServo);
   cabeza.write(anguloDestino);
 
@@ -290,11 +309,14 @@ void procesarComandosSerial() {
     char comando = Serial.read();
 
     if ((comando == 'A' || comando == 'a') && MOTOR_ACTIVO) {
+      detenerTodos();
+      activarServo();
       sistemaArmado = true;
       Serial.println("SISTEMA ARMADO: motores autorizados");
     } else if (comando == 'S' || comando == 's') {
       sistemaArmado = false;
       detenerTodos();
+      desactivarServo();
       Serial.println("STOP MANUAL: sistema desarmado");
     } else if (comando >= '1' && comando <= '4') {
       probarMotor(comando - '0', +1);
@@ -421,10 +443,7 @@ void setup() {
   pinMode(TRACKER_IR5, INPUT);
 
   Serial.begin(9600);
-  cabeza.attach(PIN_SERVO);
-  cabeza.write(ANGULO_FRENTE);
-  anguloActualServo = ANGULO_FRENTE;
-  delay(600);
+  desactivarServo();
 
   Serial.println("PX-32: EVASION ACTIVA CON MEDIANA DE 3");
   Serial.println("Seguridad: una lectura no fiable siempre produce STOP");
@@ -438,6 +457,11 @@ void setup() {
 
 void loop() {
   procesarComandosSerial();
-  evaluarYActuar();
-  delay(40);
+  if (sistemaArmado) {
+    evaluarYActuar();
+    delay(40);
+  } else {
+    detenerTodos();
+    delay(20);
+  }
 }

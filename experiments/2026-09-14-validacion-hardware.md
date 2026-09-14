@@ -14,6 +14,7 @@
 | IR de obstáculos izquierdo, D3 | APROBADO | Cambia entre `1 libre` y `0 DETECTA`. |
 | IR de obstáculos derecho, D2 | APROBADO | Cambia entre `1 libre` y `0 DETECTA`. |
 | Tracker IR1-IR5, A4-A0 | APROBADO | Los cinco bits cambian al desplazar una franja negra sobre fondo blanco. |
+| Faros LED delanteros | PENDIENTE REPRUEBA | Ambos estaban con polaridad invertida: rojo a GND y negro a 3.3V. |
 | Motor 1, BK1 | APROBADO | Rueda frontal derecha; PWM 90; gira hacia adelante y hacia atrás. |
 | Motor 2, BK3 | APROBADO | Rueda frontal izquierda; PWM 90; gira hacia adelante. |
 | Motor 3, AK1 | APROBADO | Rueda trasera derecha; PWM 90; gira hacia adelante. |
@@ -29,3 +30,4 @@ No ejecutar conducción autónoma sobre el piso hasta reparar o reemplazar el ac
 - `TRIG -> D30` y `ECHO -> D31` quedaron confirmados.
 - El servo estaba dirigido a D12; se corrigió la ruta `Model Y S1 -> D13`.
 - El tracker requirió corregir pines y ajustar su potenciómetro azul.
+- El firmware deja servo y motores inactivos mientras el sistema está desarmado.
