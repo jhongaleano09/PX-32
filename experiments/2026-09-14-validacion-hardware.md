@@ -30,10 +30,12 @@ No ejecutar conducción autónoma sobre el piso hasta reparar o reemplazar el ac
 ## Modo de juego provisional
 
 - El firmware arranca automáticamente después de una cuenta regresiva de ocho segundos.
-- Por la avería trasera izquierda, la navegación usa solamente los dos motores delanteros; ambos motores traseros quedan detenidos durante avance y giro.
+- Por la avería trasera izquierda, la navegación usa los tres motores sanos; el motor trasero izquierdo queda siempre sin energía.
+- La potencia delantera de avance subió de PWM 90 a 125 para ayudar a que ambos motores arranquen juntos; el trasero derecho usa PWM 100 para reducir el desvío.
+- Ante un obstáculo confirmado por ultrasonido o IR, hace una reversa limitada a 600 ms y luego explora los lados. Una lectura ultrasónica ausente, por sí sola, mantiene `STOP` y no autoriza la reversa.
 - Antes de avanzar exige mediana ultrasónica segura y ambos IR frontales libres.
 - Durante cada giro, una sola lectura ultrasónica peligrosa/no fiable o cualquier IR activo produce `STOP`.
-- La carga y la lógica de parada se validaron por USB. La prueba elevada y la prueba de piso siguen pendientes.
+- La carga y la lógica de parada se validaron por USB. La prueba elevada del nuevo modo de tres ruedas y la prueba de piso siguen pendientes.
 
 ## Hallazgos de cableado
 

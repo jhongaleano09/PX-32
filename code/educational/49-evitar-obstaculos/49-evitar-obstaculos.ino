@@ -7,8 +7,8 @@
 // El movimiento esta habilitado, pero siempre subordinado a los sensores.
 const bool MOTOR_ACTIVO = true;
 // Contingencia: la reductora trasera izquierda esta averiada. Durante el
-// juego se usa solo el par delantero para no empujar el chasis en diagonal.
-const bool MODO_CONTINGENCIA_TRACCION_DELANTERA = true;
+// juego se usan las tres ruedas sanas y la averiada permanece sin energia.
+const bool MODO_CONTINGENCIA_TRES_RUEDAS = true;
 const bool INICIO_AUTONOMO = true;
 const byte SEGUNDOS_ANTES_DE_MOVER = 8;
 
@@ -17,10 +17,17 @@ const bool GRADOS_45_MIRA_A_TU_IZQUIERDA = true;
 
 const float DISTANCIA_SEGURA_CM = 25.0;
 const float DISTANCIA_PELIGRO_GIRO_CM = 12.0;
-const byte POTENCIA_AVANCE = 90;
-const byte POTENCIA_GIRO = 85;
+// El par delantero necesitaba algo mas de fuerza para arrancar junto. La
+// rueda trasera derecha recibe menos PWM para reducir el desvio del carro.
+const byte POTENCIA_AVANCE_DELANTERA = 125;
+const byte POTENCIA_AVANCE_TRASERA = 100;
+const byte POTENCIA_REVERSA_DELANTERA = 110;
+const byte POTENCIA_REVERSA_TRASERA = 90;
+const byte POTENCIA_GIRO = 105;
 const byte POTENCIA_PRUEBA_MOTOR = 90;
 const unsigned int DURACION_PRUEBA_MOTOR_MS = 2000;
+const unsigned int DURACION_REVERSA_MS = 600;
+const unsigned int PASO_VIGILANCIA_REVERSA_MS = 30;
 const unsigned int DURACION_GIRO_MS = 420;
 const unsigned int PASO_VIGILANCIA_GIRO_MS = 60;
 
@@ -115,20 +122,59 @@ void detenerTodos() {
 
 void avanzar() {
   if (MOTOR_ACTIVO && sistemaArmado) {
-    if (MODO_CONTINGENCIA_TRACCION_DELANTERA) {
-      moverConPotencia(+1, +1, 0, 0, POTENCIA_AVANCE);
+    if (MODO_CONTINGENCIA_TRES_RUEDAS) {
+      controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, +1, POTENCIA_AVANCE_DELANTERA);
+      controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, +1, POTENCIA_AVANCE_DELANTERA);
+      controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, +1, POTENCIA_AVANCE_TRASERA);
+      controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4, 0, 0);
     } else {
-      moverConPotencia(+1, +1, +1, +1, POTENCIA_AVANCE);
+      moverConPotencia(+1, +1, +1, +1, POTENCIA_AVANCE_DELANTERA);
     }
   } else {
     detenerTodos();
   }
 }
 
+bool retrocederBrevemente() {
+  if (!MOTOR_ACTIVO || !sistemaArmado) {
+    detenerTodos();
+    return false;
+  }
+
+  Serial.println("REVERSA CORTA: despejando el obstaculo frontal");
+  unsigned long inicioReversaMs = millis();
+  while (millis() - inicioReversaMs < DURACION_REVERSA_MS) {
+    if (MODO_CONTINGENCIA_TRES_RUEDAS) {
+      controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, -1, POTENCIA_REVERSA_DELANTERA);
+      controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, -1, POTENCIA_REVERSA_DELANTERA);
+      controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, -1, POTENCIA_REVERSA_TRASERA);
+      controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4, 0, 0);
+    } else {
+      moverConPotencia(-1, -1, -1, -1, POTENCIA_REVERSA_DELANTERA);
+    }
+
+    delay(PASO_VIGILANCIA_REVERSA_MS);
+    if (Serial.available() > 0) {
+      char comando = Serial.read();
+      if (comando == 'S' || comando == 's') {
+        sistemaArmado = false;
+        detenerTodos();
+        desactivarServo();
+        Serial.println("STOP MANUAL DURANTE REVERSA: sistema desarmado");
+        return false;
+      }
+    }
+  }
+
+  detenerTodos();
+  Serial.println("REVERSA TERMINADA: motores en STOP");
+  return true;
+}
+
 void girarHaciaLaIzquierda() {
   if (MOTOR_ACTIVO && sistemaArmado) {
-    if (MODO_CONTINGENCIA_TRACCION_DELANTERA) {
-      moverConPotencia(+1, -1, 0, 0, POTENCIA_GIRO);
+    if (MODO_CONTINGENCIA_TRES_RUEDAS) {
+      moverConPotencia(+1, -1, +1, 0, POTENCIA_GIRO);
     } else {
       moverConPotencia(+1, -1, +1, -1, POTENCIA_GIRO);
     }
@@ -139,8 +185,8 @@ void girarHaciaLaIzquierda() {
 
 void girarHaciaLaDerecha() {
   if (MOTOR_ACTIVO && sistemaArmado) {
-    if (MODO_CONTINGENCIA_TRACCION_DELANTERA) {
-      moverConPotencia(-1, +1, 0, 0, POTENCIA_GIRO);
+    if (MODO_CONTINGENCIA_TRES_RUEDAS) {
+      moverConPotencia(-1, +1, -1, 0, POTENCIA_GIRO);
     } else {
       moverConPotencia(-1, +1, -1, +1, POTENCIA_GIRO);
     }
@@ -552,6 +598,17 @@ void evaluarYActuar() {
   detenerTodos();
   Serial.println("DECISION: STOP Y EXPLORAR");
 
+  // Sin sensor trasero, la reversa solo se permite por un tiempo corto y
+  // cuando existe evidencia real de obstaculo. Una medicion ausente por si
+  // sola conserva STOP y nunca autoriza movimiento.
+  bool obstaculoIrConfirmado = obstaculoIrFrontalDetectado();
+  bool obstaculoUltrasonicoConfirmado =
+    frente >= 0 && frente < DISTANCIA_SEGURA_CM;
+  if ((obstaculoIrConfirmado || obstaculoUltrasonicoConfirmado) &&
+      !retrocederBrevemente()) {
+    return;
+  }
+
   apuntarSensor(ANGULO_45);
   float lado45 = medirDistanciaMedianaCm();
   apuntarSensor(ANGULO_135);
@@ -600,7 +657,8 @@ void setup() {
   Serial.println("Prueba sin movimiento: I = sensores IR durante 6 segundos");
   Serial.println("Prueba sin movimiento: T = tracker de linea durante 8 segundos");
   Serial.println("Prueba sin movimiento: W = diagnostico WiFi del ESP-12S");
-  Serial.println("MODO DE JUEGO: traccion delantera por motor averiado");
+  Serial.println("MODO DE JUEGO: tres ruedas sanas; trasera izquierda apagada");
+  Serial.println("Al detectar obstaculo confirmado: reversa corta y exploracion");
 
   if (INICIO_AUTONOMO && MOTOR_ACTIVO) {
     activarServo();
