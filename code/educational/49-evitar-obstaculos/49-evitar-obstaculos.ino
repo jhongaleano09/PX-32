@@ -14,6 +14,8 @@ const float DISTANCIA_SEGURA_CM = 25.0;
 const float DISTANCIA_PELIGRO_GIRO_CM = 12.0;
 const byte POTENCIA_AVANCE = 60;
 const byte POTENCIA_GIRO = 55;
+const byte POTENCIA_PRUEBA_MOTOR = 45;
+const unsigned int DURACION_PRUEBA_MOTOR_MS = 300;
 const unsigned int DURACION_GIRO_MS = 420;
 const unsigned int PASO_VIGILANCIA_GIRO_MS = 60;
 
@@ -138,6 +140,29 @@ void prepararMotores() {
   detenerTodos();
 }
 
+void probarMotor(byte numeroMotor) {
+  sistemaArmado = false;
+  detenerTodos();
+
+  Serial.print("PRUEBA MOTOR ");
+  Serial.print(numeroMotor);
+  Serial.println(": 300 ms a baja potencia");
+
+  if (numeroMotor == 1) {
+    controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, +1, POTENCIA_PRUEBA_MOTOR);
+  } else if (numeroMotor == 2) {
+    controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, +1, POTENCIA_PRUEBA_MOTOR);
+  } else if (numeroMotor == 3) {
+    controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, +1, POTENCIA_PRUEBA_MOTOR);
+  } else if (numeroMotor == 4) {
+    controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4, +1, POTENCIA_PRUEBA_MOTOR);
+  }
+
+  delay(DURACION_PRUEBA_MOTOR_MS);
+  detenerTodos();
+  Serial.println("PRUEBA TERMINADA: todos los motores en STOP");
+}
+
 // ---------------- Medicion ----------------
 
 void apuntarSensor(byte anguloDestino) {
@@ -219,6 +244,8 @@ void procesarComandosSerial() {
       sistemaArmado = false;
       detenerTodos();
       Serial.println("STOP MANUAL: sistema desarmado");
+    } else if (comando >= '1' && comando <= '4') {
+      probarMotor(comando - '0');
     }
   }
 }
@@ -337,6 +364,7 @@ void setup() {
   Serial.println("PX-32: EVASION ACTIVA CON MEDIANA DE 3");
   Serial.println("Seguridad: una lectura no fiable siempre produce STOP");
   Serial.println("Comandos: A = armar motores; S = STOP y desarmar");
+  Serial.println("Pruebas con ruedas levantadas: 1, 2, 3 o 4 = un motor");
   Serial.println("ESTADO INICIAL: DESARMADO");
   delay(3000);
 }
