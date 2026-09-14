@@ -6,14 +6,19 @@
 
 // El movimiento esta habilitado, pero siempre subordinado a los sensores.
 const bool MOTOR_ACTIVO = true;
+// Contingencia: la reductora trasera izquierda esta averiada. Durante el
+// juego se usa solo el par delantero para no empujar el chasis en diagonal.
+const bool MODO_CONTINGENCIA_TRACCION_DELANTERA = true;
+const bool INICIO_AUTONOMO = true;
+const byte SEGUNDOS_ANTES_DE_MOVER = 8;
 
 // Ajustar despues de comprobar fisicamente hacia donde apunta el servo.
 const bool GRADOS_45_MIRA_A_TU_IZQUIERDA = true;
 
 const float DISTANCIA_SEGURA_CM = 25.0;
 const float DISTANCIA_PELIGRO_GIRO_CM = 12.0;
-const byte POTENCIA_AVANCE = 60;
-const byte POTENCIA_GIRO = 55;
+const byte POTENCIA_AVANCE = 90;
+const byte POTENCIA_GIRO = 85;
 const byte POTENCIA_PRUEBA_MOTOR = 90;
 const unsigned int DURACION_PRUEBA_MOTOR_MS = 2000;
 const unsigned int DURACION_GIRO_MS = 420;
@@ -110,7 +115,11 @@ void detenerTodos() {
 
 void avanzar() {
   if (MOTOR_ACTIVO && sistemaArmado) {
-    moverConPotencia(+1, +1, +1, +1, POTENCIA_AVANCE);
+    if (MODO_CONTINGENCIA_TRACCION_DELANTERA) {
+      moverConPotencia(+1, +1, 0, 0, POTENCIA_AVANCE);
+    } else {
+      moverConPotencia(+1, +1, +1, +1, POTENCIA_AVANCE);
+    }
   } else {
     detenerTodos();
   }
@@ -118,7 +127,11 @@ void avanzar() {
 
 void girarHaciaLaIzquierda() {
   if (MOTOR_ACTIVO && sistemaArmado) {
-    moverConPotencia(+1, -1, +1, -1, POTENCIA_GIRO);
+    if (MODO_CONTINGENCIA_TRACCION_DELANTERA) {
+      moverConPotencia(+1, -1, 0, 0, POTENCIA_GIRO);
+    } else {
+      moverConPotencia(+1, -1, +1, -1, POTENCIA_GIRO);
+    }
   } else {
     detenerTodos();
   }
@@ -126,7 +139,11 @@ void girarHaciaLaIzquierda() {
 
 void girarHaciaLaDerecha() {
   if (MOTOR_ACTIVO && sistemaArmado) {
-    moverConPotencia(-1, +1, -1, +1, POTENCIA_GIRO);
+    if (MODO_CONTINGENCIA_TRACCION_DELANTERA) {
+      moverConPotencia(-1, +1, 0, 0, POTENCIA_GIRO);
+    } else {
+      moverConPotencia(-1, +1, -1, +1, POTENCIA_GIRO);
+    }
   } else {
     detenerTodos();
   }
@@ -249,6 +266,11 @@ float medirDistanciaMedianaCm() {
 
 bool distanciaEsSegura(float distanciaCm, float umbralCm) {
   return distanciaCm >= umbralCm;
+}
+
+bool obstaculoIrFrontalDetectado() {
+  return digitalRead(SENSOR_IR_IZQUIERDO) == LECTURA_IR_AL_DETECTAR ||
+         digitalRead(SENSOR_IR_DERECHO) == LECTURA_IR_AL_DETECTAR;
 }
 
 void imprimirDistancia(const char *etiqueta, float distanciaCm) {
@@ -481,7 +503,16 @@ bool ejecutarGiroVigilado(DecisionMovimiento decision) {
     ordenarGiro(decision);
     delay(PASO_VIGILANCIA_GIRO_MS);
 
-    float distanciaDuranteGiro = medirDistanciaMedianaCm();
+    // Los IR miran siempre al frente: cualquiera de ellos ordena STOP sin
+    // esperar las tres muestras del ultrasonido.
+    if (obstaculoIrFrontalDetectado()) {
+      detenerTodos();
+      Serial.println("PELIGRO DURANTE GIRO: sensor IR; STOP");
+      return false;
+    }
+
+    // Durante el giro una sola lectura peligrosa o ausente basta para parar.
+    float distanciaDuranteGiro = medirUnaDistanciaCm();
     if (!distanciaEsSegura(distanciaDuranteGiro, DISTANCIA_PELIGRO_GIRO_CM)) {
       detenerTodos();
       imprimirDistancia("PELIGRO DURANTE GIRO: ", distanciaDuranteGiro);
@@ -496,7 +527,8 @@ bool ejecutarGiroVigilado(DecisionMovimiento decision) {
   float frenteDespuesDelGiro = medirDistanciaMedianaCm();
   imprimirDistancia("FRENTE DESPUES DEL GIRO: ", frenteDespuesDelGiro);
 
-  if (!distanciaEsSegura(frenteDespuesDelGiro, DISTANCIA_SEGURA_CM)) {
+  if (obstaculoIrFrontalDetectado() ||
+      !distanciaEsSegura(frenteDespuesDelGiro, DISTANCIA_SEGURA_CM)) {
     Serial.println("STOP: el nuevo frente no es seguro");
     return false;
   }
@@ -510,7 +542,8 @@ void evaluarYActuar() {
   float frente = medirDistanciaMedianaCm();
   imprimirDistancia("FRENTE: ", frente);
 
-  if (distanciaEsSegura(frente, DISTANCIA_SEGURA_CM)) {
+  if (!obstaculoIrFrontalDetectado() &&
+      distanciaEsSegura(frente, DISTANCIA_SEGURA_CM)) {
     Serial.println("DECISION: AVANZAR");
     avanzar();
     return;
@@ -567,8 +600,22 @@ void setup() {
   Serial.println("Prueba sin movimiento: I = sensores IR durante 6 segundos");
   Serial.println("Prueba sin movimiento: T = tracker de linea durante 8 segundos");
   Serial.println("Prueba sin movimiento: W = diagnostico WiFi del ESP-12S");
-  Serial.println("ESTADO INICIAL: DESARMADO");
-  delay(3000);
+  Serial.println("MODO DE JUEGO: traccion delantera por motor averiado");
+
+  if (INICIO_AUTONOMO && MOTOR_ACTIVO) {
+    activarServo();
+    Serial.println("INICIO AUTONOMO: manten el carro elevado");
+    for (byte restante = SEGUNDOS_ANTES_DE_MOVER; restante > 0; restante--) {
+      detenerTodos();
+      Serial.print("Arranque seguro en ");
+      Serial.println(restante);
+      delay(1000);
+    }
+    sistemaArmado = true;
+    Serial.println("SISTEMA ARMADO: primero mide, despues decide");
+  } else {
+    Serial.println("ESTADO INICIAL: DESARMADO");
+  }
 }
 
 void loop() {

@@ -27,6 +27,14 @@
 
 No ejecutar conducción autónoma sobre el piso hasta reparar o reemplazar el acople o motorreductor trasero izquierdo. Las pruebas de motores se realizan con las cuatro ruedas elevadas y parada automática.
 
+## Modo de juego provisional
+
+- El firmware arranca automáticamente después de una cuenta regresiva de ocho segundos.
+- Por la avería trasera izquierda, la navegación usa solamente los dos motores delanteros; ambos motores traseros quedan detenidos durante avance y giro.
+- Antes de avanzar exige mediana ultrasónica segura y ambos IR frontales libres.
+- Durante cada giro, una sola lectura ultrasónica peligrosa/no fiable o cualquier IR activo produce `STOP`.
+- La carga y la lógica de parada se validaron por USB. La prueba elevada y la prueba de piso siguen pendientes.
+
 ## Hallazgos de cableado
 
 - El HC-SR04 tenía alimentación invertida; se corrigió a `VCC -> 5V` y `GND -> GND`.
