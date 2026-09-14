@@ -14,8 +14,8 @@ const float DISTANCIA_SEGURA_CM = 25.0;
 const float DISTANCIA_PELIGRO_GIRO_CM = 12.0;
 const byte POTENCIA_AVANCE = 60;
 const byte POTENCIA_GIRO = 55;
-const byte POTENCIA_PRUEBA_MOTOR = 45;
-const unsigned int DURACION_PRUEBA_MOTOR_MS = 300;
+const byte POTENCIA_PRUEBA_MOTOR = 90;
+const unsigned int DURACION_PRUEBA_MOTOR_MS = 500;
 const unsigned int DURACION_GIRO_MS = 420;
 const unsigned int PASO_VIGILANCIA_GIRO_MS = 60;
 
@@ -146,7 +146,7 @@ void probarMotor(byte numeroMotor) {
 
   Serial.print("PRUEBA MOTOR ");
   Serial.print(numeroMotor);
-  Serial.println(": 300 ms a baja potencia");
+  Serial.println(": 500 ms a potencia moderada");
 
   if (numeroMotor == 1) {
     controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, +1, POTENCIA_PRUEBA_MOTOR);
