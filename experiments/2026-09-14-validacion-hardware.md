@@ -14,7 +14,7 @@
 | IR de obstáculos izquierdo, D3 | APROBADO | Cambia entre `1 libre` y `0 DETECTA`. |
 | IR de obstáculos derecho, D2 | APROBADO | Cambia entre `1 libre` y `0 DETECTA`. |
 | Tracker IR1-IR5, A4-A0 | APROBADO | Los cinco bits cambian al desplazar una franja negra sobre fondo blanco. |
-| Faros LED delanteros | PENDIENTE REPRUEBA | Ambos estaban con polaridad invertida: rojo a GND y negro a 3.3V. |
+| Faros LED delanteros | APROBADO | Tras corregir ambos a rojo `3.3V` y negro `GND`, encienden con brillo continuo. |
 | Motor 1, BK1 | APROBADO | Rueda frontal derecha; PWM 90; gira hacia adelante y hacia atrás. |
 | Motor 2, BK3 | APROBADO | Rueda frontal izquierda; PWM 90; gira hacia adelante. |
 | Motor 3, AK1 | APROBADO | Rueda trasera derecha; PWM 90; gira hacia adelante. |
