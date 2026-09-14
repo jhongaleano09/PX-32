@@ -40,6 +40,11 @@ const byte PIN_SERVO = 13;
 const byte SENSOR_IR_IZQUIERDO = 3;
 const byte SENSOR_IR_DERECHO = 2;
 const int LECTURA_IR_AL_DETECTAR = LOW;
+const byte TRACKER_IR1 = A4;
+const byte TRACKER_IR2 = A3;
+const byte TRACKER_IR3 = A2;
+const byte TRACKER_IR4 = A1;
+const byte TRACKER_IR5 = A0;
 const unsigned long TIMEOUT_US = 30000UL;
 const float SONIDO_CM_POR_US = 0.0343;
 const byte CANTIDAD_LECTURAS = 3;
@@ -259,6 +264,26 @@ void diagnosticarSensoresIr() {
   Serial.println("PRUEBA IR TERMINADA: motores en STOP");
 }
 
+void diagnosticarTracker() {
+  sistemaArmado = false;
+  detenerTodos();
+  Serial.println("PRUEBA TRACKER: 8 segundos; mueve papel blanco y franja negra");
+
+  for (byte muestra = 1; muestra <= 40; muestra++) {
+    Serial.print("TRACKER ");
+    Serial.print(muestra);
+    Serial.print(" | IR1..IR5=");
+    Serial.print(digitalRead(TRACKER_IR1));
+    Serial.print(digitalRead(TRACKER_IR2));
+    Serial.print(digitalRead(TRACKER_IR3));
+    Serial.print(digitalRead(TRACKER_IR4));
+    Serial.println(digitalRead(TRACKER_IR5));
+    delay(200);
+  }
+
+  Serial.println("PRUEBA TRACKER TERMINADA: motores en STOP");
+}
+
 void procesarComandosSerial() {
   while (Serial.available() > 0) {
     char comando = Serial.read();
@@ -274,6 +299,8 @@ void procesarComandosSerial() {
       probarMotor(comando - '0');
     } else if (comando == 'I' || comando == 'i') {
       diagnosticarSensoresIr();
+    } else if (comando == 'T' || comando == 't') {
+      diagnosticarTracker();
     }
   }
 }
@@ -384,6 +411,11 @@ void setup() {
   pinMode(ECHO, INPUT);
   pinMode(SENSOR_IR_IZQUIERDO, INPUT);
   pinMode(SENSOR_IR_DERECHO, INPUT);
+  pinMode(TRACKER_IR1, INPUT);
+  pinMode(TRACKER_IR2, INPUT);
+  pinMode(TRACKER_IR3, INPUT);
+  pinMode(TRACKER_IR4, INPUT);
+  pinMode(TRACKER_IR5, INPUT);
 
   Serial.begin(9600);
   cabeza.attach(PIN_SERVO);
@@ -396,6 +428,7 @@ void setup() {
   Serial.println("Comandos: A = armar motores; S = STOP y desarmar");
   Serial.println("Pruebas con ruedas levantadas: 1, 2, 3 o 4 = un motor");
   Serial.println("Prueba sin movimiento: I = sensores IR durante 6 segundos");
+  Serial.println("Prueba sin movimiento: T = tracker de linea durante 8 segundos");
   Serial.println("ESTADO INICIAL: DESARMADO");
   delay(3000);
 }
