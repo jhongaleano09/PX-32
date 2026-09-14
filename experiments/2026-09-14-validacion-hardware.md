@@ -17,6 +17,7 @@
 | Faros LED delanteros | APROBADO | Tras corregir ambos a rojo `3.3V` y negro `GND`, encienden con brillo continuo. |
 | Voltímetro | APROBADO | Lectura estable entre 7.81 V y 7.82 V con alimentación por baterías. |
 | ESP-12S, UART E | APROBADO | Con `E_TX -> D19/RX1` y `E_RX -> D18/TX1`, respondió `OK` al comando `AT` a 115200 baudios. |
+| Radio Wi-Fi ESP-12S | APROBADO | Consultas de firmware, modo, estado e IP correctas; detectó 19 redes con SSID ocultos y restauró el modo AP original (`2`). |
 | Motor 1, BK1 | APROBADO | Rueda frontal derecha; PWM 90; gira hacia adelante y hacia atrás. |
 | Motor 2, BK3 | APROBADO | Rueda frontal izquierda; PWM 90; gira hacia adelante. |
 | Motor 3, AK1 | APROBADO | Rueda trasera derecha; PWM 90; gira hacia adelante. |
@@ -33,4 +34,5 @@ No ejecutar conducción autónoma sobre el piso hasta reparar o reemplazar el ac
 - El servo estaba dirigido a D12; se corrigió la ruta `Model Y S1 -> D13`.
 - El tracker requirió corregir pines y ajustar su potenciómetro azul.
 - Para el ESP-12S se seleccionó solamente la ruta UART E; la ruta UART B quedó desconectada.
+- La prueba de escaneo usa temporalmente `CWMODE_CUR=3` cuando el ESP está en modo AP y restaura `CWMODE_CUR=2` al terminar.
 - El firmware deja servo y motores inactivos mientras el sistema está desarmado.

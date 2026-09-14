@@ -304,33 +304,116 @@ void diagnosticarTracker() {
   Serial.println("PRUEBA TRACKER TERMINADA: motores en STOP");
 }
 
+bool consultarEsp(
+  const char *etiqueta,
+  const char *comando,
+  unsigned long esperaMaximaMs,
+  byte *cantidadRedes,
+  int *modoWifi
+) {
+  while (Serial1.available() > 0) {
+    Serial1.read();
+  }
+
+  Serial.print("ESP ");
+  Serial.print(etiqueta);
+  Serial.print(": ");
+  Serial1.print(comando);
+  Serial1.print("\r\n");
+
+  char linea[64];
+  byte longitud = 0;
+  bool respondioOk = false;
+  bool respondioError = false;
+  unsigned long inicioMs = millis();
+
+  while (millis() - inicioMs < esperaMaximaMs && !respondioOk && !respondioError) {
+    while (Serial1.available() > 0) {
+      char caracter = Serial1.read();
+      if (caracter == '\n') {
+        linea[longitud] = '\0';
+        if (strcmp(linea, "OK") == 0) {
+          respondioOk = true;
+        } else if (strstr(linea, "ERROR") != NULL || strstr(linea, "FAIL") != NULL) {
+          respondioError = true;
+        } else if (cantidadRedes != NULL && strstr(linea, "+CWLAP:") != NULL) {
+          (*cantidadRedes)++;
+        } else if (modoWifi != NULL && strstr(linea, "+CWMODE:") != NULL) {
+          *modoWifi = atoi(strchr(linea, ':') + 1);
+        }
+        longitud = 0;
+      } else if (caracter != '\r' && longitud < sizeof(linea) - 1) {
+        linea[longitud++] = caracter;
+      }
+    }
+  }
+
+  if (respondioOk) {
+    Serial.println("APROBADO");
+    return true;
+  }
+  if (respondioError) {
+    Serial.println("RESPONDIO ERROR");
+  } else {
+    Serial.println("SIN RESPUESTA");
+  }
+  return false;
+}
+
 void diagnosticarEsp() {
   sistemaArmado = false;
   detenerTodos();
   desactivarServo();
 
-  while (Serial1.available() > 0) {
-    Serial1.read();
+  Serial.println("PRUEBA WIFI: solo consultas; SSID ocultos");
+  bool enlace = consultarEsp("enlace AT", "AT", 2000UL, NULL, NULL);
+  if (!enlace) {
+    Serial.println("PRUEBA WIFI CANCELADA: revisar UART E");
+    return;
   }
 
-  Serial.println("PRUEBA ESP: enviando AT a 115200 baudios");
-  Serial1.print("AT\r\n");
+  consultarEsp("firmware", "AT+GMR", 3000UL, NULL, NULL);
+  int modoOriginal = -1;
+  consultarEsp("modo", "AT+CWMODE?", 3000UL, NULL, &modoOriginal);
+  Serial.print("MODO WIFI ORIGINAL: ");
+  Serial.println(modoOriginal);
+  consultarEsp("estado de red", "AT+CWJAP?", 3000UL, NULL, NULL);
+  consultarEsp("direccion IP", "AT+CIFSR", 3000UL, NULL, NULL);
 
-  unsigned long inicioMs = millis();
-  bool recibioRespuesta = false;
-  while (millis() - inicioMs < 2000UL) {
-    while (Serial1.available() > 0) {
-      Serial.write(Serial1.read());
-      recibioRespuesta = true;
-    }
+  bool cambioTemporal = false;
+  if (modoOriginal == 2) {
+    cambioTemporal = consultarEsp(
+      "activar estacion temporal",
+      "AT+CWMODE_CUR=3",
+      3000UL,
+      NULL,
+      NULL
+    );
   }
 
-  if (!recibioRespuesta) {
-    Serial.println("ESP: SIN RESPUESTA");
-  } else {
-    Serial.println();
-    Serial.println("PRUEBA ESP TERMINADA");
+  byte cantidadRedes = 0;
+  bool escaneoOk = consultarEsp(
+    "radio y escaneo",
+    "AT+CWLAP",
+    15000UL,
+    &cantidadRedes,
+    NULL
+  );
+  if (escaneoOk) {
+    Serial.print("REDES WIFI DETECTADAS (nombres ocultos): ");
+    Serial.println(cantidadRedes);
   }
+
+  if (cambioTemporal) {
+    consultarEsp(
+      "restaurar modo original",
+      "AT+CWMODE_CUR=2",
+      3000UL,
+      NULL,
+      NULL
+    );
+  }
+  Serial.println("PRUEBA WIFI TERMINADA: motores en STOP");
 }
 
 void procesarComandosSerial() {
@@ -483,7 +566,7 @@ void setup() {
   Serial.println("Motores adelante: 1-4; motores atras: 5-8");
   Serial.println("Prueba sin movimiento: I = sensores IR durante 6 segundos");
   Serial.println("Prueba sin movimiento: T = tracker de linea durante 8 segundos");
-  Serial.println("Prueba sin movimiento: W = respuesta AT del ESP-12S");
+  Serial.println("Prueba sin movimiento: W = diagnostico WiFi del ESP-12S");
   Serial.println("ESTADO INICIAL: DESARMADO");
   delay(3000);
 }
