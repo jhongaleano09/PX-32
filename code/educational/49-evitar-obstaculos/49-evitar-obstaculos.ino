@@ -304,6 +304,35 @@ void diagnosticarTracker() {
   Serial.println("PRUEBA TRACKER TERMINADA: motores en STOP");
 }
 
+void diagnosticarEsp() {
+  sistemaArmado = false;
+  detenerTodos();
+  desactivarServo();
+
+  while (Serial1.available() > 0) {
+    Serial1.read();
+  }
+
+  Serial.println("PRUEBA ESP: enviando AT a 115200 baudios");
+  Serial1.print("AT\r\n");
+
+  unsigned long inicioMs = millis();
+  bool recibioRespuesta = false;
+  while (millis() - inicioMs < 2000UL) {
+    while (Serial1.available() > 0) {
+      Serial.write(Serial1.read());
+      recibioRespuesta = true;
+    }
+  }
+
+  if (!recibioRespuesta) {
+    Serial.println("ESP: SIN RESPUESTA");
+  } else {
+    Serial.println();
+    Serial.println("PRUEBA ESP TERMINADA");
+  }
+}
+
 void procesarComandosSerial() {
   while (Serial.available() > 0) {
     char comando = Serial.read();
@@ -326,6 +355,8 @@ void procesarComandosSerial() {
       diagnosticarSensoresIr();
     } else if (comando == 'T' || comando == 't') {
       diagnosticarTracker();
+    } else if (comando == 'W' || comando == 'w') {
+      diagnosticarEsp();
     }
   }
 }
@@ -443,6 +474,7 @@ void setup() {
   pinMode(TRACKER_IR5, INPUT);
 
   Serial.begin(9600);
+  Serial1.begin(115200);
   desactivarServo();
 
   Serial.println("PX-32: EVASION ACTIVA CON MEDIANA DE 3");
@@ -451,6 +483,7 @@ void setup() {
   Serial.println("Motores adelante: 1-4; motores atras: 5-8");
   Serial.println("Prueba sin movimiento: I = sensores IR durante 6 segundos");
   Serial.println("Prueba sin movimiento: T = tracker de linea durante 8 segundos");
+  Serial.println("Prueba sin movimiento: W = respuesta AT del ESP-12S");
   Serial.println("ESTADO INICIAL: DESARMADO");
   delay(3000);
 }

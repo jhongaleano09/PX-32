@@ -16,6 +16,7 @@
 | Tracker IR1-IR5, A4-A0 | APROBADO | Los cinco bits cambian al desplazar una franja negra sobre fondo blanco. |
 | Faros LED delanteros | APROBADO | Tras corregir ambos a rojo `3.3V` y negro `GND`, encienden con brillo continuo. |
 | Voltímetro | APROBADO | Lectura estable entre 7.81 V y 7.82 V con alimentación por baterías. |
+| ESP-12S, UART E | APROBADO | Con `E_TX -> D19/RX1` y `E_RX -> D18/TX1`, respondió `OK` al comando `AT` a 115200 baudios. |
 | Motor 1, BK1 | APROBADO | Rueda frontal derecha; PWM 90; gira hacia adelante y hacia atrás. |
 | Motor 2, BK3 | APROBADO | Rueda frontal izquierda; PWM 90; gira hacia adelante. |
 | Motor 3, AK1 | APROBADO | Rueda trasera derecha; PWM 90; gira hacia adelante. |
@@ -31,4 +32,5 @@ No ejecutar conducción autónoma sobre el piso hasta reparar o reemplazar el ac
 - `TRIG -> D30` y `ECHO -> D31` quedaron confirmados.
 - El servo estaba dirigido a D12; se corrigió la ruta `Model Y S1 -> D13`.
 - El tracker requirió corregir pines y ajustar su potenciómetro azul.
+- Para el ESP-12S se seleccionó solamente la ruta UART E; la ruta UART B quedó desconectada.
 - El firmware deja servo y motores inactivos mientras el sistema está desarmado.
