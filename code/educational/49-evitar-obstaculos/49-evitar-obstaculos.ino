@@ -37,6 +37,9 @@ const byte AK3_IN4 = 8;
 const byte TRIG = 30;
 const byte ECHO = 31;
 const byte PIN_SERVO = 13;
+const byte SENSOR_IR_IZQUIERDO = 3;
+const byte SENSOR_IR_DERECHO = 2;
+const int LECTURA_IR_AL_DETECTAR = LOW;
 const unsigned long TIMEOUT_US = 30000UL;
 const float SONIDO_CM_POR_US = 0.0343;
 const byte CANTIDAD_LECTURAS = 3;
@@ -233,6 +236,29 @@ void imprimirDistancia(const char *etiqueta, float distanciaCm) {
   }
 }
 
+void diagnosticarSensoresIr() {
+  sistemaArmado = false;
+  detenerTodos();
+  Serial.println("PRUEBA IR: 6 segundos; acerca y retira una mano");
+
+  for (byte muestra = 1; muestra <= 30; muestra++) {
+    int lecturaIzquierda = digitalRead(SENSOR_IR_IZQUIERDO);
+    int lecturaDerecha = digitalRead(SENSOR_IR_DERECHO);
+
+    Serial.print("IR ");
+    Serial.print(muestra);
+    Serial.print(" | izquierda=");
+    Serial.print(lecturaIzquierda);
+    Serial.print(lecturaIzquierda == LECTURA_IR_AL_DETECTAR ? " DETECTA" : " libre");
+    Serial.print(" | derecha=");
+    Serial.print(lecturaDerecha);
+    Serial.println(lecturaDerecha == LECTURA_IR_AL_DETECTAR ? " DETECTA" : " libre");
+    delay(200);
+  }
+
+  Serial.println("PRUEBA IR TERMINADA: motores en STOP");
+}
+
 void procesarComandosSerial() {
   while (Serial.available() > 0) {
     char comando = Serial.read();
@@ -246,6 +272,8 @@ void procesarComandosSerial() {
       Serial.println("STOP MANUAL: sistema desarmado");
     } else if (comando >= '1' && comando <= '4') {
       probarMotor(comando - '0');
+    } else if (comando == 'I' || comando == 'i') {
+      diagnosticarSensoresIr();
     }
   }
 }
@@ -354,6 +382,8 @@ void setup() {
   pinMode(TRIG, OUTPUT);
   digitalWrite(TRIG, LOW);
   pinMode(ECHO, INPUT);
+  pinMode(SENSOR_IR_IZQUIERDO, INPUT);
+  pinMode(SENSOR_IR_DERECHO, INPUT);
 
   Serial.begin(9600);
   cabeza.attach(PIN_SERVO);
@@ -365,6 +395,7 @@ void setup() {
   Serial.println("Seguridad: una lectura no fiable siempre produce STOP");
   Serial.println("Comandos: A = armar motores; S = STOP y desarmar");
   Serial.println("Pruebas con ruedas levantadas: 1, 2, 3 o 4 = un motor");
+  Serial.println("Prueba sin movimiento: I = sensores IR durante 6 segundos");
   Serial.println("ESTADO INICIAL: DESARMADO");
   delay(3000);
 }
