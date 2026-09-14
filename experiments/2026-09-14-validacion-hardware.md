@@ -15,7 +15,7 @@
 | IR de obstáculos derecho, D2 | APROBADO | Cambia entre `1 libre` y `0 DETECTA`. |
 | Tracker IR1-IR5, A4-A0 | APROBADO | Los cinco bits cambian al desplazar una franja negra sobre fondo blanco. |
 | Motor 1, BK1 | APROBADO | Rueda frontal derecha; PWM 90; gira hacia adelante. |
-| Motor 2, BK3 | PENDIENTE DIRECCIÓN | Rueda frontal izquierda; sí gira. |
+| Motor 2, BK3 | APROBADO | Rueda frontal izquierda; PWM 90; gira hacia adelante. |
 | Motor 3, AK1 | PENDIENTE DIRECCIÓN | Rueda trasera derecha; sí gira. |
 | Motor 4, AK3 | FALLA MECÁNICA | El motor recibe orden, pero la rueda trasera izquierda no transmite giro. Rueda y acople giran juntos sin resistencia; video grabado. |
 
