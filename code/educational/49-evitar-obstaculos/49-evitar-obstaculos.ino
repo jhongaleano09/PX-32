@@ -3,13 +3,18 @@
 // Ninguna lectura no fiable autoriza avanzar o continuar un giro.
 
 #include <Servo.h>
+#include <WiFiEsp.h>
+#include <WiFiEspUdp.h>
 
 // El movimiento esta habilitado, pero siempre subordinado a los sensores.
 const bool MOTOR_ACTIVO = true;
+// En este modo el carro espera ordenes UDP de la app oficial. Nunca arranca
+// solo y una perdida de comunicacion produce STOP.
+const bool MODO_CONTROL_WIFI = true;
 // Contingencia: la reductora trasera izquierda esta averiada. Durante el
 // juego se usan las tres ruedas sanas y la averiada permanece sin energia.
 const bool MODO_CONTINGENCIA_TRES_RUEDAS = true;
-const bool INICIO_AUTONOMO = true;
+const bool INICIO_AUTONOMO = false;
 const byte SEGUNDOS_ANTES_DE_MOVER = 8;
 
 // Ajustar despues de comprobar fisicamente hacia donde apunta el servo.
@@ -30,6 +35,14 @@ const unsigned int DURACION_REVERSA_MS = 600;
 const unsigned int PASO_VIGILANCIA_REVERSA_MS = 30;
 const unsigned int DURACION_GIRO_MS = 420;
 const unsigned int PASO_VIGILANCIA_GIRO_MS = 60;
+const unsigned int TIMEOUT_ORDEN_WIFI_MS = 800;
+const unsigned int INTERVALO_ULTRASONIDO_WIFI_MS = 80;
+
+// Punto de acceso local del carro. No usa el router ni Internet.
+char NOMBRE_RED_WIFI[] = "osoyoo_robot";
+char CLAVE_RED_WIFI[] = "genomo123";
+const unsigned int PUERTO_CONTROL_UDP = 8888;
+const byte TAMANO_PAQUETE_WIFI = 8;
 
 // Orden: frontal derecho, frontal izquierdo, trasero derecho,
 // trasero izquierdo.
@@ -76,8 +89,14 @@ enum DecisionMovimiento {
 };
 
 Servo cabeza;
+WiFiEspUDP controlUdp;
 byte anguloActualServo = ANGULO_FRENTE;
 bool sistemaArmado = false;
+bool wifiListo = false;
+char ordenWifiActual = 'E';
+unsigned long ultimaOrdenWifiMs = 0;
+unsigned long ultimaMedicionWifiMs = 0;
+bool frenteWifiConfirmado = false;
 
 // ---------------- Movimiento ----------------
 
@@ -484,6 +503,160 @@ void diagnosticarEsp() {
   Serial.println("PRUEBA WIFI TERMINADA: motores en STOP");
 }
 
+// ---------------- Control Wi-Fi seguro ----------------
+
+void frenarControlWifi(const char *motivo) {
+  detenerTodos();
+  sistemaArmado = false;
+  ordenWifiActual = 'E';
+  frenteWifiConfirmado = false;
+  if (motivo != NULL) {
+    Serial.print("STOP WIFI: ");
+    Serial.println(motivo);
+  }
+}
+
+void iniciarControlWifi() {
+  frenarControlWifi(NULL);
+  desactivarServo();
+  WiFi.init(&Serial1);
+
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WIFI NO DISPONIBLE: revisar E_TX/E_RX; motores en STOP");
+    return;
+  }
+
+  Serial.print("Creando red WiFi: ");
+  Serial.println(NOMBRE_RED_WIFI);
+  int estadoWifi = WiFi.beginAP(
+    NOMBRE_RED_WIFI,
+    10,
+    CLAVE_RED_WIFI,
+    ENC_TYPE_WPA2_PSK
+  );
+  if (estadoWifi != WL_CONNECTED) {
+    Serial.println("NO SE PUDO CREAR LA RED: motores en STOP");
+    return;
+  }
+
+  if (controlUdp.begin(PUERTO_CONTROL_UDP) == 0) {
+    Serial.println("NO SE PUDO ABRIR UDP 8888: motores en STOP");
+    return;
+  }
+
+  wifiListo = true;
+  Serial.print("WIFI LISTO | IP: ");
+  Serial.print(WiFi.localIP());
+  Serial.print(" | puerto: ");
+  Serial.println(PUERTO_CONTROL_UDP);
+  Serial.println("Esperando la tablet: el carro permanece en STOP");
+}
+
+bool frenteSeguroParaWifi() {
+  // Los IR se consultan en cada vuelta para conseguir el freno mas rapido.
+  if (obstaculoIrFrontalDetectado()) {
+    Serial.println("OBSTACULO WIFI: sensor IR frontal");
+    return false;
+  }
+
+  unsigned long ahoraMs = millis();
+  if (!frenteWifiConfirmado ||
+      ahoraMs - ultimaMedicionWifiMs >= INTERVALO_ULTRASONIDO_WIFI_MS) {
+    float distanciaFrontal = medirDistanciaMedianaCm();
+    ultimaMedicionWifiMs = millis();
+    frenteWifiConfirmado =
+      distanciaEsSegura(distanciaFrontal, DISTANCIA_SEGURA_CM);
+    if (!frenteWifiConfirmado) {
+      imprimirDistancia("OBSTACULO WIFI: ultrasonido ", distanciaFrontal);
+    }
+  }
+
+  return frenteWifiConfirmado;
+}
+
+void aceptarOrdenWifi(char orden) {
+  if (orden == 'E') {
+    frenarControlWifi("boton de pausa");
+    return;
+  }
+
+  if (orden != 'A' && orden != 'B' && orden != 'L' && orden != 'R') {
+    frenarControlWifi("orden desconocida");
+    return;
+  }
+
+  ordenWifiActual = orden;
+  ultimaOrdenWifiMs = millis();
+  frenteWifiConfirmado = false;
+  sistemaArmado = MOTOR_ACTIVO;
+  Serial.print("ORDEN WIFI: ");
+  Serial.println(ordenWifiActual);
+}
+
+void recibirOrdenWifi() {
+  int tamanoPaquete = controlUdp.parsePacket();
+  if (tamanoPaquete <= 0) {
+    return;
+  }
+
+  char paquete[TAMANO_PAQUETE_WIFI];
+  int leidos = controlUdp.read((uint8_t *)paquete, sizeof(paquete));
+  if (leidos <= 0) {
+    frenarControlWifi("paquete vacio");
+    return;
+  }
+
+  char orden = paquete[0];
+  if (orden >= 'a' && orden <= 'z') {
+    orden -= ('a' - 'A');
+  }
+  aceptarOrdenWifi(orden);
+}
+
+void ejecutarOrdenWifi() {
+  if (!wifiListo || !sistemaArmado || ordenWifiActual == 'E') {
+    detenerTodos();
+    return;
+  }
+
+  if (millis() - ultimaOrdenWifiMs > TIMEOUT_ORDEN_WIFI_MS) {
+    frenarControlWifi("sin orden reciente de la tablet");
+    return;
+  }
+
+  // No hay sensor trasero: la reversa solo dura mientras la orden sea
+  // reciente y siempre termina por el timeout de 800 ms.
+  if (ordenWifiActual == 'B') {
+    controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, -1, POTENCIA_REVERSA_DELANTERA);
+    controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, -1, POTENCIA_REVERSA_DELANTERA);
+    controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, -1, POTENCIA_REVERSA_TRASERA);
+    controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4, 0, 0);
+    return;
+  }
+
+  if (!frenteSeguroParaWifi()) {
+    frenarControlWifi("pared u obstaculo frontal");
+    return;
+  }
+
+  if (ordenWifiActual == 'A') {
+    avanzar();
+  } else if (ordenWifiActual == 'L') {
+    girarHaciaLaIzquierda();
+  } else if (ordenWifiActual == 'R') {
+    girarHaciaLaDerecha();
+  }
+}
+
+void procesarControlWifi() {
+  if (!wifiListo) {
+    detenerTodos();
+    return;
+  }
+  recibirOrdenWifi();
+  ejecutarOrdenWifi();
+}
+
 void procesarComandosSerial() {
   while (Serial.available() > 0) {
     char comando = Serial.read();
@@ -660,6 +833,13 @@ void setup() {
   Serial.println("MODO DE JUEGO: tres ruedas sanas; trasera izquierda apagada");
   Serial.println("Al detectar obstaculo confirmado: reversa corta y exploracion");
 
+  if (MODO_CONTROL_WIFI) {
+    Serial.println("MODO WIFI MANUAL: no existe arranque automatico");
+    Serial.println("App: OSOYOO Wifi UDP Robot Car Controller");
+    iniciarControlWifi();
+    return;
+  }
+
   if (INICIO_AUTONOMO && MOTOR_ACTIVO) {
     activarServo();
     Serial.println("INICIO AUTONOMO: manten el carro elevado");
@@ -677,6 +857,12 @@ void setup() {
 }
 
 void loop() {
+  if (MODO_CONTROL_WIFI) {
+    procesarControlWifi();
+    delay(15);
+    return;
+  }
+
   procesarComandosSerial();
   if (sistemaArmado) {
     evaluarYActuar();
