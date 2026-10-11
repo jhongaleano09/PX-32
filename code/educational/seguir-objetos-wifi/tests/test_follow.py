@@ -29,6 +29,7 @@ inline int testPins[128]={}, testPwm[128]={};
 inline unsigned long testEcho=466;
 inline std::deque<unsigned long> testEchoes;
 inline int testMeasurements=0;
+inline int testMovingMeasurements=0, testStopWrites=0;
 inline std::function<void()> duringMeasurement;
 inline unsigned long millis() { return testNow; }
 inline void delay(unsigned long ms) { testNow+=ms; }
@@ -36,10 +37,9 @@ inline void delayMicroseconds(unsigned int) {}
 inline void pinMode(int,int) {}
 inline void digitalWrite(int p,int v) { testPins[p]=v; }
 inline int digitalRead(int p) { return testPins[p]; }
-inline void analogWrite(int p,int v) { testPwm[p]=v; }
+inline void analogWrite(int p,int v) { testPwm[p]=v; if (!v) ++testStopWrites; }
 inline unsigned long pulseIn(int,int,unsigned long) {
-  // Every F6 ultrasonic sample must happen with all motors stopped.
-  assert(!testPwm[9] && !testPwm[10] && !testPwm[11] && !testPwm[12]);
+  if (testPwm[9] || testPwm[10] || testPwm[11] || testPwm[12]) ++testMovingMeasurements;
   ++testMeasurements;
   if (duringMeasurement) duringMeasurement();
   unsigned long result=testEcho;
@@ -112,92 +112,122 @@ void mask(byte value) {
 void distance(float cm) { testEcho=static_cast<unsigned long>(cm*2/SONIDO_CM_POR_US); }
 void reset(byte value=3) {
   std::fill_n(testPins,128,HIGH); std::fill_n(testPwm,128,0);
-  testNow=1000; testMeasurements=0; testEchoes.clear(); duringMeasurement=nullptr;
+  testNow=1000; testMeasurements=0; testMovingMeasurements=0; testStopWrites=0;
+  testEchoes.clear(); duringMeasurement=nullptr;
   controlUdp.packets.clear(); controlUdp.failRead=false;
   wifiListo=true; modoAutonomoWifi=false; modoSeguidorLineaWifi=false;
   modoSeguidorObjetoWifi=false; sistemaArmado=false;
-  distance(8); mask(value); aceptarOrdenWifi('K');
+  distance(8.5); mask(value); aceptarOrdenWifi('K');
   assert(stopped() && modoSeguidorObjetoWifi && cabeza.angle==90);
 }
 void firstSample() {
   ejecutarSeguidorObjeto();
   assert(stopped() && testMeasurements==0);
-  testNow+=PAUSA_OBJETO_MS;
+  testNow+=ESTABILIDAD_IR_OBJETO_MS;
   ejecutarSeguidorObjeto();
 }
-void finishPulse() {
-  testNow+=IMPULSO_OBJETO_MS;
-  ejecutarSeguidorObjeto();
-  assert(stopped() && !impulsoObjetoActivo);
+void nextSample() { testNow+=INTERVALO_MEDICION_OBJETO_MS; ejecutarSeguidorObjeto(); }
+void startMoving() {
+  firstSample(); assert(stopped() && confirmacionesObjeto==1);
+  nextSample(); assert(stopped() && confirmacionesObjeto==2);
+  nextSample(); assert(!stopped() && confirmacionesObjeto==3);
 }
-void nextSample() { testNow+=PAUSA_OBJETO_MS; ejecutarSeguidorObjeto(); }
 int main() {
   // No automatic movement at startup.
   std::fill_n(testPins,128,HIGH); setup(); assert(stopped());
   assert(!modoSeguidorObjetoWifi && !sistemaArmado);
 
-  reset(); firstSample();
-  assert(impulsoObjetoActivo && testMeasurements==3);
-  assert(testPwm[9]==100 && testPwm[10]==90 && testPwm[11]==85 && testPwm[12]==95);
+  reset(); startMoving();
+  assert(testMeasurements==3);
+  assert(testPwm[9]==125 && testPwm[10]==125 && testPwm[11]==125 && testPwm[12]==125);
   assert(testPins[BK1_IN1]==HIGH && testPins[BK3_IN3]==HIGH);
   assert(testPins[AK3_IN3]==HIGH && testPins[AK3_IN4]==LOW);
-  auto pulseStart=inicioImpulsoObjetoMs;
-  aceptarOrdenWifi('K'); assert(inicioImpulsoObjetoMs==pulseStart);
-  testNow+=IMPULSO_OBJETO_MS-1; ejecutarSeguidorObjeto(); assert(!stopped());
-  ++testNow; ejecutarSeguidorObjeto(); assert(stopped());
-  assert(testMeasurements==3);
-  testNow+=PAUSA_OBJETO_MS-1; ejecutarSeguidorObjeto(); assert(testMeasurements==3);
-  ++testNow; ejecutarSeguidorObjeto(); assert(!stopped() && testMeasurements==6);
+  auto previousMeasurement=ultimaMedicionObjetoMs;
+  aceptarOrdenWifi('K'); assert(ultimaMedicionObjetoMs==previousMeasurement && !stopped());
+  auto beforeStops=testStopWrites;
+  for (int step=0;step<100;++step) {
+    testNow+=15; ejecutarSeguidorObjeto();
+    assert(!stopped() && testPwm[9]==125 && testPwm[10]==125 && testPwm[11]==125 && testPwm[12]==125);
+  }
+  assert(testStopWrites==beforeStops && testMovingMeasurements>10);
 
-  reset(1); firstSample();
+  reset(1); startMoving();
   assert(!stopped() && testPins[BK1_IN1]==HIGH && testPins[BK3_IN3]==LOW);
-  reset(2); firstSample();
+  assert(testPwm[9]==125 && testPwm[10]==125 && testPwm[11]==125 && testPwm[12]==125);
+  reset(2); startMoving();
   assert(!stopped() && testPins[BK1_IN1]==LOW && testPins[BK3_IN3]==HIGH);
+  assert(testPwm[9]==125 && testPwm[10]==125 && testPwm[11]==125 && testPwm[12]==125);
 
   reset(0); firstSample(); assert(stopped() && testMeasurements==0);
-  reset(); firstSample(); mask(0); ejecutarSeguidorObjeto();
-  assert(stopped() && !impulsoObjetoActivo);
+  reset(); startMoving(); mask(0); ejecutarSeguidorObjeto();
+  assert(stopped() && confirmacionesObjeto==0);
   mask(1); ejecutarSeguidorObjeto(); assert(stopped());
+  nextSample(); assert(stopped()); nextSample(); assert(stopped());
   nextSample(); assert(!stopped() && testPins[BK3_IN3]==LOW);
 
-  reset(); distance(5.9); firstSample(); assert(stopped() && objetoDemasiadoCerca);
-  distance(6.5); nextSample(); assert(stopped());
-  distance(7.1); nextSample(); assert(!stopped());
-  finishPulse(); distance(6.5); nextSample(); assert(!stopped());
-  finishPulse(); distance(5.9); nextSample(); assert(stopped());
+  // Side changes retain movement while filtering the new direction.
+  reset(); startMoving(); beforeStops=testStopWrites;
+  mask(1); ejecutarSeguidorObjeto(); assert(!stopped() && direccionObjeto==3);
+  nextSample(); assert(!stopped() && direccionObjeto==1 && testPins[BK3_IN3]==LOW);
+  assert(testStopWrites==beforeStops);
+
+  reset(); distance(6.9); firstSample(); assert(stopped() && objetoDemasiadoCerca);
+  distance(7.5); nextSample(); assert(stopped());
+  distance(8.1); nextSample(); assert(stopped()); nextSample(); assert(stopped());
+  nextSample(); assert(!stopped());
+  distance(7.5); nextSample(); assert(!stopped());
+  distance(6.9); nextSample(); assert(stopped());
 
   reset(); testEcho=0; firstSample(); assert(stopped());
-  reset(); testEchoes={466,0,466}; firstSample(); assert(stopped());
+  assert(ultimoEstadoObjeto=='N'); ejecutarSeguidorObjeto(); assert(ultimoEstadoObjeto=='N');
+  reset(); testEchoes={495,0,495}; firstSample(); assert(stopped());
+  nextSample(); assert(stopped() && confirmacionesObjeto==0);
+  nextSample(); assert(stopped() && confirmacionesObjeto==1);
   reset(); distance(12.1); firstSample(); assert(stopped());
   reset(); sistemaArmado=false; firstSample(); assert(stopped() && testMeasurements==0);
 
-  // A queued STOP during measurement must prevent the next motor impulse.
+  // A single bad/close reading stops a moving robot; no median delay.
+  for (float cm : {6.9f,12.1f}) {
+    reset(); startMoving(); distance(cm); nextSample(); assert(stopped());
+  }
+  reset(); startMoving(); testEcho=0; nextSample(); assert(stopped());
+
+  // A queued STOP during measurement cancels startup or current movement.
   reset(); duringMeasurement=[] {
     if (testMeasurements==1) controlUdp.packets.push_back({'E'});
   };
   firstSample(); assert(stopped() && !modoSeguidorObjetoWifi && !sistemaArmado);
-  assert(!impulsoObjetoActivo);
+  assert(confirmacionesObjeto==0);
+  reset(); startMoving();
+  duringMeasurement=[] { controlUdp.packets.push_back({'E'}); };
+  nextSample(); assert(stopped() && !modoSeguidorObjetoWifi);
 
   // Losing the IR target during measurement also prevents movement.
   reset(); duringMeasurement=[] { mask(0); };
   firstSample(); assert(stopped());
+  reset(); startMoving(); duringMeasurement=[] { mask(0); };
+  nextSample(); assert(stopped());
+
+  // Direction filtering cannot bypass a simultaneous dangerous echo.
+  reset(); startMoving(); distance(6.9);
+  duringMeasurement=[] { mask(1); }; nextSample(); assert(stopped());
 
   // STOP remains latched even if the box stays visible.
-  reset(); firstSample(); aceptarOrdenWifi('E');
+  reset(); startMoving(); aceptarOrdenWifi('E');
   assert(stopped() && !modoSeguidorObjetoWifi && !sistemaArmado);
   ejecutarOrdenWifi(); assert(stopped());
   for (char command : {'F','G','H','I','J','A','B','L','R','?'}) {
-    reset(); firstSample(); aceptarOrdenWifi(command);
+    reset(); startMoving(); aceptarOrdenWifi(command);
     assert(stopped() && !modoSeguidorObjetoWifi);
     if (command=='I') assert(modoAutonomoWifi && !modoSeguidorLineaWifi);
     if (command=='J') assert(!modoAutonomoWifi && modoSeguidorLineaWifi);
   }
-  reset(); firstSample(); controlUdp.failRead=true;
+  reset(); startMoving(); controlUdp.failRead=true;
   controlUdp.packets.push_back({'K'}); recibirOrdenWifi();
   assert(stopped() && !modoSeguidorObjetoWifi && !sistemaArmado);
   reset(); aceptarOrdenWifi('E'); controlUdp.packets.push_back({'k'});
   recibirOrdenWifi(); assert(modoSeguidorObjetoWifi && stopped());
-  std::cout << "PASS: F6 direction, pulses, hysteresis, invalid echoes, target loss, STOP and mode transitions\n";
+  std::cout << "PASS: continuous F6, equal PWM, live sonar, direction filter, hysteresis, target loss, STOP and mode transitions\n";
 }
 '''
 

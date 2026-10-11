@@ -49,18 +49,14 @@ const byte POTENCIA_LINEA_BASE_DERECHA = 95;
 const byte CORRECCION_LINEA_POR_MEDIO_PASO = 14;
 // F6: los IR estan calibrados a unos 10 cm. El ultrasonico permanece
 // centrado: un eco ausente, demasiado lejano o cercano conserva STOP.
-const float DISTANCIA_FRENO_OBJETO_CM = 6.0;
-const float DISTANCIA_REANUDAR_OBJETO_CM = 7.0;
+const float DISTANCIA_FRENO_OBJETO_CM = 7.0;
+const float DISTANCIA_REANUDAR_OBJETO_CM = 8.0;
 const float DISTANCIA_MAXIMA_OBJETO_CM = 12.0;
-const byte POTENCIA_OBJETO_FRONTAL_DERECHA = 100;
-const byte POTENCIA_OBJETO_FRONTAL_IZQUIERDA = 90;
-const byte POTENCIA_OBJETO_TRASERA_DERECHA = 85;
-const byte POTENCIA_OBJETO_TRASERA_IZQUIERDA = 95;
-const byte POTENCIA_GIRO_OBJETO = 100;
-const byte POTENCIA_GIRO_OBJETO_TRASERA_IZQUIERDA = 110;
+// Una misma orden PWM para los cuatro motores en avance y giros de F6.
+// Igual PWM no implica igual corriente ni velocidad real sin realimentacion.
+const byte POTENCIA_OBJETO = 125;
 const unsigned int ESTABILIDAD_IR_OBJETO_MS = 60;
-const unsigned int IMPULSO_OBJETO_MS = 40;
-const unsigned int PAUSA_OBJETO_MS = 90;
+const unsigned int INTERVALO_MEDICION_OBJETO_MS = 60;
 const byte POTENCIA_PRUEBA_MOTOR = 90;
 const unsigned int DURACION_PRUEBA_MOTOR_MS = 2000;
 const unsigned int DURACION_REVERSA_MS = 600;
@@ -149,10 +145,12 @@ bool modoAutonomoWifi = false;
 bool modoSeguidorLineaWifi = false;
 bool modoSeguidorObjetoWifi = false;
 byte deteccionObjeto = 0;
+byte direccionObjeto = 0;
 unsigned long cambioDeteccionObjetoMs = 0;
-unsigned long inicioImpulsoObjetoMs = 0;
-unsigned long ultimaParadaObjetoMs = 0;
-bool impulsoObjetoActivo = false;
+unsigned long ultimaMedicionObjetoMs = 0;
+bool medicionObjetoDisponible = false;
+float distanciaObjetoCm = -1.0;
+byte confirmacionesObjeto = 0;
 bool objetoDemasiadoCerca = true;
 char ultimoEstadoObjeto = '\0';
 int ultimoErrorLinea = 0;
@@ -711,7 +709,8 @@ void diagnosticarEsp() {
 void frenarControlWifi(const char *motivo) {
   detenerTodos();
   modoSeguidorObjetoWifi = false;
-  impulsoObjetoActivo = false;
+  confirmacionesObjeto = 0;
+  direccionObjeto = 0;
   sistemaArmado = false;
   ordenWifiActual = 'E';
   frenteWifiConfirmado = false;
@@ -844,7 +843,7 @@ void aceptarOrdenWifi(char orden) {
   }
 
   if (orden == 'K') {
-    // La app puede repetir F6; no reiniciar el pulso ni la calibracion.
+    // La app puede repetir F6; no interrumpir el seguimiento ni las lecturas.
     if (modoSeguidorObjetoWifi) {
       return;
     }
@@ -854,15 +853,18 @@ void aceptarOrdenWifi(char orden) {
     modoAutonomoWifi = false;
     modoSeguidorLineaWifi = false;
     deteccionObjeto = 0;
+    direccionObjeto = 0;
     cambioDeteccionObjetoMs = millis();
-    ultimaParadaObjetoMs = millis();
-    impulsoObjetoActivo = false;
+    ultimaMedicionObjetoMs = millis();
+    medicionObjetoDisponible = false;
+    distanciaObjetoCm = -1.0;
+    confirmacionesObjeto = 0;
     objetoDemasiadoCerca = true;
     ultimoEstadoObjeto = '\0';
     activarServo();
     modoSeguidorObjetoWifi = true;
     sistemaArmado = MOTOR_ACTIVO;
-    Serial.println("MODO F6: SEGUIR OBJETO | freno 6 cm | reanudar 7 cm");
+    Serial.println("MODO F6: CONTINUO | PWM 125 IGUAL | freno 7 cm | reanudar 8 cm");
     return;
   }
 
@@ -886,7 +888,7 @@ void aceptarOrdenWifi(char orden) {
   }
   if (modoSeguidorObjetoWifi) {
     modoSeguidorObjetoWifi = false;
-    impulsoObjetoActivo = false;
+    confirmacionesObjeto = 0;
     detenerTodos();
     iniciarCicloServo();
     Serial.println("SEGUIR OBJETO CANCELADO: control manual");
@@ -940,90 +942,128 @@ void informarEstadoObjeto(char estado, const char *mensaje) {
 
 void moverHaciaObjeto(byte deteccion) {
   if (deteccion == 3) {
-    informarEstadoObjeto('A', "AVANZAR POR IMPULSOS");
-    controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, +1, POTENCIA_OBJETO_FRONTAL_DERECHA);
-    controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, +1, POTENCIA_OBJETO_FRONTAL_IZQUIERDA);
-    controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, +1, POTENCIA_OBJETO_TRASERA_DERECHA);
+    informarEstadoObjeto('A', "AVANZAR CONTINUO");
+    controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, +1, POTENCIA_OBJETO);
+    controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, +1, POTENCIA_OBJETO);
+    controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, +1, POTENCIA_OBJETO);
     controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4,
-      MODO_CONTINGENCIA_TRES_RUEDAS ? 0 : +1, POTENCIA_OBJETO_TRASERA_IZQUIERDA);
+      MODO_CONTINGENCIA_TRES_RUEDAS ? 0 : +1, POTENCIA_OBJETO);
     return;
   }
   informarEstadoObjeto(deteccion == 1 ? 'L' : 'R',
-    deteccion == 1 ? "GIRAR IZQUIERDA POR IMPULSOS" : "GIRAR DERECHA POR IMPULSOS");
+    deteccion == 1 ? "GIRAR IZQUIERDA CONTINUO" : "GIRAR DERECHA CONTINUO");
   int sentidoDerecho = deteccion == 1 ? +1 : -1;
-  controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, sentidoDerecho, POTENCIA_GIRO_OBJETO);
-  controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, -sentidoDerecho, POTENCIA_GIRO_OBJETO);
-  controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, sentidoDerecho, POTENCIA_GIRO_OBJETO);
+  controlarMotor(PWM_BK1, BK1_IN1, BK1_IN2, sentidoDerecho, POTENCIA_OBJETO);
+  controlarMotor(PWM_BK3, BK3_IN3, BK3_IN4, -sentidoDerecho, POTENCIA_OBJETO);
+  controlarMotor(PWM_AK1, AK1_IN1, AK1_IN2, sentidoDerecho, POTENCIA_OBJETO);
   controlarMotor(PWM_AK3, AK3_IN3, AK3_IN4,
     MODO_CONTINGENCIA_TRES_RUEDAS ? 0 : -sentidoDerecho,
-    POTENCIA_GIRO_OBJETO_TRASERA_IZQUIERDA);
+    POTENCIA_OBJETO);
 }
 
 void ejecutarSeguidorObjeto() {
   if (!sistemaArmado) {
     detenerTodos();
-    impulsoObjetoActivo = false;
+    confirmacionesObjeto = 0;
+    direccionObjeto = 0;
     return;
   }
 
   unsigned long ahoraMs = millis();
   byte deteccion = leerDeteccionObjeto();
   if (deteccion != deteccionObjeto) {
-    detenerTodos();
-    impulsoObjetoActivo = false;
     deteccionObjeto = deteccion;
     cambioDeteccionObjetoMs = ahoraMs;
-    ultimaParadaObjetoMs = ahoraMs;
   }
   if (deteccion == 0) {
     detenerTodos();
-    impulsoObjetoActivo = false;
+    confirmacionesObjeto = 0;
+    direccionObjeto = 0;
+    medicionObjetoDisponible = false;
     objetoDemasiadoCerca = true;
     informarEstadoObjeto('P', "PERDIDO; STOP");
     return;
   }
-  if (impulsoObjetoActivo) {
-    if (ahoraMs - inicioImpulsoObjetoMs >= IMPULSO_OBJETO_MS) {
-      detenerTodos();
-      impulsoObjetoActivo = false;
-      ultimaParadaObjetoMs = ahoraMs;
-    }
-    return;
-  }
-  detenerTodos();
-  if (ahoraMs - cambioDeteccionObjetoMs < ESTABILIDAD_IR_OBJETO_MS ||
-      ahoraMs - ultimaParadaObjetoMs < PAUSA_OBJETO_MS) {
+  if (direccionObjeto == 0 &&
+      ahoraMs - cambioDeteccionObjetoMs < ESTABILIDAD_IR_OBJETO_MS) {
+    detenerTodos();
     return;
   }
 
-  // Las tres muestras se toman con motores parados. Luego atender STOP
-  // recibido durante la medicion antes de autorizar un nuevo impulso.
-  float distancia = medirDistanciaMedianaCm();
-  ultimaParadaObjetoMs = millis();
-  recibirOrdenWifi();
-  if (!modoSeguidorObjetoWifi || !sistemaArmado) {
-    return;
+  if (!medicionObjetoDisponible ||
+      ahoraMs - ultimaMedicionObjetoMs >= INTERVALO_MEDICION_OBJETO_MS) {
+    // Una muestra por ciclo, sin parar para medir ni esperar entre muestras.
+    // Se requieren tres muestras seguras para arrancar; en movimiento basta
+    // una muestra peligrosa/ausente para frenar. pulseIn limita la espera a
+    // 30 ms si no hay eco, tras lo cual se atiende la orden STOP pendiente.
+    distanciaObjetoCm = medirUnaDistanciaCm();
+    ultimaMedicionObjetoMs = millis();
+    medicionObjetoDisponible = true;
+    recibirOrdenWifi();
+    if (!modoSeguidorObjetoWifi || !sistemaArmado) {
+      return;
+    }
+    byte deteccionDespuesDeMedir = leerDeteccionObjeto();
+    if (deteccionDespuesDeMedir == 0) {
+      detenerTodos();
+      direccionObjeto = 0;
+      confirmacionesObjeto = 0;
+      medicionObjetoDisponible = false;
+      objetoDemasiadoCerca = true;
+      return;
+    }
+    if (deteccionDespuesDeMedir != deteccion) {
+      deteccion = deteccionDespuesDeMedir;
+      deteccionObjeto = deteccion;
+      cambioDeteccionObjetoMs = millis();
+    }
+    if (distanciaObjetoCm < 0 || distanciaObjetoCm > DISTANCIA_MAXIMA_OBJETO_CM) {
+      detenerTodos();
+      confirmacionesObjeto = 0;
+      direccionObjeto = 0;
+      objetoDemasiadoCerca = true;
+      informarEstadoObjeto('N', "ECO AUSENTE O FUERA DE ALCANCE; STOP");
+      return;
+    }
+    if (distanciaObjetoCm <= DISTANCIA_FRENO_OBJETO_CM) {
+      objetoDemasiadoCerca = true;
+    } else if (distanciaObjetoCm >= DISTANCIA_REANUDAR_OBJETO_CM) {
+      objetoDemasiadoCerca = false;
+    }
+    if (!objetoDemasiadoCerca && confirmacionesObjeto < CANTIDAD_LECTURAS) {
+      confirmacionesObjeto++;
+    }
   }
-  if (leerDeteccionObjeto() != deteccion) {
-    return;
-  }
-  if (distancia < 0 || distancia > DISTANCIA_MAXIMA_OBJETO_CM) {
-    objetoDemasiadoCerca = true;
+  // Conservar la causa de parada entre mediciones, sin alternar mensajes
+  // de eco invalido y cercania ni permitir usar un eco anterior.
+  if (distanciaObjetoCm < 0 || distanciaObjetoCm > DISTANCIA_MAXIMA_OBJETO_CM) {
+    detenerTodos();
+    confirmacionesObjeto = 0;
+    direccionObjeto = 0;
     informarEstadoObjeto('N', "ECO AUSENTE O FUERA DE ALCANCE; STOP");
     return;
   }
-  if (distancia <= DISTANCIA_FRENO_OBJETO_CM) {
-    objetoDemasiadoCerca = true;
-  } else if (distancia >= DISTANCIA_REANUDAR_OBJETO_CM) {
-    objetoDemasiadoCerca = false;
-  }
   if (objetoDemasiadoCerca) {
+    detenerTodos();
+    confirmacionesObjeto = 0;
+    direccionObjeto = 0;
     informarEstadoObjeto('C', "DEMASIADO CERCA; STOP");
     return;
   }
-  moverHaciaObjeto(deteccion);
-  inicioImpulsoObjetoMs = millis();
-  impulsoObjetoActivo = true;
+  if (confirmacionesObjeto < CANTIDAD_LECTURAS) {
+    detenerTodos();
+    return;
+  }
+  // Filtrar cambios breves de lado sin cortar el avance. Las mediciones
+  // siguen activas durante el filtro y perder ambos IR siempre frena.
+  if (millis() - cambioDeteccionObjetoMs >= ESTABILIDAD_IR_OBJETO_MS) {
+    direccionObjeto = deteccion;
+  }
+  if (direccionObjeto == 0) {
+    detenerTodos();
+    return;
+  }
+  moverHaciaObjeto(direccionObjeto);
 }
 
 void ejecutarOrdenWifi() {
