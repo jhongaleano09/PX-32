@@ -54,7 +54,7 @@ const float DISTANCIA_REANUDAR_OBJETO_CM = 8.0;
 const float DISTANCIA_MAXIMA_OBJETO_CM = 12.0;
 // Una misma orden PWM para los cuatro motores en avance y giros de F6.
 // Igual PWM no implica igual corriente ni velocidad real sin realimentacion.
-const byte POTENCIA_OBJETO = 115;
+const byte POTENCIA_OBJETO = 110;
 const unsigned int ESTABILIDAD_IR_OBJETO_MS = 60;
 const unsigned int INTERVALO_MEDICION_OBJETO_MS = 60;
 const byte POTENCIA_PRUEBA_MOTOR = 90;
@@ -864,7 +864,7 @@ void aceptarOrdenWifi(char orden) {
     activarServo();
     modoSeguidorObjetoWifi = true;
     sistemaArmado = MOTOR_ACTIVO;
-    Serial.println("MODO F6: CONTINUO | PWM 115 IGUAL | freno 7 cm | reanudar 8 cm");
+    Serial.println("MODO F6: CONTINUO | PWM 110 IGUAL | freno 7 cm | reanudar 8 cm");
     return;
   }
 
