@@ -14,7 +14,7 @@ Firmware para OSOYOO Mega 2560 + ESP-12S. Esta carpeta conserva la versión inte
 - Perfiles desde la app: F1 suave (90 %), F2 normal (100 %), F3 potencia (120 %), F4 autónomo con evasión de obstáculos, F5 **Misión Línea** y F6 **Seguir Objeto**.
 - Misión Línea sigue una pista negra sobre fondo claro con los cinco sensores inferiores y frena si los IR o el ultrasónico detectan un obstáculo frontal.
 - Seguir Objeto usa los dos IR delanteros calibrados a unos 10 cm: ambos detectan = avance; solo izquierdo/derecho = giro hacia ese lado; ninguno = STOP. El ultrasónico permanece centrado. Para arrancar exige tres lecturas seguras consecutivas entre 8 y 12 cm. Frena a 7 cm o menos y permite reanudar desde 8 cm; entre 7 y 8 cm conserva la condición anterior para evitar oscilación.
-- F6 avanza y gira de forma continua con PWM 125 en los cuatro motores, sin pausas periódicas ni compensaciones individuales en este modo. Igual PWM significa igual orden de potencia, no igual corriente, energía ni velocidad física: esas dependen del motor, la carga y la fricción.
+- F6 avanza y gira de forma continua con PWM 115 en los cuatro motores, sin pausas periódicas ni compensaciones individuales en este modo. Igual PWM significa igual orden de potencia, no igual corriente, energía ni velocidad física: esas dependen del motor, la carga y la fricción.
 - En F6 se toma una lectura ultrasónica cada 60 ms o más, sin detener los motores para medir. Una única lectura ausente, superior a 12 cm o demasiado cercana ordena STOP. La espera por eco tiene un máximo de 30 ms; después se atiende cualquier orden Wi-Fi recibida. Los cambios de lado deben mantenerse 60 ms para cambiar la dirección; durante ese filtro se mantiene el movimiento anterior y se sigue midiendo. Perder ambos IR frena sin esperar el filtro. No busca un objeto perdido ni retrocede automáticamente.
 
 ## Recompilar y recargar
@@ -33,7 +33,7 @@ Ejecutar desde la raíz de `genomo_bot`. El puerto detectado durante esta tarea 
 python3 code/educational/seguir-objetos-wifi/tests/test_follow.py
 ```
 
-Compila el sketch para Mega y ejecuta el mismo código con sensores, reloj y motores simulados usando `clang++` o `g++`. Comprueba avance continuo sin escrituras de parada durante más de un segundo simulado, PWM 125 igual en los cuatro motores durante avance y giros, mediciones durante movimiento, filtro de dirección, pérdida del objeto, histéresis de frenado, ecos ausentes y fuera de alcance, STOP recibido durante medición y cambios de modo. Una única lectura peligrosa debe detener un robot que ya estaba moviéndose. No abre el puerto USB ni sustituye la prueba física.
+Compila el sketch para Mega y ejecuta el mismo código con sensores, reloj y motores simulados usando `clang++` o `g++`. Comprueba avance continuo sin escrituras de parada durante más de un segundo simulado, PWM 115 igual en los cuatro motores durante avance y giros, mediciones durante movimiento, filtro de dirección, pérdida del objeto, histéresis de frenado, ecos ausentes y fuera de alcance, STOP recibido durante medición y cambios de modo. Una única lectura peligrosa debe detener un robot que ya estaba moviéndose. No abre el puerto USB ni sustituye la prueba física.
 
 ## Configuración de la tablet
 
@@ -54,7 +54,7 @@ Compila el sketch para Mega y ejecuta el mismo código con sensores, reloj y mot
 5. Pulsar STOP mientras sigue detectando la caja: debe quedar detenido y salir de F6. Repetir F6 y comprobar que F1 deja el carro detenido y que F4/F5 cambian de modo.
 6. Solo después de verificar lo anterior, probar en suelo plano, despejado y con STOP a mano. El frenado a 7 cm es un ajuste inicial, no una distancia garantizada: hay que comprobar inercia y respuesta reales. Si no arranca o gira con esta potencia, registrar el resultado antes de aumentarla.
 
-El usuario confirmó ambos IR calibrados a 10 cm, las cuatro combinaciones esperadas usando una caja y el funcionamiento de la primera versión por impulsos. Los mensajes USB también registraron avance, giros y paradas por pérdida de la caja o cercanía. La nueva versión continua y su mayor potencia todavía necesitan prueba física de seguimiento y frenado.
+El usuario confirmó ambos IR calibrados a 10 cm, las cuatro combinaciones esperadas usando una caja y el funcionamiento de la primera versión por impulsos. Los mensajes USB también registraron avance, giros y paradas por pérdida de la caja o cercanía. La versión continua, ajustada a PWM 115 a petición del usuario, todavía necesita prueba física de seguimiento y frenado.
 
 ## Verificación serial (9600 baudios)
 

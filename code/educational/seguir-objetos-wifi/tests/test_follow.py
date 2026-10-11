@@ -139,7 +139,7 @@ int main() {
 
   reset(); startMoving();
   assert(testMeasurements==3);
-  assert(testPwm[9]==125 && testPwm[10]==125 && testPwm[11]==125 && testPwm[12]==125);
+  assert(testPwm[9]==115 && testPwm[10]==115 && testPwm[11]==115 && testPwm[12]==115);
   assert(testPins[BK1_IN1]==HIGH && testPins[BK3_IN3]==HIGH);
   assert(testPins[AK3_IN3]==HIGH && testPins[AK3_IN4]==LOW);
   auto previousMeasurement=ultimaMedicionObjetoMs;
@@ -147,16 +147,16 @@ int main() {
   auto beforeStops=testStopWrites;
   for (int step=0;step<100;++step) {
     testNow+=15; ejecutarSeguidorObjeto();
-    assert(!stopped() && testPwm[9]==125 && testPwm[10]==125 && testPwm[11]==125 && testPwm[12]==125);
+    assert(!stopped() && testPwm[9]==115 && testPwm[10]==115 && testPwm[11]==115 && testPwm[12]==115);
   }
   assert(testStopWrites==beforeStops && testMovingMeasurements>10);
 
   reset(1); startMoving();
   assert(!stopped() && testPins[BK1_IN1]==HIGH && testPins[BK3_IN3]==LOW);
-  assert(testPwm[9]==125 && testPwm[10]==125 && testPwm[11]==125 && testPwm[12]==125);
+  assert(testPwm[9]==115 && testPwm[10]==115 && testPwm[11]==115 && testPwm[12]==115);
   reset(2); startMoving();
   assert(!stopped() && testPins[BK1_IN1]==LOW && testPins[BK3_IN3]==HIGH);
-  assert(testPwm[9]==125 && testPwm[10]==125 && testPwm[11]==125 && testPwm[12]==125);
+  assert(testPwm[9]==115 && testPwm[10]==115 && testPwm[11]==115 && testPwm[12]==115);
 
   reset(0); firstSample(); assert(stopped() && testMeasurements==0);
   reset(); startMoving(); mask(0); ejecutarSeguidorObjeto();
